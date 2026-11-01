@@ -165,7 +165,7 @@ function OrderBook({ levels, seq, mode, symbol }: {
     const shown = levels.slice(0, 56);
     return <section className="panel depth-panel"><div className="panel-heading"><div><h2>Order book</h2><p>{symbol} · Level II depth</p></div><Settings2 size={16} className="muted-icon"/></div>
     <div className="book-tabs"><button className={tab === 'book' ? 'active' : ''} onClick={() => setTab('book')}>Order Book</button><button className={tab === 'trades' ? 'active' : ''} onClick={() => setTab('trades')}>Recent Trades</button></div>
-    {tab === 'book' ? <><div className="depth-columns"><span>BID SIZE</span><span>PRICE (USD)</span><span>ASK SIZE</span></div><div className="depth-scroll" ref={root}>{shown.map((level, i) => <div className="depth-row" data-depth-row key={level.id}>
+    {tab === 'book' ? <><div className="depth-columns"><span>BID SIZE</span><span>PRICE (USD)</span><span>ASK SIZE</span></div><div className="depth-scroll" ref={root}>{shown.map((level) => <div className="depth-row" data-depth-row key={level.id}>
       <div className="depth-cell depth-bid"><span className="depth-bar green" data-depth-bar style={mode === 'optimized' ? { transform: `scaleX(${level.bidSize / 740})` } : undefined}/><span>{level.bidSize.toLocaleString()}</span></div>
       <div className="depth-price">{money((level.bid + level.ask) / 2)}</div>
       <div className="depth-cell depth-ask"><span className="depth-bar red" style={{ transform: `scaleX(${level.askSize / 740})` }}/><span>{level.askSize.toLocaleString()}</span></div>
