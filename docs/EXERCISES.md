@@ -14,15 +14,7 @@ Type the same query into the watchlist search in both modes.
 - What happens between the key press and the screen update?
 - What is the most expensive call you can find?
 
-## 02. Watchlist
-
-Leave the quote stream running, scroll the watchlist and record for 5 seconds.
-
-- What work repeats?
-- How does scrolling feel?
-- Where would you look first?
-
-## 03. Order book
+## 02. Order book
 
 Record the order book for 5 seconds while it updates.
 
@@ -30,15 +22,15 @@ Record the order book for 5 seconds while it updates.
 - Which part of that work is expensive?
 - What would confirm your guess?
 
-## 04. Chart scanner
+## 03. Watchlist
 
-Watch the moving marker under the chart and record a few seconds.
+Leave the quote stream running, scroll the watchlist and record for 5 seconds.
 
-- Does it move smoothly?
-- How much work does each frame take?
-- How would you compare the two versions?
+- What work repeats?
+- How does scrolling feel?
+- Where would you look first?
 
-## 05. Market bulletin
+## 04. Market bulletin
 
 Click Replay bulletin and record while the notice appears.
 
@@ -46,13 +38,21 @@ Click Replay bulletin and record while the notice appears.
 - Can you put a number on it?
 - Which DevTools data would you use?
 
-## 06. Market overview
+## 05. Market overview
 
 Click Reload overview in each mode.
 
 - Where does the time go between the request and the result on screen?
 - What do Network and Performance show?
 - What would you check next if this happened in production?
+
+## 06. Chart scanner
+
+Watch the moving marker under the chart and record a few seconds.
+
+- Does it move smoothly?
+- How much work does each frame take?
+- How would you compare the two versions?
 
 ## Comparing
 

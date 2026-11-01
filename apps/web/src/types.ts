@@ -17,9 +17,9 @@ export type Scenario = 'search' | 'watchlist' | 'layout' | 'animation' | 'shift'
 export type Mode = 'baseline' | 'optimized';
 export const SCENARIOS: Array<{ id: Scenario; title: string; subtitle: string; hint: string; area: string }> = [
   { id: 'search', title: 'Search', subtitle: 'Symbol lookup', hint: 'Type a query in the watchlist search and compare interactions.', area: 'Watchlist' },
-  { id: 'watchlist', title: 'Watchlist', subtitle: 'Live market list', hint: 'Keep the feed running, then scroll through instruments.', area: 'Watchlist' },
   { id: 'layout', title: 'Order book', subtitle: 'Market depth', hint: 'Record the updates to bid and ask levels.', area: 'Order book' },
-  { id: 'animation', title: 'Chart scanner', subtitle: 'Visual activity', hint: 'Record the moving marker on the price chart.', area: 'Chart' },
+  { id: 'watchlist', title: 'Watchlist', subtitle: 'Live market list', hint: 'Keep the feed running, then scroll through instruments.', area: 'Watchlist' },
   { id: 'shift', title: 'Market bulletin', subtitle: 'Event notification', hint: 'Press Replay bulletin and capture the moment it appears.', area: 'Chart' },
   { id: 'loading', title: 'Market overview', subtitle: 'Data refresh', hint: 'Press Reload overview and inspect the result.', area: 'Overview' },
+  { id: 'animation', title: 'Chart scanner', subtitle: 'Visual activity', hint: 'Record the moving marker on the price chart.', area: 'Chart' },
 ];
