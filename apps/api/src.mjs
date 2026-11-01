@@ -28,7 +28,7 @@ app.get('/api/orderbook/:symbol', async (request, reply) => {
   reply.header('Cache-Control', 'no-store');
   const symbol = String(request.params.symbol).toUpperCase();
   if (!bySymbol.has(symbol)) return reply.code(404).send({error: 'Unknown symbol'});
-  return makeOrderBook(symbol, 85, bySymbol.get(symbol).price);
+  return makeOrderBook(symbol, 160, bySymbol.get(symbol).price);
 });
 app.get('/api/news', async () => NEWS);
 app.get('/api/overview', async (request, reply) => {

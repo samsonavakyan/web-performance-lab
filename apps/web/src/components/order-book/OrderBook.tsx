@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Settings2 } from 'lucide-react';
 import { money } from '../../lib/format';
 import type { BookLevel, Mode } from '../../types';
 
-const VISIBLE_LEVELS = 56;
+const VISIBLE_LEVELS = 160;
 const MAX_SIZE = 740;
 
 type Props = {
@@ -55,23 +55,7 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
             <span>ASK SIZE</span>
           </div>
           <div className="depth-scroll" ref={root}>
-            {levels.slice(0, VISIBLE_LEVELS).map((level) => (
-              <div className="depth-row" data-depth-row key={level.id}>
-                <div className="depth-cell depth-bid">
-                  <span
-                    className="depth-bar green"
-                    data-depth-bar
-                    style={mode === 'optimized' ? { transform: `scaleX(${level.bidSize / MAX_SIZE})` } : undefined}
-                  />
-                  <span>{level.bidSize.toLocaleString()}</span>
-                </div>
-                <div className="depth-price">{money((level.bid + level.ask) / 2)}</div>
-                <div className="depth-cell depth-ask">
-                  <span className="depth-bar red" style={{ transform: `scaleX(${level.askSize / MAX_SIZE})` }} />
-                  <span>{level.askSize.toLocaleString()}</span>
-                </div>
-              </div>
-            ))}
+            <DepthRows levels={levels} mode={mode} />
           </div>
           <div className="spread">
             <span>Spread</span>
@@ -95,3 +79,27 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
     </section>
   );
 }
+
+const DepthRows = memo(function DepthRows({ levels, mode }: { levels: BookLevel[]; mode: Mode }) {
+  return (
+    <>
+      {levels.slice(0, VISIBLE_LEVELS).map((level) => (
+        <div className="depth-row" data-depth-row key={level.id}>
+          <div className="depth-cell depth-bid">
+            <span
+              className="depth-bar green"
+              data-depth-bar
+              style={mode === 'optimized' ? { transform: `scaleX(${level.bidSize / MAX_SIZE})` } : undefined}
+            />
+            <span>{level.bidSize.toLocaleString()}</span>
+          </div>
+          <div className="depth-price">{money(level.bid)}</div>
+          <div className="depth-cell depth-ask">
+            <span className="depth-bar red" style={{ transform: `scaleX(${level.askSize / MAX_SIZE})` }} />
+            <span>{level.askSize.toLocaleString()}</span>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+});

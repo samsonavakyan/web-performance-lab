@@ -90,7 +90,7 @@ export function Watchlist({ instruments, quotes, selected, onSelect, mode }: Pro
       <div className="watchlist-scroll" key={mode} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}>
         {mode === 'optimized' ? (
           <div style={{ height: filtered.length * ROW_HEIGHT, position: 'relative' }}>
-            <div style={{ position: 'absolute', top: first * ROW_HEIGHT, width: '100%' }}>{rows}</div>
+            <div style={{ position: 'absolute', top: 0, width: '100%', transform: `translateY(${first * ROW_HEIGHT}px)` }}>{rows}</div>
           </div>
         ) : (
           rows

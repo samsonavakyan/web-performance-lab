@@ -50,6 +50,8 @@ export default function App() {
               </div>
             )}
 
+            <Bulletin mode={modes.shift} replay={bulletinReplay} />
+
             <div className="workspace">
               <Watchlist
                 instruments={instruments}
@@ -59,7 +61,6 @@ export default function App() {
                 mode={modes.watchlist}
               />
               <div className="center-column">
-                <Bulletin mode={modes.shift} replay={bulletinReplay} />
                 <ChartPanel
                   symbol={selected}
                   instrument={instrument}

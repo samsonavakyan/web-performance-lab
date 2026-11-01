@@ -19,8 +19,8 @@ type Props = {
 
 export function CandlestickChart({ candles, symbol, mode, interval, change }: Props) {
   const view = interval === '1D' ? candles.slice(-55) : interval === '1W' ? candles.slice(-100) : candles;
-  const high = Math.max(...view.map((c) => c.high), 1) * 1.003;
-  const low = Math.min(...view.map((c) => c.low), 0) * 0.997;
+  const high = (view.length ? Math.max(...view.map((c) => c.high)) : 1) * 1.003;
+  const low = (view.length ? Math.min(...view.map((c) => c.low)) : 0) * 0.997;
   const valueY = (v: number) => TOP + ((high - v) / (high - low)) * PLOT_HEIGHT;
   const step = PLOT_WIDTH / Math.max(view.length, 1);
   const current = view[view.length - 1];

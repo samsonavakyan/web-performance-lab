@@ -743,14 +743,17 @@ a {
   font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
   white-space:nowrap
 }
+.bulletin-slot {
+  margin-bottom:16px
+}
 .bulletin-slot.optimized {
-  height:73px
+  height:140px
 }
 .bulletin-slot.baseline {
   height:auto
 }
 .market-bulletin {
-  height:73px;
+  height:140px;
   background:#312a20;
   border:1px solid #705c3a;
   border-radius:8px;
@@ -786,7 +789,7 @@ a {
   white-space:nowrap
 }
 .bulletin-placeholder {
-  height:73px;
+  height:140px;
   border:1px dashed #344154;
   border-radius:8px;
   background:#121b29
