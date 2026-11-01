@@ -1,12 +1,12 @@
 # Web Performance Lab
 
-MarketLab is a local trading-terminal testbed for exploring web performance with Chrome DevTools. It includes a React + TypeScript frontend, a Fastify API, WebSocket updates, and synthetic market data. No real account, trading service, or API key is involved.
+MarketLab is a fake trading terminal for practicing performance work in Chrome DevTools. React + TypeScript on the frontend, Fastify with a WebSocket quote stream on the backend. All data is generated locally.
 
 ## Requirements
 
-- Node.js 20.19+ (Node 22 recommended)
+- Node.js 20.19+ (22 recommended)
 - npm 10+
-- Chrome or Chromium
+- Chrome
 
 ## Run
 
@@ -15,31 +15,30 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. Vite serves the frontend on port 5173 and proxies `/api` and `/ws` to the Fastify server on port 8787.
+Open http://localhost:5173. Vite serves the frontend and proxies `/api` and `/ws` to the API on port 8787.
 
-To start the services separately:
+You can also start the two parts separately:
 
 ```bash
 npm run dev:api
 npm run dev:web
 ```
 
-## Performance exercises
+## Exercises
 
-The **Performance Lab** panel contains six scenarios. You can switch each between `Baseline` and `Optimized` and run the same interaction in Chrome DevTools → Performance. The goal is to investigate what happens, compare traces, and explain any difference using evidence.
+The Performance Lab panel on the right has six scenarios. Each one switches between `Baseline` and `Optimized`. Record the same interaction in both modes in DevTools → Performance and find out what makes the difference.
 
-See [docs/EXERCISES.md](docs/EXERCISES.md) for the tasks. Start with one Baseline scenario at a time; the other scenarios can stay Optimized to make recordings easier to interpret.
+Tasks are in [docs/EXERCISES.md](docs/EXERCISES.md). Work on one scenario at a time and keep the rest on Optimized, otherwise the traces get noisy.
 
-Results depend on hardware, browser version and recording conditions. Compare the same interaction several times under similar conditions, and do not treat one trace as a benchmark.
+On a fast laptop some differences are small. Turn on CPU throttling (4x or 6x) in the Performance panel. Record each case a few times before drawing conclusions.
 
-## Project layout
+## Layout
 
 ```text
-apps/
-  api/         Fastify REST and WebSocket server, market fixtures and tests
-  web/         React terminal and performance scenarios
-scripts/       development runner
-docs/          exercises
+apps/api/   Fastify server, data generators, tests
+apps/web/   React app
+scripts/    dev runner
+docs/       exercises
 ```
 
 ## Checks
@@ -49,5 +48,3 @@ npm run test
 npm run typecheck
 npm run build
 ```
-
-All quotes, charts and news are simulated. No database or external market service is required.

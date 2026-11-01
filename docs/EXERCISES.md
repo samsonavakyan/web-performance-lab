@@ -1,59 +1,59 @@
-# Performance exercises
+# Exercises
 
-Open the terminal at http://localhost:5173 and Chrome DevTools → Performance.
+Open http://localhost:5173 and DevTools → Performance.
 
-Select one scenario in the **Performance Lab** panel. Record the interaction in Baseline mode, examine the trace, then repeat it in Optimized mode under similar conditions.
+Pick a scenario in the Performance Lab panel. Record the interaction in Baseline, look at the trace, then record the same thing in Optimized.
 
-For every exercise, try to answer: What feels slow or unstable? Which recording evidence supports the diagnosis? How would you test whether the change helped?
+For each one, try to answer three things. What feels slow or jumpy? What in the recording proves it? How would you check that a fix helped?
 
-## 01 — Search
+## 01. Search
 
-Use the watchlist search in both modes. Enter the same query in each recording.
+Type the same query into the watchlist search in both modes.
 
-- Does the interaction stay responsive?
-- What happens between the input event and the visual update?
-- What is the most expensive operation you can find?
+- Does the input keep up with typing?
+- What happens between the key press and the screen update?
+- What is the most expensive call you can find?
 
-## 02 — Watchlist
+## 02. Watchlist
 
-Keep the quote stream running, scroll the watchlist and record for 5 seconds.
+Leave the quote stream running, scroll the watchlist and record for 5 seconds.
 
 - What work repeats?
-- How does scrolling behave?
-- Which part of the interface should you investigate first?
+- How does scrolling feel?
+- Where would you look first?
 
-## 03 — Order book
+## 03. Order book
 
-Record the updating order book for 5 seconds.
+Record the order book for 5 seconds while it updates.
 
-- What is the browser doing between updates?
-- Can you identify the expensive part of the work?
-- What evidence would confirm your hypothesis?
+- What does the browser do on each update?
+- Which part of that work is expensive?
+- What would confirm your guess?
 
-## 04 — Chart animation
+## 04. Chart scanner
 
-Observe the scanner indicator on the chart and record a few seconds.
+Watch the moving marker under the chart and record a few seconds.
 
-- Does the movement look consistent?
-- How much work is associated with the animation?
-- How would you compare the two implementations?
+- Does it move smoothly?
+- How much work does each frame take?
+- How would you compare the two versions?
 
-## 05 — Market bulletin
+## 05. Market bulletin
 
-Click **Replay bulletin** and record the page while the notification appears.
+Click Replay bulletin and record while the notice appears.
 
 - What changed on the page?
-- Can you quantify its effect on the experience?
-- Which data in DevTools would you use?
+- Can you put a number on it?
+- Which DevTools data would you use?
 
-## 06 — Market overview
+## 06. Market overview
 
-Click **Reload overview** with each mode selected.
+Click Reload overview in each mode.
 
-- Where is time spent between starting the request and showing the result?
-- What evidence can you collect from Network and Performance?
-- What would you investigate next if this happened in production?
+- Where does the time go between the request and the result on screen?
+- What do Network and Performance show?
+- What would you check next if this happened in production?
 
-## Compare results
+## Comparing
 
-Keep the browser, machine, viewport and network settings consistent. Save or describe the recordings and note any differences. Repeat measurements before concluding that one version is faster.
+Use the same browser, window size, throttling and network settings for both modes. Write down what you saw. One recording is not a benchmark.

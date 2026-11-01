@@ -10,7 +10,7 @@ let sequence = 0;
 const random = rngFrom(2026);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-app.get('/api/health', async () => ({ok: true, simulation: true}));
+app.get('/api/health', async () => ({ok: true}));
 app.get('/api/instruments', async (request, reply) => {
   reply.header('Cache-Control', 'no-store');
   const q = String(request.query?.q ?? '').toLowerCase().trim();
@@ -34,14 +34,13 @@ app.get('/api/news', async () => NEWS);
 app.get('/api/overview', async (request, reply) => {
   const mode = request.query?.mode === 'baseline' ? 'baseline' : 'optimized';
   reply.header('Cache-Control', 'no-store');
-  if (mode === 'baseline') await sleep(1100); // Simulate avoidable endpoint processing and overfetching.
+  if (mode === 'baseline') await sleep(1100);
   else await sleep(60);
   return makeOverview(mode);
 });
 
-// Do not treat the stream as market data. It exists to create reproducible UI activity.
 app.get('/ws/quotes', { websocket: true }, (socket) => {
-  socket.send(JSON.stringify({kind: 'connected', simulation: true}));
+  socket.send(JSON.stringify({kind: 'connected'}));
   const timer = setInterval(() => {
     const updates = Array.from({length: 18}, () => {
       const item = instruments[Math.floor(random() * instruments.length)];

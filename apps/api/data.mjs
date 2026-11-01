@@ -1,4 +1,3 @@
-// Reproducible, synthetic fixtures: no real quotes, no personal data, no API keys.
 export function rngFrom(seed) {
   let state = seed >>> 0;
   return () => {
@@ -97,12 +96,11 @@ export function makeOverview(mode = 'optimized') {
     { symbol: 'TSLA', price: 253.08, change: -1.47 }
   ];
   return {
-    asOf: 'SIMULATED',
+    asOf: '2026-01-02T15:30:00Z',
     title: 'Market pulse',
     highlights,
-    // Baseline sends a large unneeded payload while the optimized route only sends what the hero needs.
     extras: full ? Array.from({length: 12000}, (_, i) => ({
-      id: i, x: random(), y: random(), z: random(), sector: 'Synthetic market fixture'
+      id: i, x: random(), y: random(), z: random(), sector: 'Technology'
     })) : []
   };
 }
