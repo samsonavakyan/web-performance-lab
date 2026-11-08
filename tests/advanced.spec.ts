@@ -41,7 +41,7 @@ test('Instrument monitor counters after switching instruments', async ({ page })
 test('Order ticket accepts input while the stream runs', async ({ page }) => {
   for (const mode of ['Baseline', 'Optimized'] as const) {
     await open(page, 'stream', mode);
-    await expect(page.locator('.quote-cell')).toHaveCount(800);
+    await expect(page.locator('.quote-cell')).toHaveCount(1600);
     await page.getByRole('button', { name: 'Start stream' }).click();
     await page.waitForTimeout(1000);
     const price = page.getByRole('textbox', { name: 'Limit price' });

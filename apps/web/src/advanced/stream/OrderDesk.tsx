@@ -4,8 +4,8 @@ import type { Instrument, Mode, Quote } from '../../types';
 import { Metric, useWorstInteraction } from '../metrics';
 import { quoteStore, useQuote, useQuoteState } from './quoteStore';
 
-const BOARD_SIZE = 800;
-const POSITIONS = 150;
+const BOARD_SIZE = 1600;
+const POSITIONS = 300;
 const MESSAGES_PER_SECOND = 120;
 const UPDATES_PER_MESSAGE = 20;
 

@@ -1,4 +1,4 @@
-import { BookOpen, ExternalLink, FlaskConical, RefreshCcw, RotateCcw, X } from 'lucide-react';
+import { FlaskConical, RefreshCcw, RotateCcw, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ADVANCED_SCENARIOS, SCENARIOS } from '../types';
 import type { Mode, Scenario } from '../types';
@@ -62,7 +62,6 @@ export function LabPanel({
       <div className="scenario-list">
         {[group].map((group) => (
           <section className="case-group" key={group} aria-label={`${group} cases`}>
-            <h3>{group === 'Advanced' ? 'Advanced Lab' : 'Basic'}</h3>
             {SCENARIOS.map((scenario, index) => {
               if ((scenario.area === 'Advanced') !== (group === 'Advanced')) return null;
               const active = activeScenario === scenario.id;
@@ -114,11 +113,6 @@ export function LabPanel({
             })}
           </section>
         ))}
-      </div>
-      <div className="lab-bottom">
-        <a href="https://developer.chrome.com/docs/devtools/performance/overview/" target="_blank" rel="noreferrer">
-          <BookOpen size={16} /> Performance documentation <ExternalLink size={14} />
-        </a>
       </div>
     </aside>
   );

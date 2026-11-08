@@ -75,6 +75,7 @@ export function InstrumentMonitor({ mode }: { mode: Mode }) {
   const [index, setIndex] = useState(0);
   const [switches, setSwitches] = useState(0);
   const [running, setRunning] = useState(false);
+  const [note, setNote] = useState('');
   const [stats, setStats] = useState({ listeners: 0, charts: 0, cache: 0, deliveries: 0, heap: heapMb() });
 
   useEffect(() => {
@@ -150,6 +151,9 @@ export function InstrumentMonitor({ mode }: { mode: Mode }) {
         <Metric label="JS heap" value={stats.heap} />
       </div>
       {instrument && <PriceChart key={instrument.symbol} instrument={instrument} mode={mode} />}
+      <label className="analysis-note">
+        Trade note <input aria-label="Trade note" value={note} onChange={(event) => setNote(event.target.value)} />
+      </label>
     </>
   );
 }
