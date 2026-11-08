@@ -27,16 +27,16 @@ function useStream(running: boolean, mode: Mode, symbols: string[]) {
         const price = +(previous.price * (1 + (Math.random() - 0.5) * 0.002)).toFixed(2);
         return { symbol, price, change: +(previous.change + (Math.random() - 0.5) * 0.05).toFixed(2) };
       });
-      if (mode === 'baseline') {
-        quoteStore.apply(updates);
+      if (mode === 'optimized') {
+        pending.push(...updates);
+        frame ||= requestAnimationFrame(() => {
+          quoteStore.apply(pending);
+          pending = [];
+          frame = 0;
+        });
         return;
       }
-      pending.push(...updates);
-      frame ||= requestAnimationFrame(() => {
-        quoteStore.apply(pending);
-        pending = [];
-        frame = 0;
-      });
+      quoteStore.apply(updates);
     }, 1000 / MESSAGES_PER_SECOND);
     return () => {
       clearInterval(timer);
@@ -209,7 +209,7 @@ export function OrderDesk({ mode }: { mode: Mode }) {
         </div>
         <span role="status">{running ? 'Streaming' : 'Ready'}</span>
       </LabSlot>
-      {desk && (mode === 'baseline' ? <BaselineDesk {...desk} /> : <OptimizedDesk {...desk} />)}
+      {desk && (mode === 'optimized' ? <OptimizedDesk {...desk} /> : <BaselineDesk {...desk} />)}
     </>
   );
 }

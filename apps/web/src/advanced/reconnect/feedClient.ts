@@ -80,7 +80,7 @@ export class FeedClient {
 
   private scheduleReconnect() {
     const ceiling = Math.min(MAX_DELAY, BASE_DELAY * 2 ** this.attempt);
-    const delay = this.mode === 'baseline' ? 1000 : ceiling / 2 + Math.random() * (ceiling / 2);
+    const delay = this.mode === 'optimized' ? ceiling / 2 + Math.random() * (ceiling / 2) : 1000;
     this.attempt += 1;
     this.retryAt = Date.now() + delay;
     if (this.status !== 'stale') this.status = 'reconnecting';

@@ -56,11 +56,12 @@ function PriceChart({
       setLast(price);
     });
     onReady(instrument.symbol);
-    if (mode === 'baseline') return;
-    return () => {
-      unsubscribe();
-      chart.destroy();
-    };
+    if (mode === 'optimized') {
+      return () => {
+        unsubscribe();
+        chart.destroy();
+      };
+    }
   }, [candles, instrument, mode, onReady]);
 
   return (

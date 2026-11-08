@@ -96,12 +96,12 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
     target.current = next;
     started.current = performance.now();
     ready.current = new Set();
-    if (mode === 'baseline') {
-      setSymbol(next);
+    if (mode === 'optimized') {
+      preloadInstrument(next);
+      startTransition(() => setSymbol(next));
       return;
     }
-    preloadInstrument(next);
-    startTransition(() => setSymbol(next));
+    setSymbol(next);
   }
 
   return (
@@ -128,12 +128,12 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
           ))}
         </nav>
         <div className={isPending ? 'nav-content pending' : 'nav-content'}>
-          {mode === 'baseline' ? (
-            <BaselinePage key={symbol} symbol={symbol} onReady={onReady} />
-          ) : (
+          {mode === 'optimized' ? (
             <Suspense fallback={<PageSkeleton />}>
               <OptimizedPage symbol={symbol} onReady={onReady} />
             </Suspense>
+          ) : (
+            <BaselinePage key={symbol} symbol={symbol} onReady={onReady} />
           )}
         </div>
       </div>

@@ -16,14 +16,14 @@ function useNow(interval: number) {
 }
 
 function StatusBadge({ client, mode, now }: { client: FeedClient; mode: Mode; now: number }) {
-  if (mode === 'baseline') {
-    const connected = client.status === 'live';
-    return <span className={`feed-badge ${connected ? 'good' : 'bad'}`}>{connected ? 'Connected' : 'Disconnected'}</span>;
+  if (mode === 'optimized') {
+    if (client.status === 'live') return <span className="feed-badge good">Live</span>;
+    if (client.status === 'stale') return <span className="feed-badge bad">Stale · reconnecting</span>;
+    const wait = Math.max(0, (client.retryAt - now) / 1000);
+    return <span className="feed-badge warn">Reconnecting{wait ? ` in ${wait.toFixed(1)} s` : ''}</span>;
   }
-  if (client.status === 'live') return <span className="feed-badge good">Live</span>;
-  if (client.status === 'stale') return <span className="feed-badge bad">Stale · reconnecting</span>;
-  const wait = Math.max(0, (client.retryAt - now) / 1000);
-  return <span className="feed-badge warn">Reconnecting{wait ? ` in ${wait.toFixed(1)} s` : ''}</span>;
+  const connected = client.status === 'live';
+  return <span className={`feed-badge ${connected ? 'good' : 'bad'}`}>{connected ? 'Connected' : 'Disconnected'}</span>;
 }
 
 async function post(path: string) {

@@ -75,8 +75,8 @@ export function TradeExport({ mode }: { mode: Mode }) {
     setError('');
     const url = `/api/lab/trades?count=${count}`;
     const started = performance.now();
-    if (mode === 'baseline') void exportOnMainThread(url, started);
-    else exportInWorker(url, started);
+    if (mode === 'optimized') exportInWorker(url, started);
+    else void exportOnMainThread(url, started);
   }
 
   function cancel() {
@@ -105,7 +105,7 @@ export function TradeExport({ mode }: { mode: Mode }) {
         <button disabled={busy} onClick={start}>
           Export CSV
         </button>
-        <button disabled={!busy || mode === 'baseline'} onClick={cancel}>
+        <button disabled={!busy || mode !== 'optimized'} onClick={cancel}>
           Cancel
         </button>
         <span role="status">
