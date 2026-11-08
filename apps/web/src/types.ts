@@ -76,7 +76,7 @@ export const SCENARIOS: Array<{ id: Scenario; title: string; subtitle: string; h
   },
   {
     id: 'navigation',
-    title: 'Instrument page',
+    title: 'Instrument switch',
     subtitle: 'Navigation',
     hint: 'Open the case and switch between instruments.',
     area: 'Advanced',

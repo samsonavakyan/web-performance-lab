@@ -7,7 +7,7 @@ export function registerLab(app, instruments) {
   const bySymbol = new Map(instruments.map((item) => [item.symbol, item]));
   const known = (symbol) => bySymbol.get(String(symbol).toUpperCase());
 
-  // Instrument page: four independent resources with server-side latency.
+  // Instrument switch: four independent resources with server-side latency.
   app.get('/api/lab/instrument/:symbol', async (request, reply) => {
     reply.header('Cache-Control', 'no-store');
     const item = known(request.params.symbol);

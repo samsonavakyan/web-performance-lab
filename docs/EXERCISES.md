@@ -38,7 +38,7 @@ Press Reload page, then Simulate trading day. It switches 80 instruments in 20 s
 
 Set CPU throttling to 4x. Press Start stream and type a limit price in the order ticket.
 
-### 09. Instrument page
+### 09. Instrument switch
 
 Switch between instruments and compare Page complete. Clear data cache resets cached data.
 

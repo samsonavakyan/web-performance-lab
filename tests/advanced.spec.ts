@@ -53,7 +53,7 @@ test('Order ticket accepts input while the stream runs', async ({ page }) => {
   }
 });
 
-test('Instrument page completes navigation in each mode', async ({ page }) => {
+test('Instrument switch completes navigation in each mode', async ({ page }) => {
   const times: Record<string, number> = {};
   for (const mode of ['Baseline', 'Optimized'] as const) {
     await open(page, 'navigation', mode);
