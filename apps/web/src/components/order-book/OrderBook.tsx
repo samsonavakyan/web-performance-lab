@@ -21,12 +21,15 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
     if (mode !== 'baseline' || tab !== 'book' || !root.current) return;
     const rows = root.current.querySelectorAll<HTMLElement>('[data-depth-row]');
     rows.forEach((row, i) => {
-      const width = row.getBoundingClientRect().width;
+      const cell = row.querySelector<HTMLElement>('.depth-bid');
       const bar = row.querySelector<HTMLElement>('[data-depth-bar]');
-      if (bar) bar.style.width = `${Math.min(85, (width % 103) / 2 + ((i * 19 + seq) % 60))}%`;
-      row.style.paddingLeft = `${((seq + i) % 3) + 9}px`;
+      if (cell && bar && levels[i]) {
+        bar.style.width = '0px';
+        const width = cell.getBoundingClientRect().width;
+        bar.style.width = `${(width * levels[i].bidSize) / MAX_SIZE}px`;
+      }
     });
-  }, [seq, mode, tab]);
+  }, [seq, mode, tab, levels]);
 
   return (
     <section className="panel depth-panel">
@@ -55,7 +58,7 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
             <span>ASK SIZE</span>
           </div>
           <div className="depth-scroll" ref={root}>
-            <DepthRows levels={levels} mode={mode} />
+            <DepthRows key={mode} levels={levels} mode={mode} />
           </div>
           <div className="spread">
             <span>Spread</span>

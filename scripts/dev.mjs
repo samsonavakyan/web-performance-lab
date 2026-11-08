@@ -1,8 +1,9 @@
 import { spawn } from 'node:child_process';
 
+const command = process.argv.includes('--preview') ? 'preview' : 'dev';
 const commands = [
-  ['api', ['run', 'dev:api']],
-  ['web', ['run', 'dev:web']]
+  ['api', ['run', `${command}:api`]],
+  ['web', ['run', `${command}:web`]]
 ];
 const children = commands.map(([name, args]) => {
   const child = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', args, {

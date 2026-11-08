@@ -21,3 +21,9 @@ test('overview responses differ across modes', () => {
   assert.equal(makeOverview('baseline').extras.length, 12000);
   assert.equal(makeOverview('optimized').extras.length, 0);
 });
+
+test('overview visible data is identical across modes', () => {
+  const {extras: a, ...baseline} = makeOverview('baseline');
+  const {extras: b, ...optimized} = makeOverview('optimized');
+  assert.deepEqual(baseline, optimized);
+});

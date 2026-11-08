@@ -1,59 +1,56 @@
-# Exercises
+# Cases
 
-Open http://localhost:5173 and DevTools → Performance.
-
-Pick a scenario in the Performance Lab panel. Record the interaction in Baseline, look at the trace, then record the same thing in Optimized.
-
-For each one, try to answer three things. What feels slow or jumpy? What in the recording proves it? How would you check that a fix helped?
+Open http://localhost:5173. Pick one case in the Performance Lab panel. Record the same interaction in Baseline and Optimized using the same browser, viewport, CPU and network settings. Keep other cases on Optimized.
 
 ## 01. Search
 
-Type the same query into the watchlist search in both modes.
-
-- Does the input keep up with typing?
-- What happens between the key press and the screen update?
-- What is the most expensive call you can find?
+Type `nvda`, clear the field, then type `  NVDA  ` in the watchlist search. Repeat in the other mode.
 
 ## 02. Order book
 
-Record the order book for 5 seconds while it updates.
-
-- What does the browser do on each update?
-- Which part of that work is expensive?
-- What would confirm your guess?
+Leave the quote stream running and the Order Book tab open. Record five seconds in each mode.
 
 ## 03. Watchlist
 
-Leave the quote stream running, scroll the watchlist and record for 5 seconds.
-
-- What work repeats?
-- How does scrolling feel?
-- Where would you look first?
+Clear the search. Leave the quote stream running, scroll to the bottom and back, and record five seconds in each mode.
 
 ## 04. Market bulletin
 
-Click Replay bulletin and record while the notice appears.
-
-- What changed on the page?
-- Can you put a number on it?
-- Which DevTools data would you use?
+Press Replay bulletin and record at least three seconds without clicking elsewhere. Repeat in the other mode.
 
 ## 05. Market overview
 
-Click Reload overview in each mode.
-
-- Where does the time go between the request and the result on screen?
-- What do Network and Performance show?
-- What would you check next if this happened in production?
+In the side panel, set Response to Normal and press Reload overview. Repeat in the other mode with the same network settings. Try Unavailable and Invalid data, then return to Normal and reload. Change modes while a request is pending and wait for the result.
 
 ## 06. Chart scanner
 
-Watch the moving marker under the chart and record a few seconds.
+Record the moving marker under the chart for five seconds in each mode.
 
-- Does it move smoothly?
-- How much work does each frame take?
-- How would you compare the two versions?
+## Advanced Lab
 
-## Comparing
+Use the Basic and Advanced tabs to find a case, then press Open case. The open case is highlighted. Baseline/Optimized, Workload and Response settings are in the side panel. Hide the list with Performance Lab to use the full window. Back to market returns to the six cases above. Changing an advanced case's mode starts a fresh run. Workload settings remain selected. The quote stream can stay connected while an advanced case is open.
 
-Use the same browser, window size, throttling and network settings for both modes. Write down what you saw. One recording is not a benchmark.
+### 07. Query workspace
+
+Choose a workload. Type `market` quickly, replace it with `energy`, then press Check interaction. Wait for Ready before switching mode. Repeat with the same workload. If needed, use 4x CPU throttling and workload 240.
+
+### 08. Desk preferences
+
+Press Run feed and wait for the sequence to reach 20. Change appearance, then run the feed again. Repeat in the other mode with the same CPU setting.
+
+### 09. Portfolio analysis
+
+Choose a sample count and press Run report. Type in Note while the report runs. Wait for the result, then repeat in the other mode with the same sample count. Compare Calculation and Elapsed for the same sample count. Cancel report stops the current run when available. On a fast machine use 4,000,000 samples and 4x CPU throttling.
+
+### 10. Saved snapshot
+
+Use localhost or HTTPS. Keep the loaded page open throughout this case. Ensure DevTools Application → Service Workers → Bypass for network is unchecked.
+
+1. Select Optimized, open the case and wait for Ready.
+2. Set Network to Online. Press Reset snapshot, then Load snapshot. Record its revision and capture time.
+3. Set Network to Offline and press Load snapshot again.
+4. Switch to Baseline and press Load snapshot while still offline.
+5. Switch back to Optimized and repeat. Restore Online and load once more.
+6. Press Reset snapshot while online. Set Offline and load again. Restore Online when finished.
+
+Saved values retain their original capture time. Reset snapshot affects this case's saved data only. Reloading the entire application while offline is outside this case. The API and app must be running for online loads.

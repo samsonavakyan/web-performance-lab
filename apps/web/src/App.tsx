@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
+import type { AdvancedScenario, Scenario } from './types';
+import { AdvancedLab } from './advanced/AdvancedLab';
+import type { OverviewResponse } from './api/client';
 import { WifiOff } from 'lucide-react';
 import { ActivityPanel } from './components/activity/ActivityPanel';
 import { Bulletin } from './components/chart/Bulletin';
@@ -15,12 +18,46 @@ import { useQuoteStream } from './hooks/useQuoteStream';
 import { LabPanel } from './lab/LabPanel';
 import { ModesContext, useLabModes } from './lab/modes';
 
+const StableAdvancedLab = memo(AdvancedLab);
+
 export default function App() {
+  const [advanced, setAdvanced] = useState<AdvancedScenario | null>(null);
+  const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
+  const [locate, setLocate] = useState<Scenario | null>(null);
+  const backToTerminal = useCallback(() => {
+    setAdvanced(null);
+    setActiveScenario(null);
+  }, []);
+  const openCase = useCallback((id: Scenario) => {
+    setActiveScenario(id);
+    if (['scheduling', 'context', 'computation', 'offline'].includes(id)) {
+      setAdvanced(id as AdvancedScenario);
+    } else {
+      setAdvanced(null);
+      setLocate(id);
+    }
+  }, []);
+  useEffect(() => {
+    if (!locate || advanced) return;
+    const targets = {
+      search: '.watchlist-panel',
+      watchlist: '.watchlist-panel',
+      layout: '.depth-panel',
+      animation: '.chart-panel',
+      shift: '.bulletin-slot',
+      loading: '.overview-section',
+    };
+    const selector = targets[locate as keyof typeof targets];
+    document.querySelector(selector)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    setLocate(null);
+  }, [locate, advanced]);
   const [selected, setSelected] = useState('NVDA');
   const [paused, setPaused] = useState(false);
   const [labOpen, setLabOpen] = useState(true);
   const [bulletinReplay, setBulletinReplay] = useState(0);
   const [overviewReload, setOverviewReload] = useState(0);
+  const [overviewResponse, setOverviewResponse] = useState<OverviewResponse>('normal');
+  const [workload, setWorkload] = useState(120);
   const [modes, setMode] = useLabModes();
 
   const { instruments, news, candles, levels, error } = useMarketData(selected);
@@ -34,6 +71,9 @@ export default function App() {
     <ModesContext.Provider value={modes}>
       <div className={`app-shell ${labOpen ? 'with-lab' : ''}`}>
         <TopBar
+          advancedOpen={advanced !== null}
+          onTerminal={backToTerminal}
+          onAdvanced={() => openCase('scheduling')}
           paused={paused}
           onTogglePause={() => setPaused((v) => !v)}
           labOpen={labOpen}
@@ -43,46 +83,63 @@ export default function App() {
 
         <main className="terminal">
           <div className="terminal-content">
-            <MarketOverview mode={modes.loading} reload={overviewReload} />
-            {error && (
-              <div className="error-banner">
-                <WifiOff size={16} /> API error: {error}. Start both apps with <code>npm run dev</code>.
-              </div>
-            )}
-
-            <Bulletin mode={modes.shift} replay={bulletinReplay} />
-
-            <div className="workspace">
-              <Watchlist
-                instruments={instruments}
-                quotes={quotes}
-                selected={selected}
-                onSelect={setSelected}
-                mode={modes.watchlist}
+            {advanced ? (
+              <StableAdvancedLab
+                scenario={advanced}
+                mode={modes[advanced]}
+                onBack={backToTerminal}
+                workload={workload}
               />
-              <div className="center-column">
-                <ChartPanel
-                  symbol={selected}
-                  instrument={instrument}
-                  candles={candles}
-                  price={price}
-                  change={change}
-                  animationMode={modes.animation}
-                />
-                <div className="bottom-grid">
-                  <MarketNews items={news} />
-                  <ActivityPanel seq={seq} connected={connected} paused={paused} selected={selected} />
-                </div>
-              </div>
-              <OrderBook levels={levels} seq={seq} mode={modes.layout} symbol={selected} />
-            </div>
+            ) : (
+              <>
+                <MarketOverview mode={modes.loading} reload={overviewReload} response={overviewResponse} />
+                {error && (
+                  <div className="error-banner">
+                    <WifiOff size={16} /> API error: {error}. Start both apps with <code>npm run dev</code>.
+                  </div>
+                )}
 
-            <Footer connected={connected} />
+                <Bulletin mode={modes.shift} replay={bulletinReplay} />
+
+                <div className="workspace">
+                  <Watchlist
+                    instruments={instruments}
+                    quotes={quotes}
+                    selected={selected}
+                    onSelect={setSelected}
+                    mode={modes.watchlist}
+                  />
+                  <div className="center-column">
+                    <ChartPanel
+                      symbol={selected}
+                      instrument={instrument}
+                      candles={candles}
+                      price={price}
+                      change={change}
+                      animationMode={modes.animation}
+                    />
+                    <div className="bottom-grid">
+                      <MarketNews items={news} />
+                      <ActivityPanel seq={seq} connected={connected} paused={paused} selected={selected} />
+                    </div>
+                  </div>
+                  <OrderBook levels={levels} seq={seq} mode={modes.layout} symbol={selected} />
+                </div>
+
+                <Footer connected={connected} />
+              </>
+            )}
           </div>
         </main>
 
         {labOpen && (
           <LabPanel
+            overviewResponse={overviewResponse}
+            onOverviewResponseChange={setOverviewResponse}
+            workload={workload}
+            onWorkloadChange={setWorkload}
+            activeScenario={activeScenario}
+            onOpenCase={openCase}
             modes={modes}
             onModeChange={setMode}
             onReplayBulletin={() => setBulletinReplay((v) => v + 1)}

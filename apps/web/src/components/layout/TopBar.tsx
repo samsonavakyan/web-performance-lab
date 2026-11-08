@@ -1,13 +1,16 @@
-import { BarChart3, FlaskConical, Gauge, LayoutGrid, Pause, Play, TrendingUp } from 'lucide-react';
+import { BarChart3, FlaskConical, LayoutGrid, Layers, Pause, Play } from 'lucide-react';
 
 type Props = {
   paused: boolean;
   onTogglePause: () => void;
   labOpen: boolean;
+  advancedOpen: boolean;
+  onTerminal: () => void;
+  onAdvanced: () => void;
   onToggleLab: () => void;
 };
 
-export function TopBar({ paused, onTogglePause, labOpen, onToggleLab }: Props) {
+export function TopBar({ paused, onTogglePause, labOpen, onToggleLab, advancedOpen, onTerminal, onAdvanced }: Props) {
   return (
     <header className="topbar">
       <div className="brand">
@@ -20,16 +23,13 @@ export function TopBar({ paused, onTogglePause, labOpen, onToggleLab }: Props) {
         <span className="brand-sep" />
         <span className="app-label">Trading Terminal</span>
       </div>
-      <nav className="main-nav">
-        <span className="nav-active">
-          <LayoutGrid size={15} /> Terminal
-        </span>
-        <span>
-          <TrendingUp size={15} /> Markets
-        </span>
-        <span>
-          <Gauge size={15} /> Analytics
-        </span>
+      <nav className="main-nav" aria-label="Workspace">
+        <button className={!advancedOpen ? 'nav-active' : ''} onClick={onTerminal}>
+          <LayoutGrid size={16} /> Market
+        </button>
+        <button className={advancedOpen ? 'nav-active' : ''} onClick={onAdvanced}>
+          <Layers size={16} /> Workspaces
+        </button>
       </nav>
       <div className="header-actions">
         <span className="market-open">

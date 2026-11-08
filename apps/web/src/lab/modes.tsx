@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { Mode, Scenario } from '../types';
 
 export type Modes = Record<Scenario, Mode>;
@@ -12,6 +12,10 @@ const defaultModes: Modes = {
   animation: 'optimized',
   shift: 'optimized',
   loading: 'optimized',
+  scheduling: 'optimized',
+  context: 'optimized',
+  computation: 'optimized',
+  offline: 'optimized',
 };
 
 function loadModes(): Modes {
@@ -23,7 +27,7 @@ function loadModes(): Modes {
     }
     return result;
   } catch {
-    return defaultModes;
+    return { ...defaultModes };
   }
 }
 
@@ -31,10 +35,16 @@ export function useLabModes() {
   const [modes, setModes] = useState<Modes>(loadModes);
 
   useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+    } catch {
+      /* Storage may be unavailable. */
+    }
   }, [modes]);
 
-  const setMode = (id: Scenario, mode: Mode) => setModes((previous) => ({ ...previous, [id]: mode }));
+  const setMode = useCallback((id: Scenario, mode: Mode) => {
+    setModes((previous) => ({ ...previous, [id]: mode }));
+  }, []);
   return [modes, setMode] as const;
 }
 

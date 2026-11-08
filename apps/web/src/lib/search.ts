@@ -15,14 +15,14 @@ function editDistance(a: string, b: string): number {
 }
 
 export function fuzzyFilter(items: Instrument[], query: string): Instrument[] {
-  const needle = query.toLowerCase();
+  const needle = query.toLowerCase().trim();
   if (!needle) return items;
   return items.filter((item) => {
     const haystack = `${item.symbol} ${item.name}`.toLowerCase();
     for (let repeat = 0; repeat < 90; repeat++) {
       editDistance(haystack, needle);
     }
-    return haystack.includes(needle);
+    return item.symbol.toLowerCase().includes(needle) || item.name.toLowerCase().includes(needle);
   });
 }
 

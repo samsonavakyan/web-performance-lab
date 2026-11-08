@@ -36,7 +36,23 @@ app.get('/api/overview', async (request, reply) => {
   reply.header('Cache-Control', 'no-store');
   if (mode === 'baseline') await sleep(1100);
   else await sleep(60);
+  if (request.query?.response === 'unavailable') {
+    return reply.code(500).send({error: 'Overview unavailable'});
+  }
+  if (request.query?.response === 'invalid') {
+    return {asOf: '2026-01-02T15:30:00Z', title: 'Market pulse', highlights: null, extras: []};
+  }
   return makeOverview(mode);
+});
+
+let snapshotRevision = 0;
+app.get('/api/lab/snapshot', async (_request, reply) => {
+  reply.header('Cache-Control', 'no-store');
+  return {
+    revision: ++snapshotRevision,
+    capturedAt: new Date().toISOString(),
+    assets: makeOverview().highlights.map(({ symbol, price }) => ({ symbol, price })),
+  };
 });
 
 app.get('/ws/quotes', { websocket: true }, (socket) => {
