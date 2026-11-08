@@ -70,7 +70,8 @@ export default function App() {
   const [modes, setMode] = useLabModes();
 
   const { instruments, news, candles, levels, error } = useMarketData(selected);
-  const { quotes, seq, connected } = useQuoteStream(paused);
+  // The terminal stream is paused while an Advanced case is open, so it does not add renders to its profiles.
+  const { quotes, seq, connected } = useQuoteStream(paused || advanced !== null);
 
   const instrument = instruments.find((item) => item.symbol === selected);
   const price = quotes[selected]?.price ?? instrument?.price ?? 0;
