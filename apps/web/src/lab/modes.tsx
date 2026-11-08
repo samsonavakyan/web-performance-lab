@@ -12,10 +12,11 @@ const defaultModes: Modes = {
   animation: 'optimized',
   shift: 'optimized',
   loading: 'optimized',
-  scheduling: 'optimized',
-  context: 'optimized',
-  computation: 'optimized',
-  offline: 'optimized',
+  leak: 'optimized',
+  stream: 'optimized',
+  navigation: 'optimized',
+  export: 'optimized',
+  reconnect: 'optimized',
 };
 
 function loadModes(): Modes {

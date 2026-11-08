@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
 import { makeInstruments, makeCandles, makeOrderBook, makeOverview, NEWS, rngFrom } from './data.mjs';
+import { registerLab } from './lab.mjs';
 
 const app = Fastify({ logger: true });
 await app.register(websocket);
@@ -45,15 +46,7 @@ app.get('/api/overview', async (request, reply) => {
   return makeOverview(mode);
 });
 
-let snapshotRevision = 0;
-app.get('/api/lab/snapshot', async (_request, reply) => {
-  reply.header('Cache-Control', 'no-store');
-  return {
-    revision: ++snapshotRevision,
-    capturedAt: new Date().toISOString(),
-    assets: makeOverview().highlights.map(({ symbol, price }) => ({ symbol, price })),
-  };
-});
+registerLab(app, instruments);
 
 app.get('/ws/quotes', { websocket: true }, (socket) => {
   socket.send(JSON.stringify({kind: 'connected'}));

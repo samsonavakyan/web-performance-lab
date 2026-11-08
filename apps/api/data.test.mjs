@@ -27,3 +27,11 @@ test('overview visible data is identical across modes', () => {
   const {extras: b, ...optimized} = makeOverview('optimized');
   assert.deepEqual(baseline, optimized);
 });
+
+test('trades are reproducible and well-formed', async () => {
+  const {makeTrades} = await import('./data.mjs');
+  const trades = makeTrades(500);
+  assert.deepEqual(trades, makeTrades(500));
+  assert.equal(new Set(trades.map(t => t.id)).size, 500);
+  assert.ok(trades.every(t => t.quantity > 0 && t.price > 0 && (t.side === 'BUY' || t.side === 'SELL')));
+});

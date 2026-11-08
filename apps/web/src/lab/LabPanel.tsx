@@ -1,6 +1,6 @@
 import { BookOpen, ExternalLink, FlaskConical, RefreshCcw, RotateCcw, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { SCENARIOS } from '../types';
+import { ADVANCED_SCENARIOS, SCENARIOS } from '../types';
 import type { Mode, Scenario } from '../types';
 import type { Modes } from './modes';
 import type { OverviewResponse } from '../api/client';
@@ -10,8 +10,6 @@ type Props = {
   modes: Modes;
   overviewResponse: OverviewResponse;
   onOverviewResponseChange: (response: OverviewResponse) => void;
-  workload: number;
-  onWorkloadChange: (workload: number) => void;
   activeScenario: Scenario | null;
   onModeChange: (id: Scenario, mode: Mode) => void;
   onReplayBulletin: () => void;
@@ -24,8 +22,6 @@ export function LabPanel({
   modes,
   overviewResponse,
   onOverviewResponseChange,
-  workload,
-  onWorkloadChange,
   activeScenario,
   onModeChange,
   onReplayBulletin,
@@ -36,7 +32,7 @@ export function LabPanel({
   const [group, setGroup] = useState('Basic');
   useEffect(() => {
     setGroup(
-      activeScenario && ['scheduling', 'context', 'computation', 'offline'].includes(activeScenario)
+      activeScenario && (ADVANCED_SCENARIOS as readonly Scenario[]).includes(activeScenario)
         ? 'Advanced'
         : 'Basic',
     );
@@ -48,7 +44,7 @@ export function LabPanel({
           <FlaskConical size={22} />
           <div>
             <h2>Performance Lab</h2>
-            <span>10 cases</span>
+            <span>{SCENARIOS.length} cases</span>
           </div>
         </div>
         <button className="icon-button" onClick={onClose} title="Close lab controls">
@@ -59,7 +55,7 @@ export function LabPanel({
       <nav className="lab-sections" role="tablist" aria-label="Case groups">
         {['Basic', 'Advanced'].map((name) => (
           <button key={name} role="tab" aria-selected={group === name} onClick={() => setGroup(name)}>
-            {name} <span>{name === 'Basic' ? 6 : 4}</span>
+            {name} <span>{name === 'Basic' ? SCENARIOS.length - ADVANCED_SCENARIOS.length : ADVANCED_SCENARIOS.length}</span>
           </button>
         ))}
       </nav>
@@ -98,23 +94,6 @@ export function LabPanel({
                       </label>
                     </div>
                   )}
-                  {scenario.id === 'scheduling' && (
-                    <div className="experiment-controls">
-                      <label>
-                        Workload
-                        <select
-                          aria-label="Workload"
-                          value={workload}
-                          onChange={(event) => onWorkloadChange(Number(event.target.value))}
-                        >
-                          <option value={60}>60</option>
-                          <option value={120}>120</option>
-                          <option value={240}>240</option>
-                        </select>
-                      </label>
-                    </div>
-                  )}
-
                   <div className="scenario-actions">
                     <button className="open-case" onClick={() => onOpenCase(scenario.id)}>
                       Open case

@@ -1,4 +1,5 @@
 import { memo, useCallback, useEffect, useState } from 'react';
+import { ADVANCED_SCENARIOS } from './types';
 import type { AdvancedScenario, Scenario } from './types';
 import { AdvancedLab } from './advanced/AdvancedLab';
 import type { OverviewResponse } from './api/client';
@@ -30,7 +31,7 @@ export default function App() {
   }, []);
   const openCase = useCallback((id: Scenario) => {
     setActiveScenario(id);
-    if (['scheduling', 'context', 'computation', 'offline'].includes(id)) {
+    if ((ADVANCED_SCENARIOS as readonly Scenario[]).includes(id)) {
       setAdvanced(id as AdvancedScenario);
     } else {
       setAdvanced(null);
@@ -57,7 +58,6 @@ export default function App() {
   const [bulletinReplay, setBulletinReplay] = useState(0);
   const [overviewReload, setOverviewReload] = useState(0);
   const [overviewResponse, setOverviewResponse] = useState<OverviewResponse>('normal');
-  const [workload, setWorkload] = useState(120);
   const [modes, setMode] = useLabModes();
 
   const { instruments, news, candles, levels, error } = useMarketData(selected);
@@ -73,7 +73,7 @@ export default function App() {
         <TopBar
           advancedOpen={advanced !== null}
           onTerminal={backToTerminal}
-          onAdvanced={() => openCase('scheduling')}
+          onAdvanced={() => openCase(ADVANCED_SCENARIOS[0])}
           paused={paused}
           onTogglePause={() => setPaused((v) => !v)}
           labOpen={labOpen}
@@ -88,7 +88,6 @@ export default function App() {
                 scenario={advanced}
                 mode={modes[advanced]}
                 onBack={backToTerminal}
-                workload={workload}
               />
             ) : (
               <>
@@ -136,8 +135,6 @@ export default function App() {
           <LabPanel
             overviewResponse={overviewResponse}
             onOverviewResponseChange={setOverviewResponse}
-            workload={workload}
-            onWorkloadChange={setWorkload}
             activeScenario={activeScenario}
             onOpenCase={openCase}
             modes={modes}

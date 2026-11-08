@@ -28,29 +28,24 @@ Record the moving marker under the chart for five seconds in each mode.
 
 ## Advanced Lab
 
-Use the Basic and Advanced tabs to find a case, then press Open case. The open case is highlighted. Baseline/Optimized, Workload and Response settings are in the side panel. Hide the list with Performance Lab to use the full window. Back to market returns to the six cases above. Changing an advanced case's mode starts a fresh run. Workload settings remain selected. The quote stream can stay connected while an advanced case is open.
+Use the Advanced tab, choose Baseline or Optimized, then press Open case. Changing the mode starts a fresh run. Back to market returns to the Basic cases. Repeat each case in both modes with the same CPU setting and data size.
 
-### 07. Query workspace
+### 07. Instrument monitor
 
-Choose a workload. Type `market` quickly, replace it with `energy`, then press Check interaction. Wait for Ready before switching mode. Repeat with the same workload. If needed, use 4x CPU throttling and workload 240.
+Press Reload page, then Simulate trading day. It switches 80 instruments in 20 seconds. Watch the counters during and after the run.
 
-### 08. Desk preferences
+### 08. Order ticket
 
-Press Run feed and wait for the sequence to reach 20. Change appearance, then run the feed again. Repeat in the other mode with the same CPU setting.
+Set CPU throttling to 4x. Press Start stream and type a limit price in the order ticket.
 
-### 09. Portfolio analysis
+### 09. Instrument page
 
-Choose a sample count and press Run report. Type in Note while the report runs. Wait for the result, then repeat in the other mode with the same sample count. Compare Calculation and Elapsed for the same sample count. Cancel report stops the current run when available. On a fast machine use 4,000,000 samples and 4x CPU throttling.
+Switch between instruments and compare Page complete. Clear data cache resets cached data.
 
-### 10. Saved snapshot
+### 10. Trade export
 
-Use localhost or HTTPS. Keep the loaded page open throughout this case. Ensure DevTools Application → Service Workers → Bypass for network is unchecked.
+Choose the number of trades. Clear Save file if you do not want downloads. Press Export CSV and type a comment while it runs.
 
-1. Select Optimized, open the case and wait for Ready.
-2. Set Network to Online. Press Reset snapshot, then Load snapshot. Record its revision and capture time.
-3. Set Network to Offline and press Load snapshot again.
-4. Switch to Baseline and press Load snapshot while still offline.
-5. Switch back to Optimized and repeat. Restore Online and load once more.
-6. Press Reset snapshot while online. Set Offline and load again. Restore Online when finished.
+### 11. Live feed
 
-Saved values retain their original capture time. Reset snapshot affects this case's saved data only. Reloading the entire application while offline is outside this case. The API and app must be running for online loads.
+Wait for the price to update. Press Simulate sleep, wait about 5 seconds, then press Wake up. Then press Restart server. The 40 other users are simulated by the server and reconnect with the selected mode's policy. These controls affect every open tab.

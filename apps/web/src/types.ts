@@ -13,7 +13,8 @@ export type BookLevel = { id: number; bid: number; ask: number; bidSize: number;
 export type Quote = { symbol: string; price: number; change: number };
 export type NewsItem = { id: number; time: string; category: string; title: string; source: string };
 export type Overview = { asOf: string; title: string; highlights: Quote[]; extras: unknown[] };
-export type AdvancedScenario = 'scheduling' | 'context' | 'computation' | 'offline';
+export const ADVANCED_SCENARIOS = ['leak', 'stream', 'navigation', 'export', 'reconnect'] as const;
+export type AdvancedScenario = (typeof ADVANCED_SCENARIOS)[number];
 export type Scenario = AdvancedScenario | 'search' | 'watchlist' | 'layout' | 'animation' | 'shift' | 'loading';
 export type Mode = 'baseline' | 'optimized';
 export const SCENARIOS: Array<{ id: Scenario; title: string; subtitle: string; hint: string; area: string }> = [
@@ -60,31 +61,38 @@ export const SCENARIOS: Array<{ id: Scenario; title: string; subtitle: string; h
     area: 'Chart',
   },
   {
-    id: 'scheduling',
-    title: 'Query workspace',
-    subtitle: 'Interactive results',
-    hint: 'Open the case. Type market quickly, then change the query. Repeat with the same workload.',
+    id: 'leak',
+    title: 'Instrument monitor',
+    subtitle: 'Long session',
+    hint: 'Open the case and press Simulate trading day.',
     area: 'Advanced',
   },
   {
-    id: 'context',
-    title: 'Desk preferences',
-    subtitle: 'Live desk',
-    hint: 'Open the case. Run the feed, then change the appearance.',
+    id: 'stream',
+    title: 'Order ticket',
+    subtitle: 'Live quotes',
+    hint: 'Open the case. Start the stream and type a price in the order ticket.',
     area: 'Advanced',
   },
   {
-    id: 'computation',
-    title: 'Portfolio analysis',
-    subtitle: 'Batch report',
-    hint: 'Open the case. Run a report and type in the note field while it runs.',
+    id: 'navigation',
+    title: 'Instrument page',
+    subtitle: 'Navigation',
+    hint: 'Open the case and switch between instruments.',
     area: 'Advanced',
   },
   {
-    id: 'offline',
-    title: 'Saved snapshot',
-    subtitle: 'Data access',
-    hint: 'Open the case. Load online, go offline in DevTools, and load again in each mode.',
+    id: 'export',
+    title: 'Trade export',
+    subtitle: 'CSV download',
+    hint: 'Open the case. Export trades and type a comment while the export runs.',
+    area: 'Advanced',
+  },
+  {
+    id: 'reconnect',
+    title: 'Live feed',
+    subtitle: 'Connection health',
+    hint: 'Open the case. Use Simulate sleep, Wake up and Restart server.',
     area: 'Advanced',
   },
 ];

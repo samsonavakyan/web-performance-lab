@@ -26,7 +26,7 @@ npm run dev:web
 
 ## Exercises
 
-The Performance Lab panel has six basic cases and four Advanced Lab cases. Use Basic and Advanced to find a case, then Open case to open it. The current case is highlighted. Baseline/Optimized and experiment settings are in the side panel. Use Back to market to return from an advanced case. Each one switches between `Baseline` and `Optimized`. Record the same interaction in both modes in DevTools → Performance and find out what makes the difference.
+The Performance Lab panel has six basic cases and five Advanced Lab cases. Use Basic and Advanced to find a case, then Open case to open it. The current case is highlighted. Baseline/Optimized and experiment settings are in the side panel. Use Back to market to return from an advanced case. Each one switches between `Baseline` and `Optimized`. Record the same interaction in both modes in DevTools → Performance and find out what makes the difference.
 
 Reproduction steps are in [docs/EXERCISES.md](docs/EXERCISES.md). Work on one scenario at a time and keep the rest on Optimized, otherwise the traces get noisy.
 
@@ -41,7 +41,7 @@ npm run preview
 
 Open http://localhost:5173. Both dev and preview proxy `/api` and `/ws` to port 8787. All workloads and delays are generated fixtures. Elapsed times depend on the machine and throttling settings.
 
-The Saved snapshot case requires localhost or HTTPS and a browser with service worker support. Keep the page open when going offline. See its reset and connection steps in the case instructions.
+The Live feed case controls a shared server feed. Simulate sleep and Restart server affect every open tab.
 
 ## Layout
 
