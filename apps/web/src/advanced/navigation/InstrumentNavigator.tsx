@@ -1,6 +1,6 @@
 import { lazy, Suspense, use, useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import type { Mode } from '../../types';
-import { Metric } from '../metrics';
+import { LabSlot } from '../../lab/LabSlot';
 import { clearResources, fetchJson, loadChartCode, loadSideCode, preloadInstrument, SYMBOLS } from './data';
 import type { InstrumentInfo, Section } from './data';
 import { InfoView, Skeleton } from './views';
@@ -76,8 +76,6 @@ function OptimizedPage({ symbol, onReady }: { symbol: string; onReady: Ready }) 
 export function InstrumentNavigator({ mode }: { mode: Mode }) {
   const [symbol, setSymbol] = useState(SYMBOLS[0]);
   const [isPending, startTransition] = useTransition();
-  const [duration, setDuration] = useState<number | null>(null);
-  const [history, setHistory] = useState<number[]>([]);
   const target = useRef(SYMBOLS[0]);
   const started = useRef(performance.now());
   const ready = useRef(new Set<Section>());
@@ -89,8 +87,6 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
     if (ready.current.size === 4) {
       const elapsed = performance.now() - started.current;
       performance.measure(`instrument ${owner}`, { start: started.current, duration: elapsed });
-      setDuration(elapsed);
-      setHistory((items) => [...items.slice(-5), elapsed]);
     }
   }, []);
   const onReady = useMemo<Ready>(() => (section) => report(symbol, section), [report, symbol]);
@@ -100,7 +96,6 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
     target.current = next;
     started.current = performance.now();
     ready.current = new Set();
-    setDuration(null);
     if (mode === 'baseline') {
       setSymbol(next);
       return;
@@ -111,22 +106,13 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
 
   return (
     <>
-      <p>Each instrument page shows details, price history, order book and news. Switch between instruments.</p>
-      <div className="advanced-controls">
-        <button
-          onClick={() => {
-            clearResources();
-            setHistory([]);
-          }}
-        >
-          Clear data cache
-        </button>
-        <span role="status">{duration === null ? 'Loading' : 'Ready'}</span>
-      </div>
-      <div className="metric-grid">
-        <Metric label="Page complete" value={duration === null ? '...' : `${duration.toFixed(0)} ms`} />
-        <Metric label="Recent" value={history.map((value) => value.toFixed(0)).join(' · ') || '-'} />
-      </div>
+      <LabSlot>
+        <div className="lab-actions">
+          <button onClick={clearResources} title="Forgets loaded instrument data, so the next switch loads from the network again">
+            Clear data cache
+          </button>
+        </div>
+      </LabSlot>
       <div className="nav-layout">
         <nav className="nav-list" aria-label="Instruments">
           {SYMBOLS.map((item) => (

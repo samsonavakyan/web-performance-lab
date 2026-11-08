@@ -1,7 +1,7 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Instrument, Mode, Quote } from '../../types';
-import { Metric, useWorstInteraction } from '../metrics';
+import { LabSlot } from '../../lab/LabSlot';
 import { quoteStore, useQuote, useQuoteState } from './quoteStore';
 
 const BOARD_SIZE = 1600;
@@ -174,24 +174,9 @@ function PositionsTable({ children }: { children: ReactNode }) {
   );
 }
 
-function MessageRate() {
-  const [rate, setRate] = useState(0);
-  const last = useRef(quoteStore.getState().version);
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      const version = quoteStore.getState().version;
-      setRate(version - last.current);
-      last.current = version;
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-  return <Metric label="Store updates / s" value={String(rate)} />;
-}
-
 export function OrderDesk({ mode }: { mode: Mode }) {
   const [desk, setDesk] = useState<DeskProps | null>(null);
   const [running, setRunning] = useState(false);
-  const { worst, reset } = useWorstInteraction();
 
   useEffect(() => {
     fetch(`/api/instruments?limit=${BOARD_SIZE}`)
@@ -212,21 +197,18 @@ export function OrderDesk({ mode }: { mode: Mode }) {
 
   return (
     <>
-      <p>
-        The stream sends {MESSAGES_PER_SECOND} messages per second with {UPDATES_PER_MESSAGE} quotes each. Start it and
-        type a limit price in the order ticket.
-      </p>
-      <div className="advanced-controls">
-        <button onClick={() => setRunning((value) => !value)} disabled={!desk}>
-          {running ? 'Stop stream' : 'Start stream'}
-        </button>
-        <button onClick={reset}>Reset measurement</button>
+      <LabSlot>
+        <div className="lab-actions">
+          <button
+            onClick={() => setRunning((value) => !value)}
+            disabled={!desk}
+            title="Simulates an active market: 120 messages per second, 20 quotes each"
+          >
+            {running ? 'Stop stream' : 'Start stream'}
+          </button>
+        </div>
         <span role="status">{running ? 'Streaming' : 'Ready'}</span>
-      </div>
-      <div className="metric-grid">
-        <Metric label="Worst interaction" value={`${worst.toFixed(0)} ms`} tone={worst > 200 ? 'bad' : worst ? 'good' : undefined} />
-        <MessageRate />
-      </div>
+      </LabSlot>
       {desk && (mode === 'baseline' ? <BaselineDesk {...desk} /> : <OptimizedDesk {...desk} />)}
     </>
   );

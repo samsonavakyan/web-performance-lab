@@ -7,7 +7,6 @@ const WINDOW = 30;
 
 // Minimal canvas chart with an API similar to common chart libraries.
 export class MiniChart {
-  static alive = 0;
   private points: Point[];
   private readonly onResize = () => this.draw();
 
@@ -15,7 +14,6 @@ export class MiniChart {
     private readonly canvas: HTMLCanvasElement,
     candles: Candle[],
   ) {
-    MiniChart.alive += 1;
     const closes = candles.map((candle) => candle.close);
     this.points = Array.from({ length: HISTORY_POINTS }, (_, index) => ({
       y: closes[(index + closes.length - (HISTORY_POINTS % closes.length)) % closes.length],
@@ -53,7 +51,7 @@ export class MiniChart {
     if (!context) return;
     const width = (this.canvas.width = this.canvas.clientWidth || 640);
     const height = (this.canvas.height = this.canvas.clientHeight || 220);
-    const visible = this.points.slice(-160);
+    const visible = this.points.slice(-120);
     const min = Math.min(...visible.map((point) => point.average - point.band));
     const max = Math.max(...visible.map((point) => point.average + point.band));
     const range = max - min || 1;
@@ -79,6 +77,5 @@ export class MiniChart {
   destroy() {
     window.removeEventListener('resize', this.onResize);
     this.points = [];
-    MiniChart.alive -= 1;
   }
 }

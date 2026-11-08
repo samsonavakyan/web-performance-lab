@@ -4,14 +4,12 @@ type Listener = (price: number) => void;
 const listeners = new Map<string, Set<Listener>>();
 const prices = new Map<string, number>();
 let timer: number | undefined;
-let deliveries = 0;
 
 function tick() {
   for (const [symbol, set] of listeners) {
     const price = (prices.get(symbol) ?? 100) * (1 + (Math.random() - 0.5) * 0.004);
     prices.set(symbol, price);
     for (const listener of set) {
-      deliveries += 1;
       listener(price);
     }
   }
@@ -32,15 +30,5 @@ export const quoteFeed = {
         timer = undefined;
       }
     };
-  },
-  listenerCount() {
-    let count = 0;
-    for (const set of listeners.values()) count += set.size;
-    return count;
-  },
-  takeDeliveries() {
-    const value = deliveries;
-    deliveries = 0;
-    return value;
   },
 };

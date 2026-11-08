@@ -5,6 +5,7 @@ import type { Mode, Scenario } from '../types';
 import type { Modes } from './modes';
 import type { OverviewResponse } from '../api/client';
 import { ModeSwitch } from './ModeSwitch';
+import { setLabSlot } from './LabSlot';
 
 type Props = {
   modes: Modes;
@@ -37,6 +38,14 @@ export function LabPanel({
         : 'Basic',
     );
   }, [activeScenario]);
+  useEffect(() => {
+    if (!activeScenario) return;
+    const timer = window.setTimeout(
+      () => document.querySelector(`[data-scenario="${activeScenario}"]`)?.scrollIntoView({ block: 'nearest' }),
+      200,
+    );
+    return () => clearTimeout(timer);
+  }, [activeScenario, group]);
   return (
     <aside className="lab-panel" aria-label="Case list">
       <div className="lab-header">
@@ -77,6 +86,7 @@ export function LabPanel({
                   </div>
                   <ModeSwitch mode={modes[scenario.id]} onChange={(mode) => onModeChange(scenario.id, mode)} />
                   {active && <p className="scenario-hint">{scenario.hint}</p>}
+                  {active && scenario.area === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
                   {scenario.id === 'loading' && (
                     <div className="experiment-controls">
                       <label>

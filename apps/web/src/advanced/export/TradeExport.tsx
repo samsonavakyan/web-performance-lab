@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Mode } from '../../types';
-import { Metric, useLongestBlock } from '../metrics';
+import { LabSlot } from '../../lab/LabSlot';
 import { CSV_HEADER, formatRow } from './csv';
 import type { Trade } from './csv';
 import type { ExportMessage } from './export.worker';
@@ -14,16 +14,7 @@ function download(blob: Blob, rows: number) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function Clock() {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 100);
-    return () => clearInterval(timer);
-  }, []);
-  return <Metric label="UI clock" value={now.toLocaleTimeString('en-GB') + '.' + String(now.getMilliseconds()).padStart(3, '0').slice(0, 1)} />;
-}
-
-type Result = { rows: number; bytes: number; elapsed: number };
+type Result = { rows: number; bytes: number };
 
 export function TradeExport({ mode }: { mode: Mode }) {
   const [count, setCount] = useState(100_000);
@@ -34,13 +25,12 @@ export function TradeExport({ mode }: { mode: Mode }) {
   const [error, setError] = useState('');
   const [comment, setComment] = useState('');
   const worker = useRef<Worker | null>(null);
-  const { longest, reset } = useLongestBlock();
 
   useEffect(() => () => worker.current?.terminate(), []);
 
   function finish(blob: Blob, rows: number, started: number) {
     performance.measure('trade export', { start: started, end: performance.now() });
-    setResult({ rows, bytes: blob.size, elapsed: performance.now() - started });
+    setResult({ rows, bytes: blob.size });
     setBusy(false);
     if (save) download(blob, rows);
   }
@@ -79,7 +69,6 @@ export function TradeExport({ mode }: { mode: Mode }) {
   }
 
   function start() {
-    reset();
     setBusy(true);
     setProgress(0);
     setResult(null);
@@ -99,9 +88,11 @@ export function TradeExport({ mode }: { mode: Mode }) {
 
   return (
     <>
-      <p>
-        Back office exports every trade for the year as a CSV file. Type a comment while the export runs.
-      </p>
+      <LabSlot>
+        <label className="checkbox" title="Downloads the CSV when the export finishes">
+          <input type="checkbox" checked={save} onChange={(e) => setSave(e.target.checked)} /> Save file
+        </label>
+      </LabSlot>
       <div className="advanced-controls">
         <label>
           Trades
@@ -111,24 +102,22 @@ export function TradeExport({ mode }: { mode: Mode }) {
             <option value={300000}>300,000</option>
           </select>
         </label>
-        <label className="checkbox">
-          <input type="checkbox" checked={save} onChange={(e) => setSave(e.target.checked)} /> Save file
-        </label>
         <button disabled={busy} onClick={start}>
           Export CSV
         </button>
         <button disabled={!busy || mode === 'baseline'} onClick={cancel}>
           Cancel
         </button>
-        <span role="status">{busy ? (mode === 'optimized' ? `Exporting ${(progress * 100).toFixed(0)}%` : 'Exporting') : error || 'Ready'}</span>
+        <span role="status">
+          {busy ? (mode === 'optimized' ? `Exporting ${(progress * 100).toFixed(0)}%` : 'Exporting') : error || 'Ready'}
+        </span>
       </div>
       {mode === 'optimized' && busy && <progress className="export-progress" value={progress} max={1} />}
-      <div className="metric-grid">
-        <Clock />
-        <Metric label="Longest main-thread block" value={`${longest.toFixed(0)} ms`} tone={longest > 200 ? 'bad' : longest ? 'good' : undefined} />
-        <Metric label="Export time" value={result ? `${(result.elapsed / 1000).toFixed(1)} s` : '-'} />
-        <Metric label="File" value={result ? `${result.rows.toLocaleString('en-US')} rows · ${(result.bytes / 1048576).toFixed(1)} MB` : '-'} />
-      </div>
+      {result && (
+        <p className="export-result">
+          Saved {result.rows.toLocaleString('en-US')} trades, {(result.bytes / 1048576).toFixed(1)} MB
+        </p>
+      )}
       <label className="analysis-note">
         Comment <input aria-label="Export comment" value={comment} onChange={(e) => setComment(e.target.value)} />
       </label>

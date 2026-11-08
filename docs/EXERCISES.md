@@ -28,11 +28,11 @@ Record the moving marker under the chart for five seconds in each mode.
 
 ## Advanced
 
-Use the Advanced tab, choose Baseline or Optimized, then press Open case. Changing the mode starts a fresh run. Back to market returns to the Basic cases. Repeat each case in both modes with the same CPU setting and data size.
+Use the Advanced tab, choose Baseline or Optimized, then press Open case. Controls that simulate load or failures appear in the side panel under the open case. The app area shows only the product. Use Chrome DevTools for every measurement. Changing the mode starts a fresh run. Back to market returns to the Basic cases. Repeat each case in both modes with the same CPU setting and data size.
 
 ### 07. Instrument monitor
 
-Press Reload page, then Simulate trading day. It switches 80 instruments in 20 seconds. Watch the counters during and after the run.
+Reload the browser tab, then press Simulate trading day. It goes through 80 instruments one by one. Type a trade note before and after the run.
 
 ### 08. Order ticket
 
@@ -40,7 +40,7 @@ Set CPU throttling to 4x. Press Start stream and type a limit price in the order
 
 ### 09. Instrument switch
 
-Switch between instruments and compare Page complete. Clear data cache resets cached data.
+Switch between instruments. Clear data cache resets cached data.
 
 ### 10. Trade export
 

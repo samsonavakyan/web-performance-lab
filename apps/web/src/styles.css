@@ -1587,33 +1587,6 @@ a {
 }
 
 /* Advanced cases */
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-  margin: 14px 0;
-}
-.metric {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 10px 12px;
-  background: var(--subtle);
-}
-.metric span {
-  display: block;
-  color: var(--muted);
-  font-size: 12px;
-}
-.metric strong {
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-}
-.metric.good strong {
-  color: var(--up);
-}
-.metric.bad strong {
-  color: var(--down);
-}
 .advanced-lab .checkbox {
   display: inline-flex;
   align-items: center;
@@ -1621,11 +1594,6 @@ a {
 }
 .advanced-lab .checkbox input {
   min-height: 0;
-}
-.lab-subheading {
-  margin: 20px 0 0;
-  font-size: 14px;
-  color: var(--muted);
 }
 
 .monitor-chart {
@@ -1851,13 +1819,58 @@ a {
   background: var(--accent);
   min-height: 0;
 }
-.attempts-caption {
-  color: var(--muted);
-}
 @media (max-width: 900px) {
   .order-desk,
   .nav-layout,
   .nav-body {
     grid-template-columns: 1fr;
   }
+}
+
+.lab-slot {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 12px;
+}
+.lab-slot button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.lab-slot button:hover:not(:disabled) {
+  background: var(--subtle);
+}
+.lab-slot button:disabled {
+  color: #8d929d;
+  cursor: default;
+}
+.lab-slot [role='status'],
+.lab-slot .checkbox {
+  font-size: 13px;
+  color: var(--muted);
+}
+.lab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.server-monitoring {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+.server-monitoring span,
+.server-monitoring small {
+  color: var(--muted);
+}
+.server-monitoring .attempts {
+  height: 60px;
+}
+.export-result {
+  margin: 10px 0 0;
 }

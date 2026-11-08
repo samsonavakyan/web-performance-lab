@@ -21,10 +21,19 @@ import { ModesContext, useLabModes } from './lab/modes';
 
 const StableAdvancedLab = memo(AdvancedLab);
 
+// An open Advanced case is kept in the URL hash, so a browser reload reopens it.
+function caseFromHash(): AdvancedScenario | null {
+  const id = location.hash.slice(1);
+  return (ADVANCED_SCENARIOS as readonly string[]).includes(id) ? (id as AdvancedScenario) : null;
+}
+
 export default function App() {
-  const [advanced, setAdvanced] = useState<AdvancedScenario | null>(null);
-  const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
+  const [advanced, setAdvanced] = useState<AdvancedScenario | null>(caseFromHash);
+  const [activeScenario, setActiveScenario] = useState<Scenario | null>(caseFromHash);
   const [locate, setLocate] = useState<Scenario | null>(null);
+  useEffect(() => {
+    history.replaceState(null, '', advanced ? `#${advanced}` : location.pathname);
+  }, [advanced]);
   const backToTerminal = useCallback(() => {
     setAdvanced(null);
     setActiveScenario(null);

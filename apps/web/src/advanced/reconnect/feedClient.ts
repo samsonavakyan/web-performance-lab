@@ -17,8 +17,6 @@ export class FeedClient {
   lastSeq = 0;
   lastMessageAt = 0;
   retryAt = 0;
-  missed = 0;
-  resyncs = 0;
   private socket: WebSocket | null = null;
   private attempt = 0;
   private retryTimer: number | undefined;
@@ -56,17 +54,13 @@ export class FeedClient {
       return;
     }
     if (message.kind !== 'quote' || message.seq <= this.lastSeq) return;
-    if (this.lastSeq && message.seq > this.lastSeq + 1) {
-      this.missed += message.seq - this.lastSeq - 1;
-      if (this.mode === 'optimized') void this.resync();
-    }
+    if (this.mode === 'optimized' && this.lastSeq && message.seq > this.lastSeq + 1) void this.resync();
     this.lastSeq = message.seq;
     this.price = message.price;
     this.attempt = 0;
   }
 
   private async resync() {
-    this.resyncs += 1;
     const response = await fetch('/api/lab/feed/snapshot');
     const snapshot = (await response.json()) as { seq: number; price: number };
     if (snapshot.seq >= this.lastSeq) {

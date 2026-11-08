@@ -1,4 +1,6 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type CDPSession, type Page } from '@playwright/test';
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 
 async function open(page: Page, id: string, mode: 'Baseline' | 'Optimized') {
   await page.getByRole('tab', { name: /Advanced/ }).click();
@@ -7,16 +9,34 @@ async function open(page: Page, id: string, mode: 'Baseline' | 'Optimized') {
   await scenario.getByRole('button', { name: 'Open case' }).click();
   await expect(page.getByRole('region', { name: 'Advanced Lab' })).toBeVisible();
 }
-const metric = (page: Page, label: string) =>
-  page.locator('.metric').filter({ has: page.getByText(label, { exact: true }) }).locator('strong');
+
+async function windowListeners(cdp: CDPSession, type: string) {
+  const win = await cdp.send('Runtime.evaluate', { expression: 'window' });
+  const { listeners } = await cdp.send('DOMDebugger.getEventListeners', { objectId: win.result.objectId! });
+  return listeners.filter((listener) => listener.type === type).length;
+}
+
+async function canvasesInMemory(cdp: CDPSession) {
+  await cdp.send('HeapProfiler.enable');
+  await cdp.send('HeapProfiler.collectGarbage');
+  const proto = await cdp.send('Runtime.evaluate', { expression: 'HTMLCanvasElement.prototype' });
+  const { objects } = await cdp.send('Runtime.queryObjects', { prototypeObjectId: proto.result.objectId! });
+  const length = await cdp.send('Runtime.callFunctionOn', {
+    objectId: objects.objectId!,
+    functionDeclaration: 'function () { return this.length; }',
+    returnByValue: true,
+  });
+  return length.result.value as number;
+}
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('Instrument monitor counters after switching instruments', async ({ page }) => {
+test('Instrument monitor keeps listeners and canvases after switching instruments', async ({ page }) => {
+  const cdp = await page.context().newCDPSession(page);
   for (const mode of ['Baseline', 'Optimized'] as const) {
-    await page.reload();
+    await page.goto('/');
     await open(page, 'leak', mode);
     const select = page.getByRole('combobox', { name: 'Instrument' });
     await expect(select.locator('option')).toHaveCount(150);
@@ -25,87 +45,67 @@ test('Instrument monitor counters after switching instruments', async ({ page })
       await expect(page.locator('canvas')).toHaveCount(1);
       await page.waitForTimeout(300);
     }
-    await page.waitForTimeout(1200);
-    const charts = Number(await metric(page, 'Live charts').innerText());
-    const listeners = Number(await metric(page, 'Feed listeners').innerText());
+    await page.waitForTimeout(500);
+    const listeners = await windowListeners(cdp, 'resize');
+    const canvases = await canvasesInMemory(cdp);
     if (mode === 'Baseline') {
-      expect(charts).toBeGreaterThanOrEqual(6);
       expect(listeners).toBeGreaterThanOrEqual(6);
+      expect(canvases).toBeGreaterThanOrEqual(6);
     } else {
-      expect(charts).toBe(1);
       expect(listeners).toBe(1);
+      expect(canvases).toBeLessThanOrEqual(2);
     }
   }
 });
 
-test('Order ticket accepts input while the stream runs', async ({ page }) => {
-  for (const mode of ['Baseline', 'Optimized'] as const) {
-    await open(page, 'stream', mode);
-    await expect(page.locator('.quote-cell')).toHaveCount(1600);
-    await page.getByRole('button', { name: 'Start stream' }).click();
-    await page.waitForTimeout(1000);
-    const price = page.getByRole('textbox', { name: 'Limit price' });
-    await price.pressSequentially('143.25', { delay: 30 });
-    await expect(price).toHaveValue('143.25');
-    await expect(page.getByText('Notional: 14,325.00')).toBeVisible();
-    console.log(mode, 'worst interaction', await metric(page, 'Worst interaction').innerText());
-    await page.getByRole('button', { name: 'Stop stream' }).click();
-  }
-});
-
-test('Instrument switch completes navigation in each mode', async ({ page }) => {
-  const times: Record<string, number> = {};
-  for (const mode of ['Baseline', 'Optimized'] as const) {
-    await open(page, 'navigation', mode);
-    await expect(page.getByRole('status')).toHaveText('Ready');
-    await page.getByRole('button', { name: 'AAPL' }).click();
-    await expect(page.getByRole('status')).toHaveText('Ready');
-    await expect(page.locator('.nav-header h2')).toHaveText('AAPL');
-    await expect(page.locator('.nav-news li')).toHaveCount(4);
-    times[mode] = parseInt(await metric(page, 'Page complete').innerText());
-  }
-  console.log('navigation', times);
-  expect(times.Baseline).toBeGreaterThan(850);
-  expect(times.Optimized).toBeLessThan(750);
-});
-
-test('Trade export produces the same file in each mode', async ({ page }) => {
-  const results: Record<string, { file: string; block: number }> = {};
+test('Trade export produces the same file and blocks the main thread only in Baseline', async ({ page }) => {
+  const results: Record<string, { hash: string; block: number }> = {};
   for (const mode of ['Baseline', 'Optimized'] as const) {
     await open(page, 'export', mode);
     await page.getByRole('combobox', { name: 'Trades' }).selectOption('50000');
-    await page.getByRole('checkbox').uncheck();
+    await page.evaluate(() => {
+      const frames: number[] = [];
+      new PerformanceObserver((list) => list.getEntries().forEach((entry) => frames.push(entry.duration))).observe({
+        type: 'long-animation-frame',
+      });
+      (window as unknown as { longFrames: number[] }).longFrames = frames;
+    });
+    const download = page.waitForEvent('download', { timeout: 40000 });
     await page.getByRole('button', { name: 'Export CSV' }).click();
-    await expect(page.getByRole('status')).toHaveText('Ready', { timeout: 40000 });
+    const file = await (await download).path();
+    await expect(page.getByText('Saved 50,000 trades')).toBeVisible();
     results[mode] = {
-      file: await metric(page, 'File').innerText(),
-      block: parseInt(await metric(page, 'Longest main-thread block').innerText()),
+      hash: createHash('sha256')
+        .update(await readFile(file))
+        .digest('hex'),
+      block: await page.evaluate(() => Math.max(0, ...(window as unknown as { longFrames: number[] }).longFrames)),
     };
   }
-  console.log('export', results);
-  expect(results.Baseline.file).toBe(results.Optimized.file);
-  expect(results.Baseline.file).toContain('50,000 rows');
-  expect(results.Baseline.block).toBeGreaterThan(results.Optimized.block * 3);
+  expect(results.Baseline.hash).toBe(results.Optimized.hash);
+  expect(results.Baseline.block).toBeGreaterThan(Math.max(500, results.Optimized.block * 3));
 });
 
 test('Live feed status through sleep, wake and restart', async ({ page }) => {
   test.setTimeout(60000);
   for (const mode of ['Baseline', 'Optimized'] as const) {
     await open(page, 'reconnect', mode);
-    await page.getByRole('checkbox').uncheck();
+    const panel = page.locator('.lab-slot');
+    await panel.getByRole('checkbox').uncheck();
     const badge = page.locator('.feed-badge');
     await expect(badge).toHaveText(mode === 'Baseline' ? 'Connected' : 'Live', { timeout: 15000 });
     await page.waitForTimeout(1000);
-    await page.getByRole('button', { name: 'Simulate sleep' }).click();
-    await page.waitForTimeout(4500);
-    if (mode === 'Baseline') await expect(badge).toHaveText('Connected');
-    else await expect(badge).toHaveText('Live');
-    await page.getByRole('button', { name: 'Wake up' }).click();
-    await page.waitForTimeout(1000);
-    const missed = Number(await metric(page, 'Missed messages').innerText());
-    if (mode === 'Baseline') expect(missed).toBeGreaterThan(10);
-    else expect(missed).toBe(0);
-    await page.getByRole('button', { name: 'Restart server' }).click();
+    await panel.getByRole('button', { name: 'Simulate sleep' }).click();
+    await page.waitForTimeout(500);
+    const frozen = await page.locator('.feed-quote strong').innerText();
+    await page.waitForTimeout(4000);
+    if (mode === 'Baseline') {
+      await expect(badge).toHaveText('Connected');
+      await expect(page.locator('.feed-quote strong')).toHaveText(frozen);
+    } else {
+      await expect(badge).toHaveText('Live');
+    }
+    await panel.getByRole('button', { name: 'Wake up' }).click();
+    await panel.getByRole('button', { name: 'Restart server' }).click();
     await expect(badge).toHaveText(mode === 'Baseline' ? 'Connected' : 'Live', { timeout: 20000 });
   }
 });

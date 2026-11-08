@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Mode } from '../../types';
-import { Metric } from '../metrics';
+import { LabSlot } from '../../lab/LabSlot';
 import { FeedClient } from './feedClient';
 
 const DESKS = 40;
@@ -55,23 +55,42 @@ export function LiveFeed({ mode }: { mode: Mode }) {
   }, []);
 
   const feed = client.current;
-  const age = feed?.lastMessageAt ? (now - feed.lastMessageAt) / 1000 : 0;
+  const age = feed?.lastMessageAt ? Math.max(0, now - feed.lastMessageAt) / 1000 : 0;
   const peak = Math.max(1, ...(stats?.buckets ?? [1]));
   return (
     <>
-      <p>
-        NVDA price from the live feed. Simulate sleep and Wake up imitate closing and opening a laptop lid. Restart
-        server imitates a deploy of the feed service.
-      </p>
-      <div className="advanced-controls">
-        <button onClick={() => post('/api/lab/feed/sleep')}>Simulate sleep</button>
-        <button onClick={() => post('/api/lab/feed/wake')}>Wake up</button>
-        <button onClick={() => post('/api/lab/feed/restart')}>Restart server</button>
-        <label className="checkbox">
+      <LabSlot>
+        <div className="lab-actions">
+          <button
+            onClick={() => post('/api/lab/feed/sleep')}
+            title="Imitates closing a laptop lid: open connections stop receiving data"
+          >
+            Simulate sleep
+          </button>
+          <button onClick={() => post('/api/lab/feed/wake')} title="Imitates opening the laptop lid again">
+            Wake up
+          </button>
+          <button onClick={() => post('/api/lab/feed/restart')} title="Imitates a deploy of the feed service">
+            Restart server
+          </button>
+        </div>
+        <label className="checkbox" title="Adds 40 users simulated on the server with the same reconnect behavior">
           <input type="checkbox" checked={withDesks} onChange={(e) => setWithDesks(e.target.checked)} /> {DESKS} other
           users
         </label>
-      </div>
+        <div className="server-monitoring">
+          <strong>Server monitoring</strong>
+          <span>
+            {stats?.connected ?? 0} connections{stats?.restarting ? ' · restarting' : ''}
+          </span>
+          <div className="attempts" aria-label="Connection attempts per 250 ms, last 15 seconds">
+            {(stats?.buckets ?? []).map((count, i) => (
+              <span key={i} style={{ height: `${(count / peak) * 100}%` }} title={`${count} attempts`} />
+            ))}
+          </div>
+          <small>Connection attempts per 250 ms, last 15 s</small>
+        </div>
+      </LabSlot>
       {feed && (
         <div className="feed-quote">
           <span>NVDA</span>
@@ -80,23 +99,6 @@ export function LiveFeed({ mode }: { mode: Mode }) {
           {mode === 'optimized' && feed.lastMessageAt > 0 && <small>Updated {age.toFixed(1)} s ago</small>}
         </div>
       )}
-      <h3 className="lab-subheading">Lab diagnostics (not visible to the trader)</h3>
-      <div className="metric-grid">
-        <Metric label="Last message" value={`${age.toFixed(1)} s ago`} tone={age > 3 ? 'bad' : 'good'} />
-        <Metric label="Client seq" value={String(feed?.lastSeq ?? 0)} />
-        <Metric label="Server seq" value={String(stats?.seq ?? 0)} />
-        <Metric label="Missed messages" value={String(feed?.missed ?? 0)} tone={feed?.missed ? 'bad' : undefined} />
-        <Metric label="Resyncs" value={String(feed?.resyncs ?? 0)} />
-        <Metric label="Server connections" value={String(stats?.connected ?? 0)} />
-      </div>
-      <div className="attempts" aria-label="Connection attempts per 250 ms, last 15 seconds">
-        {(stats?.buckets ?? []).map((count, i) => (
-          <span key={i} style={{ height: `${(count / peak) * 100}%` }} title={`${count} attempts`} />
-        ))}
-      </div>
-      <small className="attempts-caption">
-        Connection attempts per 250 ms, last 15 s{stats?.restarting ? ' · server is restarting or warming up' : ''}
-      </small>
     </>
   );
 }
