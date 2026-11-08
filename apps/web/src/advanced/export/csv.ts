@@ -16,7 +16,7 @@ export function escapeCsv(value: string) {
   return /[",\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
 }
 
-export function formatRowSlow(trade: Trade) {
+export function formatRow(trade: Trade) {
   const time = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short', timeStyle: 'medium', timeZone: 'UTC' }).format(
     new Date(trade.time),
   );
@@ -41,7 +41,7 @@ export function formatRowSlow(trade: Trade) {
 const dateFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'short', timeStyle: 'medium', timeZone: 'UTC' });
 const moneyFormat = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export function formatRowFast(trade: Trade) {
+export function formatTradeRow(trade: Trade) {
   return [
     String(trade.id),
     dateFormat.format(new Date(trade.time)),

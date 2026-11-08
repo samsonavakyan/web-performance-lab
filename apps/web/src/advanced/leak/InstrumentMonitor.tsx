@@ -42,7 +42,7 @@ function PriceChart({ instrument, mode }: { instrument: Instrument; mode: Mode }
   useEffect(() => {
     if (!candles || !canvas.current) return;
     const chart = new MiniChart(canvas.current, candles);
-    const unsubscribe = quoteFeed.subscribe(instrument.symbol, instrument.price, (price) => {
+    const unsubscribe = quoteFeed.subscribe(instrument.symbol, candles[candles.length - 1].close, (price) => {
       chart.update(price);
       setLast(price);
     });
@@ -115,7 +115,7 @@ export function InstrumentMonitor({ mode }: { mode: Mode }) {
     <>
       <p>
         A trader keeps this screen open all day and switches instruments. Simulate trading day switches 80 instruments
-        in 20 seconds. Reload the page to start from a clean heap.
+        in 20 seconds. Reload page resets the case.
       </p>
       <div className="advanced-controls">
         <label>

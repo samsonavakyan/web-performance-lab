@@ -1,4 +1,4 @@
-import { CSV_HEADER, formatRowFast } from './csv';
+import { CSV_HEADER, formatTradeRow } from './csv';
 import type { Trade } from './csv';
 
 export type ExportRequest = { url: string };
@@ -17,7 +17,7 @@ self.onmessage = async (event: MessageEvent<ExportRequest>) => {
     const parts: string[] = [CSV_HEADER];
     const chunk: string[] = [];
     for (let i = 0; i < trades.length; i++) {
-      chunk.push(formatRowFast(trades[i]));
+      chunk.push(formatTradeRow(trades[i]));
       if (chunk.length === 10_000 || i === trades.length - 1) {
         parts.push(chunk.join('\n') + '\n');
         chunk.length = 0;

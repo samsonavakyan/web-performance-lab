@@ -111,7 +111,7 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
 
   return (
     <>
-      <p>Each instrument page needs details, price history, order book and news. Record Network and switch instruments.</p>
+      <p>Each instrument page shows details, price history, order book and news. Switch between instruments.</p>
       <div className="advanced-controls">
         <button
           onClick={() => {

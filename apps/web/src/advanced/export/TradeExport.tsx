@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Mode } from '../../types';
 import { Metric, useLongestBlock } from '../metrics';
-import { CSV_HEADER, formatRowSlow } from './csv';
+import { CSV_HEADER, formatRow } from './csv';
 import type { Trade } from './csv';
 import type { ExportMessage } from './export.worker';
 
@@ -51,7 +51,7 @@ export function TradeExport({ mode }: { mode: Mode }) {
       if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
       const trades = (await response.json()) as Trade[];
       let csv = CSV_HEADER;
-      for (const trade of trades) csv += formatRowSlow(trade) + '\n';
+      for (const trade of trades) csv += formatRow(trade) + '\n';
       finish(new Blob([csv], { type: 'text/csv' }), trades.length, started);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Export failed');
@@ -100,8 +100,7 @@ export function TradeExport({ mode }: { mode: Mode }) {
   return (
     <>
       <p>
-        Back office exports every trade for the year. The API returns all rows as one JSON array, the app converts them to
-        CSV and saves the file. Type a comment while the export runs.
+        Back office exports every trade for the year as a CSV file. Type a comment while the export runs.
       </p>
       <div className="advanced-controls">
         <label>

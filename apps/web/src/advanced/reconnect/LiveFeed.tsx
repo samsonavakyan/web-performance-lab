@@ -60,8 +60,8 @@ export function LiveFeed({ mode }: { mode: Mode }) {
   return (
     <>
       <p>
-        NVDA price from the live feed. Simulate sleep keeps every socket open but stops delivery, like a laptop lid or
-        a dropped NAT entry. Restart server closes every socket, refuses new ones for 3 seconds, then admits at most 8 per 250 ms while it warms up, like a deploy.
+        NVDA price from the live feed. Simulate sleep and Wake up imitate closing and opening a laptop lid. Restart
+        server imitates a deploy of the feed service.
       </p>
       <div className="advanced-controls">
         <button onClick={() => post('/api/lab/feed/sleep')}>Simulate sleep</button>

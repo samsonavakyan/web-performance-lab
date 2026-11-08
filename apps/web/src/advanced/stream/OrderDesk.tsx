@@ -9,11 +9,11 @@ const POSITIONS = 150;
 const MESSAGES_PER_SECOND = 120;
 const UPDATES_PER_MESSAGE = 20;
 
-function formatPriceSlow(value: number) {
+function formatPrice(value: number) {
   return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
 const priceFormat = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const formatPriceFast = (value: number) => priceFormat.format(value);
+const formatQuotePrice = (value: number) => priceFormat.format(value);
 
 function useStream(running: boolean, mode: Mode, symbols: string[]) {
   useEffect(() => {
@@ -55,7 +55,7 @@ function QuoteCell({ quote, format }: { quote?: Quote; format: (value: number) =
   );
 }
 const LiveQuoteCell = memo(function LiveQuoteCell({ symbol }: { symbol: string }) {
-  return <QuoteCell quote={useQuote(symbol)} format={formatPriceFast} />;
+  return <QuoteCell quote={useQuote(symbol)} format={formatQuotePrice} />;
 });
 
 function PositionRow({
@@ -83,7 +83,7 @@ const LivePositionRow = memo(function LivePositionRow({
 }: {
   position: { symbol: string; quantity: number; cost: number };
 }) {
-  return <PositionRow position={position} quote={useQuote(position.symbol)} format={formatPriceFast} />;
+  return <PositionRow position={position} quote={useQuote(position.symbol)} format={formatQuotePrice} />;
 });
 
 function OrderTicket({ symbol, quote }: { symbol: string; quote?: Quote }) {
@@ -94,7 +94,7 @@ function OrderTicket({ symbol, quote }: { symbol: string; quote?: Quote }) {
   return (
     <form className="order-ticket" onSubmit={(event) => event.preventDefault()}>
       <h2>Order ticket · {symbol}</h2>
-      <p>Last: {quote ? formatPriceFast(quote.price) : '-'}</p>
+      <p>Last: {quote ? formatQuotePrice(quote.price) : '-'}</p>
       <div className="side-switch">
         {(['BUY', 'SELL'] as const).map((value) => (
           <button type="button" key={value} aria-pressed={side === value} onClick={() => setSide(value)}>
@@ -110,7 +110,7 @@ function OrderTicket({ symbol, quote }: { symbol: string; quote?: Quote }) {
         Quantity
         <input aria-label="Quantity" inputMode="numeric" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
       </label>
-      <p>Notional: {Number.isFinite(notional) ? formatPriceFast(notional) : '-'}</p>
+      <p>Notional: {Number.isFinite(notional) ? formatQuotePrice(notional) : '-'}</p>
     </form>
   );
 }
@@ -125,12 +125,12 @@ function BaselineDesk({ symbols, positions }: DeskProps) {
       <OrderTicket symbol={symbols[0]} quote={quotes[symbols[0]]} />
       <div className="quote-board">
         {symbols.map((symbol) => (
-          <QuoteCell key={symbol} quote={quotes[symbol]} format={formatPriceSlow} />
+          <QuoteCell key={symbol} quote={quotes[symbol]} format={formatPrice} />
         ))}
       </div>
       <PositionsTable>
         {positions.map((position) => (
-          <PositionRow key={position.symbol} position={position} quote={quotes[position.symbol]} format={formatPriceSlow} />
+          <PositionRow key={position.symbol} position={position} quote={quotes[position.symbol]} format={formatPrice} />
         ))}
       </PositionsTable>
     </div>

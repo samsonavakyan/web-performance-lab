@@ -44,7 +44,7 @@ Switch between instruments and compare Page complete. Clear data cache resets ca
 
 ### 10. Trade export
 
-Choose the number of trades. Clear Save file if you do not want downloads. Press Export CSV and type a comment while it runs.
+Keep CPU throttling off. Choose the number of trades. Clear Save file if you do not want downloads. Press Export CSV and type a comment while it runs.
 
 ### 11. Live feed
 
