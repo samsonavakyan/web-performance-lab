@@ -3,7 +3,7 @@ import type { Candle } from '../../types';
 type Point = { y: number; average: number; band: number };
 
 const HISTORY_POINTS = 40_000;
-const WINDOW = 20;
+const WINDOW = 30;
 
 // Minimal canvas chart with an API similar to common chart libraries.
 export class MiniChart {
