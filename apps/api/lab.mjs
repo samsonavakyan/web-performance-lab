@@ -38,7 +38,6 @@ export function registerLab(app, instruments) {
     return NEWS.map((news) => ({ ...news, title: `${item.symbol}: ${news.title}` }));
   });
 
-  // Trade export.
   const tradeBodies = new Map();
   app.get('/api/lab/trades', async (request, reply) => {
     const count = Math.min(Math.max(Number(request.query?.count) || 100_000, 1), 300_000);

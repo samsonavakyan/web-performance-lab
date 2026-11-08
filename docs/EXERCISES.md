@@ -26,7 +26,7 @@ In the side panel, set Response to Normal and press Reload overview. Repeat in t
 
 Record the moving marker under the chart for five seconds in each mode.
 
-## Advanced Lab
+## Advanced
 
 Use the Advanced tab, choose Baseline or Optimized, then press Open case. Changing the mode starts a fresh run. Back to market returns to the Basic cases. Repeat each case in both modes with the same CPU setting and data size.
 

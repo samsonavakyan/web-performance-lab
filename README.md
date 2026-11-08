@@ -26,9 +26,9 @@ npm run dev:web
 
 ## Exercises
 
-The Performance Lab panel has six basic cases and five Advanced Lab cases. Use Basic and Advanced to find a case, then Open case to open it. The current case is highlighted. Baseline/Optimized and experiment settings are in the side panel. Use Back to market to return from an advanced case. Each one switches between `Baseline` and `Optimized`. Record the same interaction in both modes in DevTools → Performance and find out what makes the difference.
+The Performance Lab panel lists six Basic and five Advanced cases. Each case has a Baseline and an Optimized mode. Pick a case, record the same interaction in both modes in DevTools and compare.
 
-Reproduction steps are in [docs/EXERCISES.md](docs/EXERCISES.md). Work on one scenario at a time and keep the rest on Optimized, otherwise the traces get noisy.
+Steps for each case are in [docs/EXERCISES.md](docs/EXERCISES.md). Test one case at a time and keep the others on Optimized, otherwise the traces get noisy.
 
 On a fast laptop some differences are small. Turn on CPU throttling (4x or 6x) in the Performance panel. Record each case a few times before drawing conclusions.
 
@@ -73,4 +73,4 @@ npm run build
 LAB_PRODUCTION=1 npm run test:e2e
 ```
 
-To use Playwright Chromium instead, install it with `npx playwright install chromium` and run with `PLAYWRIGHT_CHANNEL=chromium`. Browser checks include real offline network requests. They compare functional results and repeatable interactions; they are not cross-machine performance benchmarks.
+To use Playwright Chromium instead, install it with `npx playwright install chromium` and run with `PLAYWRIGHT_CHANNEL=chromium`. These checks verify behavior in both modes. They do not measure performance across machines.
