@@ -2,7 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 
 async function openOverview(page: Page) {
   const open = page.locator('[data-scenario="overview"]').getByRole('button', { name: 'Open case' });
-  if (await open.count()) await open.click();
+  if (await open.count()) {
+    await open.click();
+    // The panel scrolls the opened card into view; wait so the next click does not miss.
+    await page.waitForTimeout(500);
+  }
 }
 
 async function setMode(page: Page, mode: 'Baseline' | 'Optimized') {

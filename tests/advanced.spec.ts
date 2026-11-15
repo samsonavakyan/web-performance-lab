@@ -6,7 +6,11 @@ async function open(page: Page, id: string, mode: 'Baseline' | 'Optimized') {
   await page.getByRole('tab', { name: /Advanced/ }).click();
   const scenario = page.locator(`[data-scenario="${id}"]`);
   const openButton = scenario.getByRole('button', { name: 'Open case' });
-  if (await openButton.count()) await openButton.click();
+  if (await openButton.count()) {
+    await openButton.click();
+    // The panel scrolls the opened card into view; wait so the mode click does not miss.
+    await page.waitForTimeout(500);
+  }
   // Changing the mode of an open case starts a fresh run.
   await scenario.getByRole('button', { name: mode, exact: true }).click();
   await expect(page.getByRole('region', { name: 'Advanced Lab' })).toBeVisible();
@@ -70,10 +74,10 @@ test('Trade export produces the same file and blocks the main thread only in Bas
     await page.getByRole('combobox', { name: 'Trades' }).selectOption('50000');
     await page.evaluate(() => {
       const frames: number[] = [];
-      new PerformanceObserver((list) => list.getEntries().forEach((entry) => frames.push(entry.duration))).observe({
-        type: 'long-animation-frame',
-      });
-      (window as unknown as { longFrames: number[] }).longFrames = frames;
+      const observer = new PerformanceObserver((list) => list.getEntries().forEach((entry) => frames.push(entry.duration)));
+      observer.observe({ type: 'longtask' });
+      // Long tasks, not long animation frames: a test window may not render frames, but tasks are always reported.
+      Object.assign(window, { longTasks: frames, longTaskObserver: observer });
     });
     const download = page.waitForEvent('download', { timeout: 40000 });
     await page.getByRole('button', { name: 'Export CSV' }).click();
@@ -83,7 +87,7 @@ test('Trade export produces the same file and blocks the main thread only in Bas
       hash: createHash('sha256')
         .update(await readFile(file))
         .digest('hex'),
-      block: await page.evaluate(() => Math.max(0, ...(window as unknown as { longFrames: number[] }).longFrames)),
+      block: await page.evaluate(() => Math.max(0, ...(window as unknown as { longTasks: number[] }).longTasks)),
     };
   }
   expect(results.Baseline.hash).toBe(results.Optimized.hash);
