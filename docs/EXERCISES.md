@@ -65,4 +65,4 @@ Keep CPU throttling off. Choose the number of trades. Clear Save file if you do 
 
 Wait for the price to update. Press Simulate sleep, wait about 5 seconds, then press Wake up. Then press Restart server. The 40 other users are simulated by the server and reconnect with the selected mode's policy. These controls affect every open tab.
 
-The problem is in how the client handles the connection, not in CPU work, so start in Network: filter WS, open the `feed` request and watch the Messages tab, then look at the reconnect requests after Restart server. Server monitoring in the side panel shows the same from the server side. For a timeline in Performance, turn on Timings.
+The problem is in how the client handles the connection, not in CPU work, so start in Network: filter Socket (WS in older Chrome), open the `feed` request and watch the Messages tab, then look at the reconnect requests after Restart server. Server monitoring in the side panel shows the same from the server side. For a timeline in Performance, turn on Timings.
