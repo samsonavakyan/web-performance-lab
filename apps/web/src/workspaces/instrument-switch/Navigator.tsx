@@ -1,28 +1,27 @@
-import { lazy, Suspense, use, useEffect, useState, useTransition } from 'react';
-import { loadChartCode, loadSideCode, preloadInstrument, SYMBOLS } from './data';
-import type { Section } from './data';
-import { useSwitchTiming } from './useSwitchTiming';
+import { lazy, Suspense, use, useState, useTransition } from 'react';
+import { SYMBOLS } from './data';
+import { loadChartSection, loadSidePanel, prefetchInstrument } from './prefetch';
+import { ReadyProvider, useReportReady, useSwitchTiming } from './readiness';
 import { InfoView, PageSkeleton, Skeleton } from './views';
 
-type Ready = (section: Section) => void;
+// Page sections are split into their own chunks; prefetchInstrument starts loading them early.
+const ChartSection = lazy(() => loadChartSection().then((module) => ({ default: module.ChartSection })));
+const SidePanel = lazy(() => loadSidePanel().then((module) => ({ default: module.SidePanel })));
 
-const ChartSection = lazy(() => loadChartCode().then((module) => ({ default: module.ChartSection })));
-const SideSection = lazy(() => loadSideCode().then((module) => ({ default: module.SideSection })));
-
-function InstrumentPage({ symbol, onReady }: { symbol: string; onReady: Ready }) {
-  const resources = preloadInstrument(symbol);
-  const info = use(resources.info);
-  useEffect(() => onReady('info'), [info, onReady]);
+function InstrumentPage({ symbol }: { symbol: string }) {
+  const data = prefetchInstrument(symbol);
+  const info = use(data.info);
+  useReportReady('info', true);
   return (
     <div className="nav-page">
       <InfoView info={info} />
       <div className="nav-body">
         <Suspense fallback={<Skeleton label="chart" height={210} />}>
-          <ChartSection history={resources.history} onReady={onReady} />
+          <ChartSection candles={data.candles} />
         </Suspense>
         <aside>
           <Suspense fallback={<Skeleton label="order book" height={300} />}>
-            <SideSection book={resources.book} news={resources.news} onReady={onReady} />
+            <SidePanel book={data.book} news={data.news} />
           </Suspense>
         </aside>
       </div>
@@ -32,13 +31,14 @@ function InstrumentPage({ symbol, onReady }: { symbol: string; onReady: Ready })
 
 export function Navigator() {
   const [symbol, setSymbol] = useState(SYMBOLS[0]);
+  // While the next page is loading, the current one stays on screen and isPending is true.
   const [isPending, startTransition] = useTransition();
   const timing = useSwitchTiming(symbol);
 
   function navigate(next: string) {
     if (next === symbol) return;
     timing.begin(next);
-    preloadInstrument(next);
+    prefetchInstrument(next);
     startTransition(() => setSymbol(next));
   }
 
@@ -50,17 +50,20 @@ export function Navigator() {
             key={item}
             aria-current={item === symbol ? 'page' : undefined}
             onClick={() => navigate(item)}
-            onMouseEnter={() => preloadInstrument(item)}
-            onFocus={() => preloadInstrument(item)}
+            // A user who points at an instrument is likely to open it: start loading now.
+            onMouseEnter={() => prefetchInstrument(item)}
+            onFocus={() => prefetchInstrument(item)}
           >
             {item}
           </button>
         ))}
       </nav>
       <div className={isPending ? 'nav-content pending' : 'nav-content'}>
-        <Suspense fallback={<PageSkeleton />}>
-          <InstrumentPage symbol={symbol} onReady={timing.onReady} />
-        </Suspense>
+        <ReadyProvider value={timing.report}>
+          <Suspense fallback={<PageSkeleton />}>
+            <InstrumentPage symbol={symbol} />
+          </Suspense>
+        </ReadyProvider>
       </div>
     </div>
   );

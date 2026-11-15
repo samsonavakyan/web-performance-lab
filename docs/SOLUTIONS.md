@@ -58,7 +58,7 @@ Each of 120 messages per second updates the store, and the whole desk subscribes
 
 ## 09. Instrument switch
 
-`workspaces/instrument-switch/Navigator.baseline.tsx`, `ChartSection.baseline.tsx`, `SideSection.baseline.tsx`
+`workspaces/instrument-switch/Navigator.baseline.tsx`, `ChartSection.baseline.tsx`, `SidePanel.baseline.tsx`, `NewsFeed.baseline.tsx`
 
 Requests and code chunks load one after another: page info, then the chart and order book chunks and requests, then the news chunk and request (a waterfall). The page is replaced by a skeleton on every switch. The fix starts all requests and chunks at once, also on hover and focus, and keeps the old page until the new one is ready (`useTransition`).
 

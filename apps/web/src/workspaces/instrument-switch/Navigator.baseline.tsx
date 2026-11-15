@@ -1,37 +1,28 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-import { fetchJson, SYMBOLS } from './data';
-import type { InstrumentInfo, Section } from './data';
-import { useSwitchTiming } from './useSwitchTiming';
+import { lazy, Suspense, useState } from 'react';
+import { instrumentApi, SYMBOLS } from './data';
+import type { InstrumentInfo } from './data';
+import { ReadyProvider, useReportReady, useSwitchTiming } from './readiness';
+import { useFetch } from './useFetch';
 import { InfoView, PageSkeleton, Skeleton } from './views';
 
-type Ready = (section: Section) => void;
-
+// Page sections are split into their own chunks.
 const ChartSection = lazy(() => import('./ChartSection.baseline').then((module) => ({ default: module.ChartSection })));
-const SideSection = lazy(() => import('./SideSection.baseline').then((module) => ({ default: module.SideSection })));
+const SidePanel = lazy(() => import('./SidePanel.baseline').then((module) => ({ default: module.SidePanel })));
 
-function InstrumentPage({ symbol, onReady }: { symbol: string; onReady: Ready }) {
-  const [info, setInfo] = useState<InstrumentInfo | null>(null);
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchJson<InstrumentInfo>(`/api/instruments/${symbol}`, controller.signal)
-      .then(setInfo)
-      .catch(() => {});
-    return () => controller.abort();
-  }, [symbol]);
-  useEffect(() => {
-    if (info) onReady('info');
-  }, [info, onReady]);
+function InstrumentPage({ symbol }: { symbol: string }) {
+  const info = useFetch<InstrumentInfo>(instrumentApi.info(symbol));
+  useReportReady('info', info !== null);
   if (!info) return <PageSkeleton />;
   return (
     <div className="nav-page">
       <InfoView info={info} />
       <div className="nav-body">
         <Suspense fallback={<Skeleton label="chart" height={210} />}>
-          <ChartSection symbol={symbol} onReady={onReady} />
+          <ChartSection symbol={symbol} />
         </Suspense>
         <aside>
           <Suspense fallback={<Skeleton label="order book" height={300} />}>
-            <SideSection symbol={symbol} onReady={onReady} />
+            <SidePanel symbol={symbol} />
           </Suspense>
         </aside>
       </div>
@@ -59,7 +50,10 @@ export function Navigator() {
         ))}
       </nav>
       <div className="nav-content">
-        <InstrumentPage key={symbol} symbol={symbol} onReady={timing.onReady} />
+        <ReadyProvider value={timing.report}>
+          {/* key: a new instrument gets a fresh page */}
+          <InstrumentPage key={symbol} symbol={symbol} />
+        </ReadyProvider>
       </div>
     </div>
   );
