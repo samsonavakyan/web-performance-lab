@@ -60,3 +60,15 @@ export function NewsView({ items }: { items: NewsItem[] }) {
 export function Skeleton({ label, height = 120 }: { label: string; height?: number }) {
   return <div className="nav-skeleton" style={{ height }} aria-label={`Loading ${label}`} />;
 }
+
+export function PageSkeleton() {
+  return (
+    <div className="nav-page">
+      <Skeleton label="instrument" height={64} />
+      <div className="nav-body">
+        <Skeleton label="chart" height={210} />
+        <Skeleton label="order book" height={300} />
+      </div>
+    </div>
+  );
+}

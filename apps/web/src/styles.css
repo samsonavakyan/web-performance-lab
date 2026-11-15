@@ -730,15 +730,7 @@ a {
   background: var(--text);
   box-shadow: none;
 }
-.scanner-track.baseline .scanner-marker {
-  animation: scanner-layout 2.5s ease-in-out infinite alternate;
-}
-/* Optimized animates transform on the compositor; baseline animates left, which needs layout every frame. */
-.scanner-track.optimized .scanner-marker {
-  animation: scanner-compositor 2.5s ease-in-out infinite alternate;
-  will-change: transform;
-}
-@keyframes scanner-layout {
+@keyframes scanner-sweep {
   from {
     left: 1%;
   }
@@ -746,7 +738,7 @@ a {
     left: 87%;
   }
 }
-@keyframes scanner-compositor {
+@keyframes scanner-slide {
   from {
     transform: translateX(0);
   }
@@ -786,13 +778,6 @@ a {
 .bulletin-slot {
   --bulletin-height: 72px;
   margin-bottom: 16px;
-}
-/* Optimized reserves the bulletin height up front, so its appearance does not shift the content below. */
-.bulletin-slot.optimized {
-  height: var(--bulletin-height);
-}
-.bulletin-slot.baseline {
-  height: auto;
 }
 .market-bulletin {
   height: var(--bulletin-height);
@@ -1228,6 +1213,23 @@ a {
 .scenario-buttons button.selected.good {
   background: var(--text);
   color: #fff;
+}
+.timings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  min-height: 26px;
+  padding: 2px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.timings-toggle:hover {
+  color: var(--text);
+}
+.timings-toggle[aria-pressed='true'] {
+  color: var(--text);
+  font-weight: 500;
 }
 .scenario-hint {
   font-size: 13px;

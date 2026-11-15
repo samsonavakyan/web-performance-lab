@@ -1,11 +1,12 @@
-import { FlaskConical, Pause, Play, RefreshCcw, RotateCcw, X } from 'lucide-react';
+import { FlaskConical, Pause, Play, RefreshCcw, RotateCcw, Timer, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { ADVANCED_SCENARIOS, SCENARIOS } from '../types';
-import type { Mode, Scenario } from '../types';
+import { ADVANCED_CASES, CASES, isAdvanced } from './cases';
+import type { Mode, Scenario } from './cases';
 import type { Modes } from './modes';
 import type { OverviewResponse } from '../api/client';
 import { ModeSwitch } from './ModeSwitch';
 import { setLabSlot } from './LabSlot';
+import { setTimings, useTimings } from './timings';
 
 type Props = {
   modes: Modes;
@@ -35,12 +36,9 @@ export function LabPanel({
   onToggleStream,
 }: Props) {
   const [group, setGroup] = useState('Basic');
+  const timings = useTimings();
   useEffect(() => {
-    setGroup(
-      activeScenario && (ADVANCED_SCENARIOS as readonly Scenario[]).includes(activeScenario)
-        ? 'Advanced'
-        : 'Basic',
-    );
+    setGroup(activeScenario && isAdvanced(activeScenario) ? 'Advanced' : 'Basic');
   }, [activeScenario]);
   useEffect(() => {
     if (!activeScenario) return;
@@ -57,7 +55,7 @@ export function LabPanel({
           <FlaskConical size={22} />
           <div>
             <h2>Performance Lab</h2>
-            <span>{SCENARIOS.length} cases</span>
+            <span>{CASES.length} cases</span>
           </div>
         </div>
         <button className="icon-button" onClick={onClose} title="Close lab controls">
@@ -68,7 +66,7 @@ export function LabPanel({
       <nav className="lab-sections" role="tablist" aria-label="Case groups">
         {['Basic', 'Advanced'].map((name) => (
           <button key={name} role="tab" aria-selected={group === name} onClick={() => setGroup(name)}>
-            {name} <span>{name === 'Basic' ? SCENARIOS.length - ADVANCED_SCENARIOS.length : ADVANCED_SCENARIOS.length}</span>
+            {name} <span>{name === 'Basic' ? CASES.length - ADVANCED_CASES.length : ADVANCED_CASES.length}</span>
           </button>
         ))}
       </nav>
@@ -83,8 +81,8 @@ export function LabPanel({
       <div className="scenario-list">
         {[group].map((group) => (
           <section className="case-group" key={group} aria-label={`${group} cases`}>
-            {SCENARIOS.map((scenario, index) => {
-              if ((scenario.area === 'Advanced') !== (group === 'Advanced')) return null;
+            {CASES.map((scenario, index) => {
+              if (scenario.group !== group) return null;
               const active = activeScenario === scenario.id;
               return (
                 <div className={`scenario ${active ? 'active' : ''}`} data-scenario={scenario.id} key={scenario.id}>
@@ -97,8 +95,18 @@ export function LabPanel({
                     {active && <span className="case-current">Open</span>}
                   </div>
                   <ModeSwitch mode={modes[scenario.id]} onChange={(mode) => onModeChange(scenario.id, mode)} />
+                  {scenario.hasTimings && (
+                    <button
+                      className="timings-toggle"
+                      aria-pressed={timings.has(scenario.id)}
+                      onClick={() => setTimings(scenario.id, !timings.has(scenario.id))}
+                      title="Adds User Timing measures to the Timings track of the Performance panel"
+                    >
+                      <Timer size={14} /> Timings {timings.has(scenario.id) ? 'on' : 'off'}
+                    </button>
+                  )}
                   {active && <p className="scenario-hint">{scenario.hint}</p>}
-                  {active && scenario.area === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
+                  {active && scenario.group === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
                   {scenario.id === 'loading' && (
                     <div className="experiment-controls">
                       <label>

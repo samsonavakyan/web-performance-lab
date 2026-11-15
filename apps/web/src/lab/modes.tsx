@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import type { Mode, Scenario } from '../types';
+import type { Mode, Scenario } from './cases';
 
 export type Modes = Record<Scenario, Mode>;
 

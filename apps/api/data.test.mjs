@@ -17,15 +17,15 @@ test('candles and book are well-formed', () => {
   assert.ok(candles.every(x => x.high >= Math.max(x.open, x.close) && x.low <= Math.min(x.open, x.close)));
   assert.equal(makeOrderBook('NVDA').length, 85);
 });
-test('overview responses differ across modes', () => {
-  assert.equal(makeOverview('baseline').extras.length, 12000);
-  assert.equal(makeOverview('optimized').extras.length, 0);
+test('full overview carries the sector table', () => {
+  assert.equal(makeOverview(true).extras.length, 12000);
+  assert.equal(makeOverview(false).extras.length, 0);
 });
 
-test('overview visible data is identical across modes', () => {
-  const {extras: a, ...baseline} = makeOverview('baseline');
-  const {extras: b, ...optimized} = makeOverview('optimized');
-  assert.deepEqual(baseline, optimized);
+test('overview summary shows the same data as the full overview', () => {
+  const {extras: a, ...full} = makeOverview(true);
+  const {extras: b, ...summary} = makeOverview(false);
+  assert.deepEqual(full, summary);
 });
 
 test('trades are reproducible and well-formed', async () => {

@@ -53,15 +53,15 @@ for (const mode of ['Baseline', 'Optimized'] as const) {
 
 test('Overview recovers after a network failure and a malformed JSON response', async ({ page }) => {
   const overview = page.locator('[data-scenario="loading"]');
-  await page.route('**/api/overview?*', (route) => route.abort('failed'));
+  await page.route('**/api/overview/summary*', (route) => route.abort('failed'));
   await overview.getByRole('button', { name: 'Reload overview', exact: true }).click();
   await expect(page.locator('.overview-title [role="status"]')).toHaveText('Overview unavailable');
   await expect(page.locator('.overview-skeleton')).toHaveCount(0);
-  await page.unroute('**/api/overview?*');
+  await page.unroute('**/api/overview/summary*');
   await overview.getByRole('button', { name: 'Reload overview', exact: true }).click();
   await expectLoaded(page);
 
-  await page.route('**/api/overview?*', (route) =>
+  await page.route('**/api/overview/summary*', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -71,7 +71,7 @@ test('Overview recovers after a network failure and a malformed JSON response', 
   await overview.getByRole('button', { name: 'Reload overview', exact: true }).click();
   await expect(page.locator('.overview-title [role="status"]')).toHaveText('Overview unavailable');
   await expect(page.locator('.overview-title small')).toHaveText('Unexpected response');
-  await page.unroute('**/api/overview?*');
+  await page.unroute('**/api/overview/summary*');
   await overview.getByRole('button', { name: 'Reload overview', exact: true }).click();
   await expectLoaded(page);
 });
@@ -83,7 +83,7 @@ for (const lateStatus of [200, 500]) {
         const fetchRequest = window.fetch.bind(window);
         window.fetch = (input, init) => {
           const url = new URL(input instanceof Request ? input.url : String(input), location.href);
-          if (url.pathname === '/api/overview' && url.searchParams.get('mode') === 'baseline') {
+          if (url.pathname === '/api/overview') {
             return new Promise<Response>((resolve) => {
               setTimeout(
                 () =>

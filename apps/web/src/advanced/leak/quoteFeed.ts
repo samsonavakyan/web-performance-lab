@@ -1,3 +1,5 @@
+import { timed } from '../../lab/timings';
+
 // Shared quote client, like a WebSocket wrapper that many widgets subscribe to.
 type Listener = (price: number) => void;
 
@@ -6,13 +8,15 @@ const prices = new Map<string, number>();
 let timer: number | undefined;
 
 function tick() {
-  for (const [symbol, set] of listeners) {
-    const price = (prices.get(symbol) ?? 100) * (1 + (Math.random() - 0.5) * 0.004);
-    prices.set(symbol, price);
-    for (const listener of set) {
-      listener(price);
+  timed('leak', 'quote tick', () => {
+    for (const [symbol, set] of listeners) {
+      const price = (prices.get(symbol) ?? 100) * (1 + (Math.random() - 0.5) * 0.004);
+      prices.set(symbol, price);
+      for (const listener of set) {
+        listener(price);
+      }
     }
-  }
+  });
 }
 
 export const quoteFeed = {

@@ -1,4 +1,4 @@
-import type { BookLevel, Candle, Instrument, Mode, NewsItem, Overview } from '../types';
+import type { BookLevel, Candle, Instrument, NewsItem, Overview } from '../types';
 
 export type OverviewResponse = 'normal' | 'unavailable' | 'invalid';
 
@@ -30,10 +30,9 @@ function isOverview(value: unknown): value is Overview {
   );
 }
 
-async function overview(mode: Mode, signal: AbortSignal, response: OverviewResponse = 'normal'): Promise<Overview> {
-  const query = new URLSearchParams({ mode });
-  if (response !== 'normal') query.set('response', response);
-  const data = await request<unknown>(`/api/overview?${query}`, { signal });
+async function loadOverview(path: string, signal: AbortSignal, response: OverviewResponse): Promise<Overview> {
+  const query = response === 'normal' ? '' : `?${new URLSearchParams({ response })}`;
+  const data = await request<unknown>(`${path}${query}`, { signal });
   if (!isOverview(data)) throw new Error('Unexpected response');
   return data;
 }
@@ -43,5 +42,7 @@ export const api = {
   news: () => request<NewsItem[]>('/api/news'),
   history: (symbol: string) => request<Candle[]>(`/api/history/${symbol}`),
   orderBook: (symbol: string) => request<BookLevel[]>(`/api/orderbook/${symbol}`),
-  overview,
+  overview: (signal: AbortSignal, response: OverviewResponse = 'normal') => loadOverview('/api/overview', signal, response),
+  overviewSummary: (signal: AbortSignal, response: OverviewResponse = 'normal') =>
+    loadOverview('/api/overview/summary', signal, response),
 };

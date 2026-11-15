@@ -1,28 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
-import type { Mode } from '../../types';
 
 const SHOW_DELAY_MS = 2300;
 
-type Props = {
-  mode: Mode;
-  replay: number;
-};
-
-export function Bulletin({ mode, replay }: Props) {
-  const isOptimized = mode === 'optimized';
+export function Bulletin({ replay }: { replay: number }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     setVisible(false);
     const timer = window.setTimeout(() => setVisible(true), SHOW_DELAY_MS);
     return () => window.clearTimeout(timer);
-  }, [mode, replay]);
+  }, [replay]);
 
-  // Optimized keeps the slot at its final height (.bulletin-slot.optimized), so the bulletin appears without a layout shift.
   return (
-    <div className={`bulletin-slot ${mode}`}>
-      {visible && (
+    <div className="bulletin-slot">
+      {visible ? (
         <div className="market-bulletin">
           <div className="bulletin-emblem">
             <Bell size={18} />
@@ -33,8 +25,9 @@ export function Bulletin({ mode, replay }: Props) {
           </div>
           <span>JUST NOW</span>
         </div>
+      ) : (
+        <div className="bulletin-placeholder" aria-hidden="true" />
       )}
-      {!visible && isOptimized && <div className="bulletin-placeholder" aria-hidden="true" />}
     </div>
   );
 }

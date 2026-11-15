@@ -63,7 +63,7 @@ test('Overview returns matching visible values and different recorded payloads',
     await mode(page, 'Market overview', value);
     await expect(page.locator('.overview-skeleton')).toHaveCount(0);
     const start = Date.now();
-    const response = page.waitForResponse((r) => r.url().includes('/api/overview?'));
+    const response = page.waitForResponse((r) => new URL(r.url()).pathname.startsWith('/api/overview'));
     await page.getByRole('button', { name: 'Reload overview' }).click();
     sizes.push((await (await response).body()).length);
     await expect(page.locator('.overview-skeleton')).toHaveCount(0);

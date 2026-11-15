@@ -1,38 +1,17 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Settings2 } from 'lucide-react';
+import { DepthTable } from '../../lab/variants';
 import { money } from '../../lib/format';
-import type { BookLevel, Mode } from '../../types';
-
-const VISIBLE_LEVELS = 160;
-const MAX_SIZE = 740;
+import type { BookLevel } from '../../types';
 
 type Props = {
   levels: BookLevel[];
   seq: number;
-  mode: Mode;
   symbol: string;
 };
 
-export function OrderBook({ levels, seq, mode, symbol }: Props) {
-  const isOptimized = mode === 'optimized';
-  const root = useRef<HTMLDivElement>(null);
+export function OrderBook({ levels, seq, symbol }: Props) {
   const [tab, setTab] = useState<'book' | 'trades'>('book');
-
-  useEffect(() => {
-    // Optimized sizes the bars with transform in DepthRows, nothing to measure.
-    if (isOptimized) return;
-    if (tab !== 'book' || !root.current) return;
-    const rows = root.current.querySelectorAll<HTMLElement>('[data-depth-row]');
-    rows.forEach((row, i) => {
-      const cell = row.querySelector<HTMLElement>('.depth-bid');
-      const bar = row.querySelector<HTMLElement>('[data-depth-bar]');
-      if (cell && bar && levels[i]) {
-        bar.style.width = '0px';
-        const width = cell.getBoundingClientRect().width;
-        bar.style.width = `${(width * levels[i].bidSize) / MAX_SIZE}px`;
-      }
-    });
-  }, [seq, isOptimized, tab, levels]);
 
   return (
     <section className="panel depth-panel">
@@ -60,9 +39,7 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
             <span>PRICE (USD)</span>
             <span>ASK SIZE</span>
           </div>
-          <div className="depth-scroll" ref={root}>
-            <DepthRows key={mode} levels={levels} isOptimized={isOptimized} />
-          </div>
+          <DepthTable levels={levels} seq={seq} />
           <div className="spread">
             <span>Spread</span>
             <strong>0.04 USD</strong>
@@ -85,27 +62,3 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
     </section>
   );
 }
-
-const DepthRows = memo(function DepthRows({ levels, isOptimized }: { levels: BookLevel[]; isOptimized: boolean }) {
-  return (
-    <>
-      {levels.slice(0, VISIBLE_LEVELS).map((level) => (
-        <div className="depth-row" data-depth-row key={level.id}>
-          <div className="depth-cell depth-bid">
-            <span
-              className="depth-bar green"
-              data-depth-bar
-              style={isOptimized ? { transform: `scaleX(${level.bidSize / MAX_SIZE})` } : undefined}
-            />
-            <span>{level.bidSize.toLocaleString()}</span>
-          </div>
-          <div className="depth-price">{money(level.bid)}</div>
-          <div className="depth-cell depth-ask">
-            <span className="depth-bar red" style={{ transform: `scaleX(${level.askSize / MAX_SIZE})` }} />
-            <span>{level.askSize.toLocaleString()}</span>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-});

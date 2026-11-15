@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { OverviewResponse } from '../../api/client';
 import { money, signed } from '../../lib/format';
-import type { Mode, Overview } from '../../types';
+import { startTiming } from '../../lab/timings';
+import type { Overview } from '../../types';
 
 type Props = {
-  mode: Mode;
   reload: number;
   response: OverviewResponse;
 };
 
-export function MarketOverview({ mode, reload, response }: Props) {
+export function MarketOverview({ reload, response }: Props) {
   const [data, setData] = useState<Overview | null>(null);
   const [pending, setPending] = useState(true);
   const [error, setError] = useState('');
@@ -23,15 +23,18 @@ export function MarketOverview({ mode, reload, response }: Props) {
     setData(null);
     setError('');
     setDetails('');
+    const endTiming = startTiming('loading', 'overview');
     api
-      .overview(mode, controller.signal, response)
+      .overviewSummary(controller.signal, response)
       .then((result) => {
         if (!active) return;
+        endTiming();
         setData(result);
         setPending(false);
       })
       .catch((e: Error) => {
         if (!active || e.name === 'AbortError') return;
+        endTiming();
         setError('Overview unavailable');
         setDetails(e instanceof SyntaxError ? 'Unexpected response' : e.message);
         setPending(false);
@@ -40,7 +43,7 @@ export function MarketOverview({ mode, reload, response }: Props) {
       active = false;
       controller.abort();
     };
-  }, [mode, reload, response]);
+  }, [reload, response]);
 
   return (
     <section className="overview-section" aria-label="Market overview">

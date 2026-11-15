@@ -1,4 +1,4 @@
-import type { Mode } from '../../types';
+import { measureSince } from '../../lab/timings';
 
 type Message =
   | { kind: 'quote'; seq: number; price: number; time: number }
@@ -10,6 +10,7 @@ export type FeedStatus = 'connecting' | 'live' | 'stale' | 'reconnecting' | 'clo
 const STALE_AFTER = 3000;
 const BASE_DELAY = 1000;
 const MAX_DELAY = 10_000;
+const QUOTE_GAP = 1500;
 
 export class FeedClient {
   status: FeedStatus = 'connecting';
@@ -22,20 +23,18 @@ export class FeedClient {
   private retryTimer: number | undefined;
   private watchdog: number | undefined;
   private disposed = false;
+  private lastQuoteAt = 0;
 
-  private readonly isOptimized: boolean;
-
-  constructor(mode: Mode) {
-    this.isOptimized = mode === 'optimized';
+  constructor() {
     this.connect();
-    // Optimized treats silence as a dead connection: no message, heartbeats included, for STALE_AFTER ms means reconnect.
-    if (this.isOptimized) this.watchdog = window.setInterval(() => this.checkStale(), 500);
+    // No message, heartbeats included, for STALE_AFTER ms means the connection is dead.
+    this.watchdog = window.setInterval(() => this.checkStale(), 500);
   }
 
   private connect() {
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-    // Optimized resumes from the last seq, and the server replays what was missed.
-    const resume = this.isOptimized && this.lastSeq ? `?from=${this.lastSeq}` : '';
+    // Resumes from the last seq, and the server replays what was missed.
+    const resume = this.lastSeq ? `?from=${this.lastSeq}` : '';
     const socket = new WebSocket(`${protocol}://${location.host}/ws/lab/feed${resume}`);
     this.socket = socket;
     this.status = this.attempt ? 'reconnecting' : 'connecting';
@@ -53,14 +52,15 @@ export class FeedClient {
 
   private handle(message: Message) {
     this.lastMessageAt = Date.now();
-    if (this.isOptimized && this.status === 'stale') this.status = 'live';
+    if (this.status === 'stale') this.status = 'live';
     if (message.kind === 'reset') {
       void this.resync();
       return;
     }
     if (message.kind !== 'quote' || message.seq <= this.lastSeq) return;
-    // Optimized treats a gap in seq as lost messages and takes a fresh snapshot.
-    if (this.isOptimized && this.lastSeq && message.seq > this.lastSeq + 1) void this.resync();
+    // A gap in seq means lost messages, so the client takes a fresh snapshot.
+    if (this.lastSeq && message.seq > this.lastSeq + 1) void this.resync();
+    this.trackQuoteGap();
     this.lastSeq = message.seq;
     this.price = message.price;
     this.attempt = 0;
@@ -86,12 +86,18 @@ export class FeedClient {
 
   private scheduleReconnect() {
     const ceiling = Math.min(MAX_DELAY, BASE_DELAY * 2 ** this.attempt);
-    // Optimized uses exponential backoff with equal jitter, so clients do not reconnect in waves.
-    const delay = this.isOptimized ? ceiling / 2 + Math.random() * (ceiling / 2) : 1000;
+    // Exponential backoff with equal jitter, so clients do not reconnect in waves.
+    const delay = ceiling / 2 + Math.random() * (ceiling / 2);
     this.attempt += 1;
     this.retryAt = Date.now() + delay;
     if (this.status !== 'stale') this.status = 'reconnecting';
     this.retryTimer = window.setTimeout(() => this.connect(), delay);
+  }
+
+  private trackQuoteGap() {
+    const now = performance.now();
+    if (this.lastQuoteAt && now - this.lastQuoteAt > QUOTE_GAP) measureSince('reconnect', 'no quotes', this.lastQuoteAt);
+    this.lastQuoteAt = now;
   }
 
   dispose() {

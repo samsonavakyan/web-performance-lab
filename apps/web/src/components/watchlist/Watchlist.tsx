@@ -1,61 +1,24 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ListFilter, Search } from 'lucide-react';
-import { useModes } from '../../lab/modes';
-import { fuzzyFilter, simpleFilter } from '../../lib/search';
-import type { Instrument, Mode, Quote } from '../../types';
-import { InstrumentRow } from './InstrumentRow';
-
-const ROW_HEIGHT = 55;
-const LIST_HEIGHT = 470;
+import { InstrumentList, useInstrumentSearch } from '../../lab/variants';
+import type { Instrument, Quote } from '../../types';
 
 type Props = {
   instruments: Instrument[];
   quotes: Record<string, Quote>;
   selected: string;
   onSelect: (symbol: string) => void;
-  mode: Mode;
 };
 
-export function Watchlist({ instruments, quotes, selected, onSelect, mode }: Props) {
-  const isOptimized = mode === 'optimized';
+export function Watchlist({ instruments, quotes, selected, onSelect }: Props) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'name' | 'change'>('name');
-  const [scrollTop, setScrollTop] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    setScrollTop(0);
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [query, mode]);
-  const deferredQuery = useDeferredValue(query);
-  const isSearchOptimized = useModes().search === 'optimized';
+  const found = useInstrumentSearch(instruments, query);
 
-  const onSearch = (next: string) => {
-    setQuery(next);
-  };
-
-  const filtered = useMemo(() => {
-    // Optimized filters with a cheap substring match on a deferred query, so typing is not blocked by filtering.
-    const base = isSearchOptimized ? simpleFilter(instruments, deferredQuery) : fuzzyFilter(instruments, query);
-    if (sort === 'change') {
-      return [...base].sort((a, b) => (quotes[b.symbol]?.change ?? b.change) - (quotes[a.symbol]?.change ?? a.change));
-    }
-    return base;
-  }, [deferredQuery, instruments, quotes, isSearchOptimized, query, sort]);
-
-  const first = Math.max(0, Math.min(Math.floor(scrollTop / ROW_HEIGHT), Math.max(0, filtered.length - 1)) - 4);
-  const count = Math.ceil(LIST_HEIGHT / ROW_HEIGHT) + 8;
-  // Optimized renders only the rows in view plus a small buffer (virtualization).
-  const visible = isOptimized ? filtered.slice(first, first + count) : filtered;
-
-  const rows = visible.map((item) => (
-    <InstrumentRow
-      key={item.symbol}
-      item={item}
-      quote={quotes[item.symbol]}
-      selected={selected === item.symbol}
-      onSelect={onSelect}
-    />
-  ));
+  const sorted = useMemo(() => {
+    if (sort === 'name') return found;
+    return [...found].sort((a, b) => (quotes[b.symbol]?.change ?? b.change) - (quotes[a.symbol]?.change ?? a.change));
+  }, [found, quotes, sort]);
 
   return (
     <section className="panel watchlist-panel">
@@ -79,7 +42,7 @@ export function Watchlist({ instruments, quotes, selected, onSelect, mode }: Pro
           aria-label="Search symbols"
           placeholder="Search symbol or company"
           value={query}
-          onChange={(e) => onSearch(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
         />
         <kbd>⌕</kbd>
       </div>
@@ -90,24 +53,11 @@ export function Watchlist({ instruments, quotes, selected, onSelect, mode }: Pro
         <span>CHG</span>
       </div>
 
-      <div className="watchlist-scroll" ref={scrollRef} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}>
-        {isOptimized ? (
-          <div style={{ height: filtered.length * ROW_HEIGHT, position: 'relative' }}>
-            <div
-              style={{ position: 'absolute', top: 0, width: '100%', transform: `translateY(${first * ROW_HEIGHT}px)` }}
-            >
-              {rows}
-            </div>
-          </div>
-        ) : (
-          rows
-        )}
-        {!filtered.length && <div className="empty-state">No instruments found</div>}
-      </div>
+      <InstrumentList items={sorted} quotes={quotes} selected={selected} onSelect={onSelect} query={query} />
 
       <div className="watchlist-footer">
         <span className="status-dot" /> <span>Watchlist</span>
-        <span>{filtered.length.toLocaleString()} results</span>
+        <span>{sorted.length.toLocaleString()} results</span>
       </div>
     </section>
   );

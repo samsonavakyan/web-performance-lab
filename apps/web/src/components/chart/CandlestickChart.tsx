@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { money, signed } from '../../lib/format';
-import type { Candle, Mode } from '../../types';
+import { ScannerTrack } from '../../lab/variants';
+import type { Candle } from '../../types';
 
 const HEIGHT = 345;
 const LEFT = 28;
@@ -13,12 +14,11 @@ const PLOT_HEIGHT = 233;
 type Props = {
   candles: Candle[];
   symbol: string;
-  mode: Mode;
   interval: string;
   change: number;
 };
 
-export function CandlestickChart({ candles, symbol, mode, interval, change }: Props) {
+export function CandlestickChart({ candles, symbol, interval, change }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [width, setWidth] = useState(970);
   useLayoutEffect(() => {
@@ -160,12 +160,7 @@ export function CandlestickChart({ candles, symbol, mode, interval, change }: Pr
         )}
       </svg>
 
-      <div className={`scanner-track ${mode}`} aria-hidden="true">
-        <span className="scanner-label">MARKET SCAN</span>
-        <div className="scanner-line">
-          <span className="scanner-marker" />
-        </div>
-      </div>
+      <ScannerTrack />
     </div>
   );
 }

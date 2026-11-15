@@ -4,7 +4,7 @@ import { fetchJson } from './data';
 import type { Section } from './data';
 import { NewsView, Skeleton } from './views';
 
-export function FetchingNews({ symbol, onReady }: { symbol: string; onReady: (section: Section) => void }) {
+export function NewsSection({ symbol, onReady }: { symbol: string; onReady: (section: Section) => void }) {
   const [items, setItems] = useState<NewsItem[] | null>(null);
   useEffect(() => {
     const controller = new AbortController();

@@ -1,4 +1,4 @@
-import type { Mode } from '../types';
+import type { Mode } from './cases';
 
 type Props = { mode: Mode; onChange: (mode: Mode) => void };
 

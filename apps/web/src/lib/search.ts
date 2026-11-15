@@ -1,33 +1,28 @@
 import type { Instrument } from '../types';
 
-function editDistance(a: string, b: string): number {
-  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
-  for (let i = 1; i <= a.length; i++) {
-    let previous = row[0];
-    row[0] = i;
-    for (let j = 1; j <= b.length; j++) {
-      const saved = row[j];
-      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, previous + (a[i - 1] === b[j - 1] ? 0 : 1));
-      previous = saved;
+// Smallest edit distance between the query and any part of the text, in one pass over the text.
+function matchDistance(text: string, query: string): number {
+  let column = Array.from({ length: query.length + 1 }, (_, i) => i);
+  let best = column[query.length];
+  for (const char of text) {
+    const next = [0];
+    for (let i = 1; i <= query.length; i++) {
+      next[i] = Math.min(column[i] + 1, next[i - 1] + 1, column[i - 1] + (query[i - 1] === char ? 0 : 1));
     }
+    column = next;
+    best = Math.min(best, column[query.length]);
   }
-  return row[b.length];
+  return best;
 }
 
-export function fuzzyFilter(items: Instrument[], query: string): Instrument[] {
+// Finds instruments by symbol or company name. Queries of five letters or more tolerate one typo.
+export function searchInstruments(items: Instrument[], query: string): Instrument[] {
   const needle = query.toLowerCase().trim();
   if (!needle) return items;
-  return items.filter((item) => {
-    const haystack = `${item.symbol} ${item.name}`.toLowerCase();
-    for (let repeat = 0; repeat < 90; repeat++) {
-      editDistance(haystack, needle);
-    }
-    return item.symbol.toLowerCase().includes(needle) || item.name.toLowerCase().includes(needle);
-  });
-}
-
-export function simpleFilter(items: Instrument[], query: string): Instrument[] {
-  const q = query.toLowerCase().trim();
-  if (!q) return items;
-  return items.filter((item) => item.symbol.toLowerCase().includes(q) || item.name.toLowerCase().includes(q));
+  const maxDistance = needle.length >= 5 ? 1 : 0;
+  return items
+    .map((item) => ({ item, distance: matchDistance(`${item.symbol} ${item.name}`.toLowerCase(), needle) }))
+    .filter((match) => match.distance <= maxDistance)
+    .sort((a, b) => a.distance - b.distance)
+    .map((match) => match.item);
 }

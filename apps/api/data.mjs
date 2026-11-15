@@ -86,8 +86,7 @@ export function makeOrderBook(symbol = 'NVDA', rows = 85, startingPrice) {
   }));
 }
 
-export function makeOverview(mode = 'optimized') {
-  const full = mode === 'baseline';
+export function makeOverview(full = false) {
   const random = rngFrom(777);
   const highlights = [
     { symbol: 'NVDA', price: 143.76, change: 2.84 },

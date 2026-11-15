@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, SlidersHorizontal, Star } from 'lucide-react';
 import { money, signed } from '../../lib/format';
-import type { Candle, Instrument, Mode } from '../../types';
+import type { Candle, Instrument } from '../../types';
 import { CandlestickChart } from './CandlestickChart';
 
 const INTERVALS = ['1D', '1W', '1M'];
@@ -12,10 +12,9 @@ type Props = {
   candles: Candle[];
   price: number;
   change: number;
-  animationMode: Mode;
 };
 
-export function ChartPanel({ symbol, instrument, candles, price, change, animationMode }: Props) {
+export function ChartPanel({ symbol, instrument, candles, price, change }: Props) {
   const [interval, setInterval] = useState('1W');
   const [favorite, setFavorite] = useState(false);
 
@@ -53,7 +52,7 @@ export function ChartPanel({ symbol, instrument, candles, price, change, animati
         </div>
       </div>
 
-      <CandlestickChart candles={candles} symbol={symbol} mode={animationMode} interval={interval} change={change} />
+      <CandlestickChart candles={candles} symbol={symbol} interval={interval} change={change} />
 
       <div className="chart-bottom">
         <div>

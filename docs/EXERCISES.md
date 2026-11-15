@@ -2,6 +2,21 @@
 
 Open http://localhost:5173. Pick one case in the Performance Lab panel. Record the same interaction in Baseline and Optimized using the same browser, viewport, CPU and network settings. Keep other cases on Optimized.
 
+## Timings
+
+Some cases have a Timings button under the mode switch. It is off by default. When it is on, the case adds User Timing measures to the Timings track of the Performance panel. A measure points at the code that does the work, so try to find the problem without it first.
+
+| Case | Measure |
+| --- | --- |
+| 01. Search | `search "<query>"`, filtering for one query |
+| 05. Market overview | `overview`, from the request to the result |
+| 07. Instrument monitor | `quote tick`, one round of price updates for all subscribed charts |
+| 09. Instrument switch | `instrument <symbol>`, from the click until every section is on screen |
+| 10. Trade export | `trade export`, from the click to the finished file |
+| 11. Live feed | `no quotes`, a pause of more than 1.5 s between prices |
+
+In dev React StrictMode runs `useMemo` twice, so the search measure appears twice per query. `npm run preview` has one. The dev build also shows React's own Components and Scheduler tracks, useful for the Watchlist and Order ticket cases.
+
 ## 01. Search
 
 Type `nvda`, clear the field, then type `  NVDA  ` in the watchlist search. Repeat in the other mode.

@@ -1,47 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
-import type { Mode } from '../../types';
+import { useEffect, useState } from 'react';
 import { LabSlot } from '../../lab/LabSlot';
-import { FeedClient } from './feedClient';
+import { useModes } from '../../lab/modes';
+import { FeedQuote } from '../../lab/variants';
 
 const DESKS = 40;
 type Stats = { connected: number; seq: number; restarting: boolean; buckets: number[] };
-
-function useNow(interval: number) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), interval);
-    return () => clearInterval(timer);
-  }, [interval]);
-  return now;
-}
-
-function StatusBadge({ client, isOptimized, now }: { client: FeedClient; isOptimized: boolean; now: number }) {
-  // Optimized shows whether the data is fresh, not only whether the socket is open.
-  if (isOptimized) {
-    if (client.status === 'live') return <span className="feed-badge good">Live</span>;
-    if (client.status === 'stale') return <span className="feed-badge bad">Stale · reconnecting</span>;
-    const wait = Math.max(0, (client.retryAt - now) / 1000);
-    return <span className="feed-badge warn">Reconnecting{wait ? ` in ${wait.toFixed(1)} s` : ''}</span>;
-  }
-  const connected = client.status === 'live';
-  return <span className={`feed-badge ${connected ? 'good' : 'bad'}`}>{connected ? 'Connected' : 'Disconnected'}</span>;
-}
 
 async function post(path: string) {
   await fetch(path, { method: 'POST' });
 }
 
-export function LiveFeed({ mode }: { mode: Mode }) {
-  const isOptimized = mode === 'optimized';
-  const client = useRef<FeedClient | null>(null);
+export function LiveFeed() {
+  const mode = useModes().reconnect;
   const [withDesks, setWithDesks] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
-  const now = useNow(200);
-
-  useEffect(() => {
-    client.current = new FeedClient(mode);
-    return () => client.current?.dispose();
-  }, [mode]);
 
   useEffect(() => {
     void post(`/api/lab/feed/users?count=${withDesks ? DESKS : 0}&policy=${mode}`);
@@ -56,8 +28,6 @@ export function LiveFeed({ mode }: { mode: Mode }) {
     return () => clearInterval(timer);
   }, []);
 
-  const feed = client.current;
-  const age = feed?.lastMessageAt ? Math.max(0, now - feed.lastMessageAt) / 1000 : 0;
   const peak = Math.max(1, ...(stats?.buckets ?? [1]));
   return (
     <>
@@ -93,14 +63,7 @@ export function LiveFeed({ mode }: { mode: Mode }) {
           <small>Connection attempts per 250 ms, last 15 s</small>
         </div>
       </LabSlot>
-      {feed && (
-        <div className="feed-quote">
-          <span>NVDA</span>
-          <strong>{feed.price ? feed.price.toFixed(2) : '-'}</strong>
-          <StatusBadge client={feed} isOptimized={isOptimized} now={now} />
-          {isOptimized && feed.lastMessageAt > 0 && <small>Updated {age.toFixed(1)} s ago</small>}
-        </div>
-      )}
+      <FeedQuote />
     </>
   );
 }

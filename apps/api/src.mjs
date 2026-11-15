@@ -32,20 +32,20 @@ app.get('/api/orderbook/:symbol', async (request, reply) => {
   return makeOrderBook(symbol, 160, bySymbol.get(symbol).price);
 });
 app.get('/api/news', async () => NEWS);
-app.get('/api/overview', async (request, reply) => {
-  const mode = request.query?.mode === 'baseline' ? 'baseline' : 'optimized';
+// The full overview also carries the sector table for the market page; the summary has only what the strip shows.
+async function overview(request, reply, isFull) {
   reply.header('Cache-Control', 'no-store');
-  // Optimized models a lean endpoint: fast and only the fields the widget shows. Baseline is slow and adds 12 000 unused rows.
-  if (mode === 'optimized') await sleep(60);
-  else await sleep(1100);
+  await sleep(isFull ? 1100 : 60);
   if (request.query?.response === 'unavailable') {
     return reply.code(500).send({error: 'Overview unavailable'});
   }
   if (request.query?.response === 'invalid') {
     return {asOf: '2026-01-02T15:30:00Z', title: 'Market pulse', highlights: null, extras: []};
   }
-  return makeOverview(mode);
-});
+  return makeOverview(isFull);
+}
+app.get('/api/overview', (request, reply) => overview(request, reply, true));
+app.get('/api/overview/summary', (request, reply) => overview(request, reply, false));
 
 registerLab(app, instruments);
 
