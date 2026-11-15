@@ -6,7 +6,9 @@ async function open(page: Page, id: string, mode: 'Baseline' | 'Optimized') {
   await page.getByRole('tab', { name: /Advanced/ }).click();
   const scenario = page.locator(`[data-scenario="${id}"]`);
   await scenario.getByRole('button', { name: mode, exact: true }).click();
-  await scenario.getByRole('button', { name: 'Open case' }).click();
+  // An open case has no Open case button: changing the mode already starts a fresh run.
+  const openButton = scenario.getByRole('button', { name: 'Open case' });
+  if (await openButton.count()) await openButton.click();
   await expect(page.getByRole('region', { name: 'Advanced Lab' })).toBeVisible();
 }
 

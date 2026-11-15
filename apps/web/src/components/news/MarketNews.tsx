@@ -1,4 +1,3 @@
-import { ArrowRight } from 'lucide-react';
 import type { NewsItem } from '../../types';
 
 type Props = {
@@ -13,7 +12,6 @@ export function MarketNews({ items }: Props) {
           <h2>Market briefing</h2>
           <p>Latest headlines</p>
         </div>
-        <ArrowRight size={16} className="muted-icon" />
       </div>
       <div className="news-list">
         {items.map((item) => (

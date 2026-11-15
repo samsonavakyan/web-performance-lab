@@ -44,7 +44,6 @@ export function Watchlist({ instruments, quotes, selected, onSelect }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <kbd>⌕</kbd>
       </div>
 
       <div className="watchlist-table-head">

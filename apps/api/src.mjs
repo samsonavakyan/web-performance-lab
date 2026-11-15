@@ -42,7 +42,7 @@ async function overview(request, reply, isFull) {
   if (request.query?.response === 'invalid') {
     return {asOf: '2026-01-02T15:30:00Z', title: 'Market pulse', highlights: null, extras: []};
   }
-  return makeOverview(isFull);
+  return makeOverview(isFull, instruments);
 }
 app.get('/api/overview', (request, reply) => overview(request, reply, true));
 app.get('/api/overview/summary', (request, reply) => overview(request, reply, false));

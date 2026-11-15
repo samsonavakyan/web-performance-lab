@@ -33,7 +33,7 @@ export function OrderTicket({ symbol, quote, format }: { symbol: string; quote?:
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('100');
   const [side, setSide] = useState<'BUY' | 'SELL'>('BUY');
-  const notional = Number(price) * Number(quantity);
+  const notional = price.trim() ? Number(price) * Number(quantity) : NaN;
   return (
     <form className="order-ticket" onSubmit={(event) => event.preventDefault()}>
       <h2>Order ticket · {symbol}</h2>

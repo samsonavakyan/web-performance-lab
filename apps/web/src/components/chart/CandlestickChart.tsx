@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { money, signed } from '../../lib/format';
 import { ScannerTrack } from '../../lab/variants';
 import type { Candle } from '../../types';
@@ -10,6 +10,8 @@ const TOP = 27;
 const AXIS_FONT_SIZE = 12;
 const PRICE_MARKER_HEIGHT = 22;
 const PLOT_HEIGHT = 233;
+const SESSION_START = 8;
+const SESSION_HOURS = 8;
 
 type Props = {
   candles: Candle[];
@@ -50,7 +52,9 @@ export function CandlestickChart({ candles, symbol, interval, change }: Props) {
   const plotWidth = plotRight - LEFT;
   const step = plotWidth / Math.max(view.length, 1);
   const closeY = current ? valueY(current.close) : null;
-  const timeTickCount = Math.min(9, Math.max(3, Math.floor(plotWidth / 70) + 1));
+  // The axis spans 08:00–16:00; ticks fall on whole hours, as often as the width allows.
+  const hourStep = [1, 2, 4].find((step) => plotWidth / (SESSION_HOURS / step) >= 70) ?? 8;
+  const timeTickCount = SESSION_HOURS / hourStep + 1;
   const labelGap = PRICE_MARKER_HEIGHT / 2 + AXIS_FONT_SIZE / 2 + 4;
 
   return (
@@ -62,7 +66,7 @@ export function CandlestickChart({ candles, symbol, interval, change }: Props) {
         <div className="chart-number">
           {current ? money(current.close) : '—'}
           <span className={change >= 0 ? 'txt-up' : 'txt-down'}>
-            {signed(change)} <ArrowUpRight size={14} />
+            {signed(change)} {change >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
           </span>
         </div>
         <div className="ohlc">
@@ -100,7 +104,7 @@ export function CandlestickChart({ candles, symbol, interval, change }: Props) {
             <g key={i}>
               <line x1={x} y1={TOP} x2={x} y2="320" className="grid-line" />
               <text x={x} y="335" textAnchor="middle" className="axis-label">
-                {String(8 + Math.round((i * 8) / (timeTickCount - 1))).padStart(2, '0')}:00
+                {String(SESSION_START + i * hourStep).padStart(2, '0')}:00
               </text>
             </g>
           );

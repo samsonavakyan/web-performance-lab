@@ -112,6 +112,8 @@ export default function App() {
                     <ChartPanel
                       symbol={selected}
                       instrument={instrument}
+                      instruments={instruments}
+                      onSelect={setSelected}
                       candles={candles}
                       price={price}
                       change={change}

@@ -1,3 +1,4 @@
+import { signed } from '../../lib/format';
 import type { BookLevel, Candle, NewsItem } from '../../types';
 import type { InstrumentInfo } from './data';
 
@@ -11,7 +12,7 @@ export function InfoView({ info }: { info: InstrumentInfo }) {
         </span>
       </div>
       <strong>{info.price.toFixed(2)}</strong>
-      <span className={info.change >= 0 ? 'txt-up' : 'txt-down'}>{info.change.toFixed(2)}%</span>
+      <span className={info.change >= 0 ? 'txt-up' : 'txt-down'}>{signed(info.change)}</span>
     </div>
   );
 }

@@ -98,11 +98,13 @@ export function LabPanel({
                   {scenario.hasTimings && (
                     <button
                       className="timings-toggle"
-                      aria-pressed={timings.has(scenario.id)}
+                      role="switch"
+                      aria-checked={timings.has(scenario.id)}
                       onClick={() => setTimings(scenario.id, !timings.has(scenario.id))}
                       title="Adds User Timing measures to the Timings track of the Performance panel"
                     >
-                      <Timer size={14} /> Timings {timings.has(scenario.id) ? 'on' : 'off'}
+                      <Timer size={14} /> Timings
+                      <span className="switch-track" aria-hidden="true" />
                     </button>
                   )}
                   {active && <p className="scenario-hint">{scenario.hint}</p>}
@@ -124,9 +126,11 @@ export function LabPanel({
                     </div>
                   )}
                   <div className="scenario-actions">
-                    <button className="open-case" onClick={() => onOpenCase(scenario.id)}>
-                      Open case
-                    </button>
+                    {!(active && scenario.group === 'Advanced') && (
+                      <button className="open-case" onClick={() => onOpenCase(scenario.id)}>
+                        Open case
+                      </button>
+                    )}
                     {scenario.id === 'shift' && (
                       <button className="replay" onClick={onReplayBulletin}>
                         <RotateCcw size={15} /> Replay bulletin

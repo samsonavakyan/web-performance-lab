@@ -1,20 +1,23 @@
 import { useState } from 'react';
-import { ChevronDown, SlidersHorizontal, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { money, signed } from '../../lib/format';
 import type { Candle, Instrument } from '../../types';
 import { CandlestickChart } from './CandlestickChart';
+import { InstrumentPicker } from './InstrumentPicker';
 
 const INTERVALS = ['1D', '1W', '1M'];
 
 type Props = {
   symbol: string;
   instrument?: Instrument;
+  instruments: Instrument[];
+  onSelect: (symbol: string) => void;
   candles: Candle[];
   price: number;
   change: number;
 };
 
-export function ChartPanel({ symbol, instrument, candles, price, change }: Props) {
+export function ChartPanel({ symbol, instrument, instruments, onSelect, candles, price, change }: Props) {
   const [interval, setInterval] = useState('1W');
   const [favorite, setFavorite] = useState(false);
 
@@ -24,10 +27,13 @@ export function ChartPanel({ symbol, instrument, candles, price, change }: Props
         <div className="chart-symbol">
           <span className="chart-symbol-icon">{symbol.slice(0, 2)}</span>
           <div>
-            <h2>
-              {instrument?.name ?? symbol} <ChevronDown size={15} />
-            </h2>
-            <p>NASDAQ · USD</p>
+            <InstrumentPicker
+              symbol={symbol}
+              name={instrument?.name ?? symbol}
+              instruments={instruments}
+              onSelect={onSelect}
+            />
+            <p>{instrument?.sector ?? 'Market'} · USD</p>
           </div>
           <button
             className={`icon-button ${favorite ? 'is-favorite' : ''}`}
@@ -48,7 +54,6 @@ export function ChartPanel({ symbol, instrument, candles, price, change }: Props
               </button>
             ))}
           </div>
-          <SlidersHorizontal size={16} className="muted-icon" />
         </div>
       </div>
 

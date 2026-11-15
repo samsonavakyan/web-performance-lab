@@ -71,7 +71,11 @@ export function makeCandles(symbol = 'NVDA', count = 160, seed = 784, startingPr
     candles.push({time: i, open: +open.toFixed(3), close: +close.toFixed(3), high: +high.toFixed(3), low: +low.toFixed(3), volume});
     price = close;
   }
-  return candles;
+  // History ends at the current price, so the chart agrees with quotes and the order book.
+  if (startingPrice === undefined) return candles;
+  const scale = startingPrice / candles[candles.length - 1].close;
+  const round = (value) => +(value * scale).toFixed(3);
+  return candles.map((c) => ({...c, open: round(c.open), close: round(c.close), high: round(c.high), low: round(c.low)}));
 }
 
 export function makeOrderBook(symbol = 'NVDA', rows = 85, startingPrice) {
@@ -86,14 +90,14 @@ export function makeOrderBook(symbol = 'NVDA', rows = 85, startingPrice) {
   }));
 }
 
-export function makeOverview(full = false) {
+const OVERVIEW_SYMBOLS = ['NVDA', 'BTCUSD', 'SPY', 'TSLA'];
+
+export function makeOverview(full = false, instruments = makeInstruments()) {
   const random = rngFrom(777);
-  const highlights = [
-    { symbol: 'NVDA', price: 143.76, change: 2.84 },
-    { symbol: 'BTCUSD', price: 67482.1, change: 1.32 },
-    { symbol: 'SPY', price: 585.72, change: -0.28 },
-    { symbol: 'TSLA', price: 253.08, change: -1.47 }
-  ];
+  const highlights = OVERVIEW_SYMBOLS.map((symbol) => {
+    const {price, change} = instruments.find((item) => item.symbol === symbol);
+    return {symbol, price, change};
+  });
   return {
     asOf: '2026-01-02T15:30:00Z',
     title: 'Market pulse',

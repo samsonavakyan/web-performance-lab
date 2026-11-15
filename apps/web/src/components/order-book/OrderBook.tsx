@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Settings2 } from 'lucide-react';
 import { DepthTable } from '../../lab/variants';
 import { money } from '../../lib/format';
 import type { BookLevel } from '../../types';
@@ -20,7 +19,6 @@ export function OrderBook({ levels, seq, symbol }: Props) {
           <h2>Order book</h2>
           <p>{symbol} · Level II depth</p>
         </div>
-        <Settings2 size={16} className="muted-icon" />
       </div>
 
       <div className="book-tabs">
