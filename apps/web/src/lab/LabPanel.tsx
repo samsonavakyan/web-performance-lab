@@ -1,4 +1,4 @@
-import { FlaskConical, Pause, Play, RefreshCcw, RotateCcw, Timer, X } from 'lucide-react';
+import { ChevronRight, FlaskConical, Pause, Play, RefreshCcw, RotateCcw, Timer, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ADVANCED_CASES, CASES, isAdvanced } from './cases';
 import type { Mode, Scenario } from './cases';
@@ -62,7 +62,7 @@ export function LabPanel({
           <X size={20} />
         </button>
       </div>
-      <p className="lab-intro">Open a case. Compare the same interaction in Baseline and Optimized.</p>
+      <p className="lab-intro">Open a case, read the complaint and reproduce it. Record the same steps in Baseline and Optimized.</p>
       <nav className="lab-sections" role="tablist" aria-label="Case groups">
         {['Basic', 'Advanced'].map((name) => (
           <button key={name} role="tab" aria-selected={group === name} onClick={() => setGroup(name)}>
@@ -84,46 +84,64 @@ export function LabPanel({
             {CASES.map((scenario, index) => {
               if (scenario.group !== group) return null;
               const active = activeScenario === scenario.id;
-              return (
-                <div className={`scenario ${active ? 'active' : ''}`} data-scenario={scenario.id} key={scenario.id}>
-                  <div className="scenario-heading">
-                    <span className="scenario-number">{String(index + 1).padStart(2, '0')}</span>
-                    <div>
-                      <strong>{scenario.title}</strong>
-                      <small>{scenario.subtitle}</small>
-                    </div>
-                    {active && <span className="case-current">Open</span>}
+              const number = String(index + 1).padStart(2, '0');
+              const mode = modes[scenario.id];
+              const title = (
+                <>
+                  <span className="scenario-number">{number}</span>
+                  <div>
+                    <strong>{scenario.title}</strong>
+                    <small>{scenario.subtitle}</small>
                   </div>
-                  <ModeSwitch mode={modes[scenario.id]} onChange={(mode) => onModeChange(scenario.id, mode)} />
-                  {scenario.hasTimings && (
-                    <button
-                      className="timings-toggle"
-                      role="switch"
-                      aria-checked={timings.has(scenario.id)}
-                      onClick={() => setTimings(scenario.id, !timings.has(scenario.id))}
-                      title="Adds User Timing measures to the Timings track of the Performance panel"
-                    >
-                      <Timer size={14} /> Timings
-                      <span className="switch-track" aria-hidden="true" />
+                </>
+              );
+              if (!active) {
+                return (
+                  <div className="scenario" data-scenario={scenario.id} key={scenario.id}>
+                    <button className="scenario-heading case-row" onClick={() => onOpenCase(scenario.id)} aria-label="Open case">
+                      {title}
+                      <span className={`mode-badge ${mode}`}>{mode === 'baseline' ? 'Baseline' : 'Optimized'}</span>
+                      <ChevronRight size={16} className="case-row-chevron" />
                     </button>
-                  )}
-                  {active && (
-                    <div className="case-brief">
-                      <details className="case-toggle" open>
-                        <summary>Complaint · {scenario.complaint.from}</summary>
-                        <blockquote>{scenario.complaint.text}</blockquote>
-                      </details>
-                      <details className="case-toggle">
-                        <summary>Reproduce</summary>
-                        <p>{scenario.steps}</p>
-                      </details>
+                  </div>
+                );
+              }
+              return (
+                <div className="scenario active" data-scenario={scenario.id} key={scenario.id}>
+                  <div className="scenario-heading">
+                    {title}
+                    <span className="case-current">Open</span>
+                  </div>
+                  <div className="case-body">
+                    <details className="case-toggle" open>
+                      <summary>
+                        Complaint <span>· {scenario.complaint.from}</span>
+                      </summary>
+                      <blockquote>{scenario.complaint.text}</blockquote>
+                    </details>
+                    <details className="case-toggle">
+                      <summary>Reproduce</summary>
+                      <p>{scenario.steps}</p>
+                    </details>
+                    <div className="case-field">
+                      <span className="case-label">Mode</span>
+                      <ModeSwitch mode={mode} onChange={(next) => onModeChange(scenario.id, next)} />
                     </div>
-                  )}
-                  {active && scenario.group === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
-                  {scenario.id === 'overview' && (
-                    <div className="experiment-controls">
-                      <label>
-                        Response
+                    {scenario.hasTimings && (
+                      <button
+                        className="timings-toggle"
+                        role="switch"
+                        aria-checked={timings.has(scenario.id)}
+                        onClick={() => setTimings(scenario.id, !timings.has(scenario.id))}
+                        title="Adds User Timing measures to the Timings track of the Performance panel"
+                      >
+                        <Timer size={14} /> Timings
+                        <span className="switch-track" aria-hidden="true" />
+                      </button>
+                    )}
+                    {scenario.id === 'overview' && (
+                      <label className="case-field">
+                        <span className="case-label">Response</span>
                         <select
                           aria-label="Overview response"
                           value={overviewResponse}
@@ -134,24 +152,18 @@ export function LabPanel({
                           <option value="invalid">Invalid data</option>
                         </select>
                       </label>
-                    </div>
-                  )}
-                  <div className="scenario-actions">
-                    {!(active && scenario.group === 'Advanced') && (
-                      <button className="open-case" onClick={() => onOpenCase(scenario.id)}>
-                        Open case
-                      </button>
                     )}
                     {scenario.id === 'bulletin' && (
-                      <button className="replay" onClick={onReplayBulletin}>
+                      <button className="case-action" onClick={onReplayBulletin}>
                         <RotateCcw size={15} /> Replay bulletin
                       </button>
                     )}
                     {scenario.id === 'overview' && (
-                      <button className="replay" onClick={onReloadOverview}>
+                      <button className="case-action" onClick={onReloadOverview}>
                         <RefreshCcw size={15} /> Reload overview
                       </button>
                     )}
+                    {scenario.group === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
                   </div>
                 </div>
               );

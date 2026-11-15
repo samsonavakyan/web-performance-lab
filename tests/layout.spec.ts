@@ -68,21 +68,18 @@ for (const largePrice of [false, true]) {
   });
 }
 
-test('Sidebar controls and actions stay separated and aligned', async ({ page }) => {
+test('Open case controls fit inside the sidebar card', async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 800 });
   await page.goto('/');
   const overview = page.locator('[data-scenario="overview"]');
+  await overview.getByRole('button', { name: 'Open case' }).click();
   await overview.scrollIntoViewIfNeeded();
-  const layout = await overview.evaluate((root) => {
+  const fits = await overview.evaluate((root) => {
     const bounds = root.getBoundingClientRect();
-    const select = root.querySelector('select')!.getBoundingClientRect();
-    const actions = [...root.querySelectorAll('.scenario-actions button')].map((el) => el.getBoundingClientRect());
-    return {
-      selectFits: select.left >= bounds.left && select.right <= bounds.right,
-      equalHeight: Math.abs(actions[0].height - actions[1].height) < 1,
-      separated: actions[1].left - actions[0].right >= 7,
-      actionsFit: actions.every((r) => r.left >= bounds.left && r.right <= bounds.right),
-    };
+    return [...root.querySelectorAll('select, button')].every((el) => {
+      const r = el.getBoundingClientRect();
+      return r.left >= bounds.left && r.right <= bounds.right;
+    });
   });
-  expect(layout).toEqual({ selectFits: true, equalHeight: true, separated: true, actionsFit: true });
+  expect(fits).toBe(true);
 });

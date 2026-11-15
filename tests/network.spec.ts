@@ -1,6 +1,12 @@
 import { test, expect, type Page } from '@playwright/test';
 
+async function openOverview(page: Page) {
+  const open = page.locator('[data-scenario="overview"]').getByRole('button', { name: 'Open case' });
+  if (await open.count()) await open.click();
+}
+
 async function setMode(page: Page, mode: 'Baseline' | 'Optimized') {
+  await openOverview(page);
   await page.locator('[data-scenario="overview"]').getByRole('button', { name: mode, exact: true }).click();
 }
 
@@ -53,6 +59,7 @@ for (const mode of ['Baseline', 'Optimized'] as const) {
 
 test('Overview recovers after a network failure and a malformed JSON response', async ({ page }) => {
   const overview = page.locator('[data-scenario="overview"]');
+  await openOverview(page);
   await page.route('**/api/overview/summary*', (route) => route.abort('failed'));
   await overview.getByRole('button', { name: 'Reload overview', exact: true }).click();
   await expect(page.locator('.overview-title [role="status"]')).toHaveText('Overview unavailable');

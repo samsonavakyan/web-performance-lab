@@ -1,10 +1,15 @@
 import { test, expect, type Page } from '@playwright/test';
 async function mode(page: Page, title: string, value: string) {
-  await page
+  const card = page
     .locator('.scenario')
-    .filter({ has: page.locator('.scenario-heading strong').filter({ hasText: new RegExp(`^${title}$`) }) })
-    .getByRole('button', { name: value, exact: true })
-    .click();
+    .filter({ has: page.locator('.scenario-heading strong').filter({ hasText: new RegExp(`^${title}$`) }) });
+  const open = card.getByRole('button', { name: 'Open case' });
+  if (await open.count()) {
+    await open.click();
+    // Opening a Basic case scrolls the app to its panel; let the smooth scroll finish before measuring.
+    await page.waitForTimeout(700);
+  }
+  await card.getByRole('button', { name: value, exact: true }).click();
 }
 test.beforeEach(async ({ page }) => {
   await page.goto('/');

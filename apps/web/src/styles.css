@@ -1,4 +1,5 @@
 :root {
+  interpolate-size: allow-keywords;
   --surface: #ffffff;
   --subtle: #f5f6f8;
   --border: #e2e5eb;
@@ -1192,17 +1193,124 @@ a {
   color: var(--muted);
 }
 .scenario {
-  border: 0;
-  background: transparent;
-  border-radius: 0;
-  margin-bottom: 0;
-  padding: 16px 4px;
   border-bottom: 1px solid var(--border);
 }
 .scenario.active {
-  border-color: var(--border);
+  margin: 8px 0;
+  padding: 14px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
   background: var(--subtle);
-  box-shadow: none;
+}
+.case-row {
+  width: 100%;
+  padding: 12px 6px;
+  border-radius: 6px;
+  text-align: left;
+  color: var(--text);
+  transition: background 0.15s ease;
+}
+.case-row:hover .case-row-chevron {
+  transform: translateX(2px);
+  color: var(--text);
+}
+.case-row:hover {
+  background: var(--subtle);
+}
+.case-row:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+}
+.case-row-chevron {
+  flex: none;
+  color: var(--muted);
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
+}
+.mode-badge {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.mode-badge.baseline {
+  color: var(--down);
+  background: #fdecee;
+}
+.mode-badge.optimized {
+  color: var(--up);
+  background: #e3f4ef;
+}
+.case-body {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  animation: case-open 0.24s ease-out;
+}
+@keyframes case-open {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+.scenario.active {
+  animation: case-highlight 0.24s ease-out;
+}
+@keyframes case-highlight {
+  from {
+    background: var(--surface);
+    border-color: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-body,
+  .scenario.active {
+    animation: none;
+  }
+  .case-toggle::details-content {
+    transition: none;
+  }
+}
+.case-field {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+.case-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.case-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 32px 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--surface);
+}
+.case-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.case-action:hover {
+  border-color: #c5cad3;
 }
 .scenario-heading {
   display: flex;
@@ -1244,14 +1352,16 @@ a {
 .scenario-buttons {
   display: flex;
   gap: 2px;
-  margin-top: 12px;
   padding: 2px;
-  background: var(--subtle);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 5px;
 }
 .scenario-buttons button {
   flex: 1;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   min-height: 30px;
   padding: 5px 10px;
   border-radius: 4px;
@@ -1264,19 +1374,18 @@ a {
   color: var(--text);
 }
 .scenario-buttons button.selected.bad {
-  background: var(--text);
-  color: #fff;
+  background: #fdecee;
+  color: var(--down);
 }
 .scenario-buttons button.selected.good {
-  background: var(--text);
-  color: #fff;
+  background: #e3f4ef;
+  color: var(--up);
 }
 .timings-toggle {
   display: flex;
   align-items: center;
   gap: 6px;
   width: 100%;
-  margin-top: 10px;
   min-height: 26px;
   padding: 2px 0;
   font-size: 12px;
@@ -1316,53 +1425,68 @@ a {
   outline: 2px solid var(--text);
   outline-offset: 2px;
 }
-.case-brief {
-  display: grid;
-  gap: 6px;
-  margin-top: 12px;
+.case-toggle {
   font-size: 13px;
   line-height: 1.55;
-}
-.case-toggle {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 .case-toggle summary {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--muted);
   cursor: pointer;
   list-style: none;
+  transition: color 0.15s;
 }
 .case-toggle summary::-webkit-details-marker {
   display: none;
 }
 .case-toggle summary::before {
   content: '';
-  width: 6px;
-  height: 6px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
+  flex: none;
+  width: 5px;
+  height: 5px;
+  margin: 0 2px;
+  border-right: 1.25px solid currentColor;
+  border-bottom: 1.25px solid currentColor;
   transform: rotate(-45deg);
-  transition: transform 0.15s;
+  transition: transform 0.2s ease;
 }
 .case-toggle[open] summary::before {
   transform: rotate(45deg);
 }
-.case-toggle summary:hover {
+.case-toggle summary:hover,
+.case-toggle[open] summary {
   color: var(--text);
+}
+.case-toggle summary span {
+  color: var(--muted);
+  font-weight: 400;
+}
+.case-toggle::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 0.22s ease,
+    content-visibility 0.22s allow-discrete;
+}
+.case-toggle[open]::details-content {
+  block-size: auto;
 }
 .case-toggle blockquote,
 .case-toggle p {
   margin: 0;
-  padding: 0 10px 9px 22px;
+  padding: 0 0 10px 17px;
+}
+.case-toggle blockquote {
+  color: var(--text);
+}
+.case-toggle p {
+  color: var(--muted);
 }
 .case-toggle blockquote {
   color: var(--text);
@@ -1394,50 +1518,6 @@ a {
 .lab-stream button:hover {
   background: var(--subtle);
 }
-.scenario-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 12px;
-}
-.scenario-actions > :only-child {
-  grid-column: 1 / -1;
-}
-.scenario-actions button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 34px;
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  font-size: 12px;
-}
-.scenario-actions button:hover {
-  background: var(--subtle);
-}
-.open-case {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  text-align: left;
-  min-height: 28px;
-  padding: 4px 0;
-}
-.replay {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 12px;
-  min-height: 28px;
-  padding: 4px 0;
-}
-.replay:hover {
-  text-decoration: underline;
-}
-
 .workspace-page {
   min-height: calc(100vh - 140px);
   background: var(--surface);
@@ -1482,7 +1562,7 @@ a {
   min-height: 36px;
 }
 .workspace-page select,
-.experiment-controls select {
+.case-field select {
   appearance: none;
   padding-right: 32px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -1695,29 +1775,7 @@ a {
 .lab-sections [aria-selected='false'] {
   color: var(--muted);
 }
-.experiment-controls {
-  display: block;
-  margin-top: 12px;
-  font-size: 13px;
-}
-.experiment-controls label {
-  display: grid;
-  grid-template-columns: 70px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-}
-.experiment-controls select {
-  width: 100%;
-  min-width: 0;
-  min-height: 36px;
-  padding: 6px 32px 6px 8px;
-  font: inherit;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background-color: var(--surface);
-}
+
 
 .chart-symbol > div {
   min-width: 0;

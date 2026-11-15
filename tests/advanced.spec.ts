@@ -5,10 +5,10 @@ import { readFile } from 'node:fs/promises';
 async function open(page: Page, id: string, mode: 'Baseline' | 'Optimized') {
   await page.getByRole('tab', { name: /Advanced/ }).click();
   const scenario = page.locator(`[data-scenario="${id}"]`);
-  await scenario.getByRole('button', { name: mode, exact: true }).click();
-  // An open case has no Open case button: changing the mode already starts a fresh run.
   const openButton = scenario.getByRole('button', { name: 'Open case' });
   if (await openButton.count()) await openButton.click();
+  // Changing the mode of an open case starts a fresh run.
+  await scenario.getByRole('button', { name: mode, exact: true }).click();
   await expect(page.getByRole('region', { name: 'Advanced Lab' })).toBeVisible();
 }
 
@@ -40,6 +40,8 @@ test('Instrument monitor keeps listeners and canvases after switching instrument
   for (const mode of ['Baseline', 'Optimized'] as const) {
     await page.goto('/');
     await open(page, 'instrument-monitor', mode);
+    // Opening may first start the case in the previous mode, and its leak would stay in this run. Start clean.
+    await page.reload();
     const select = page.getByRole('combobox', { name: 'Instrument' });
     await expect(select.locator('option')).toHaveCount(150);
     for (const value of ['1', '2', '3', '4', '5']) {
@@ -51,8 +53,9 @@ test('Instrument monitor keeps listeners and canvases after switching instrument
     const listeners = await windowListeners(cdp, 'resize');
     const canvases = await canvasesInMemory(cdp);
     if (mode === 'Baseline') {
-      expect(listeners).toBeGreaterThanOrEqual(6);
-      expect(canvases).toBeGreaterThanOrEqual(6);
+      // One leaked chart per switch.
+      expect(listeners).toBeGreaterThanOrEqual(5);
+      expect(canvases).toBeGreaterThanOrEqual(5);
     } else {
       expect(listeners).toBe(1);
       expect(canvases).toBeLessThanOrEqual(2);
