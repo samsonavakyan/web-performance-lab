@@ -29,7 +29,11 @@ export function useQuoteStream(paused: boolean) {
         return next;
       });
     };
-    return () => socket.close();
+    return () => {
+      // Closing a socket that is still connecting aborts it, and the Vite proxy logs ECONNRESET.
+      if (socket.readyState === WebSocket.CONNECTING) socket.onopen = () => socket.close();
+      else socket.close();
+    };
   }, []);
 
   return { quotes, seq, connected };
