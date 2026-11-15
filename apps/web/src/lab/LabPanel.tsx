@@ -13,7 +13,6 @@ const HINTS = [
   { key: 'steps', label: 'Reproduce' },
   { key: 'look', label: 'Where to look' },
   { key: 'notice', label: 'What to notice' },
-  { key: 'code', label: 'Where in the code' },
   { key: 'solution', label: 'Solution' },
 ] as const;
 

@@ -38,11 +38,6 @@ Performance panel. Record while typing, then look at the Interactions and Main t
 How long each keystroke takes until the next frame, and which functions fill the long tasks in Bottom-Up.
 
 </details>
-<details><summary>Where in the code</summary>
-
-src/terminal/watchlist/useInstrumentSearch.baseline.ts, src/lib/search.baseline.ts
-
-</details>
 <details><summary>Solution</summary>
 
 The typo-tolerant match compares the query with every substring of every instrument on each keystroke (O(n²·m)), in the same render as the input. The fix finds the best match in one pass (O(n·m)) and filters a useDeferredValue copy of the query, so typing stays responsive and stale queries are skipped.
@@ -66,11 +61,6 @@ Performance panel, Main track, with the quote stream running.
 <details><summary>What to notice</summary>
 
 Purple Layout blocks inside script tasks and the Forced reflow warnings. Which line causes them?
-
-</details>
-<details><summary>Where in the code</summary>
-
-src/terminal/order-book/DepthTable.baseline.tsx
 
 </details>
 <details><summary>Solution</summary>
@@ -98,11 +88,6 @@ Elements panel for the list, then Performance while scrolling with the stream on
 How many rows are in the DOM compared to the rows you can see, and how long each quote update takes to render.
 
 </details>
-<details><summary>Where in the code</summary>
-
-src/terminal/watchlist/InstrumentList.baseline.tsx
-
-</details>
 <details><summary>Solution</summary>
 
 All 2,200 rows are rendered and updated on every quote message. The fix renders only the rows in view plus a small buffer (virtualization).
@@ -126,11 +111,6 @@ Performance panel, Layout shifts track. In the Rendering drawer, turn on Layout 
 <details><summary>What to notice</summary>
 
 What moves when the notice appears, and the CLS value.
-
-</details>
-<details><summary>Where in the code</summary>
-
-src/terminal/chart/Bulletin.baseline.tsx
 
 </details>
 <details><summary>Solution</summary>
@@ -158,11 +138,6 @@ Network panel. Compare the overview request in both modes.
 Response size, and in Timing the time spent waiting for the server. How much of the response does the strip show?
 
 </details>
-<details><summary>Where in the code</summary>
-
-src/terminal/overview/MarketOverview.baseline.tsx
-
-</details>
 <details><summary>Solution</summary>
 
 The strip loads /api/overview, which is slow and carries a 12,000-row sector table the strip never shows (overfetching). The fix loads /api/overview/summary with only the fields on screen.
@@ -186,11 +161,6 @@ Performance panel with CPU throttling. In the Rendering drawer, turn on Paint fl
 <details><summary>What to notice</summary>
 
 What the browser does on every frame while the marker moves: layout and paint, or only compositing.
-
-</details>
-<details><summary>Where in the code</summary>
-
-src/terminal/chart/ScannerTrack.baseline.tsx and the scanner keyframes in src/styles.css
 
 </details>
 <details><summary>Solution</summary>
@@ -222,11 +192,6 @@ Memory panel: a heap snapshot before and after the trading day. Elements panel, 
 In the snapshot comparison, which objects keep growing although the screen shows one chart? How many resize listeners are there?
 
 </details>
-<details><summary>Where in the code</summary>
-
-src/workspaces/instrument-monitor/PriceChart.baseline.tsx
-
-</details>
 <details><summary>Solution</summary>
 
 The chart effect has no cleanup, so every old chart stays subscribed to the quote feed and to window resize, keeps its canvas and recalculates on every tick. The history cache also grows without limit. The fix unsubscribes and destroys the chart on unmount and keeps an LRU cache of 20 histories.
@@ -250,11 +215,6 @@ Performance panel while typing during the stream. In a dev build, the Components
 <details><summary>What to notice</summary>
 
 How long keystrokes wait, and how many components render for one quote message.
-
-</details>
-<details><summary>Where in the code</summary>
-
-src/workspaces/order-desk/Desk.baseline.tsx, src/workspaces/order-desk/quoteStore.ts
 
 </details>
 <details><summary>Solution</summary>
@@ -282,11 +242,6 @@ Network panel, Waterfall column, with Fast 4G.
 When each request and JS chunk starts relative to the click. Do they start together or one after another?
 
 </details>
-<details><summary>Where in the code</summary>
-
-src/workspaces/instrument-switch/Navigator.baseline.tsx, SidePanel.baseline.tsx, useFetch.ts
-
-</details>
 <details><summary>Solution</summary>
 
 Each section fetches its data only after it renders, and it renders only after the previous request finishes: info, then the chart and book chunks and requests, then the news chunk and request (a waterfall). The page is also replaced by a skeleton on every switch. The fix starts every request and chunk at once on click, hover or focus (prefetchInstrument), reads them with use() and keeps the old page on screen during the switch with useTransition.
@@ -312,11 +267,6 @@ Performance panel while the export runs and you type.
 The longest task on the Main track, what fills it in Bottom-Up, and whether a Worker track appears.
 
 </details>
-<details><summary>Where in the code</summary>
-
-src/workspaces/trade-export/ExportPanel.baseline.tsx, src/workspaces/trade-export/csv.baseline.ts
-
-</details>
 <details><summary>Solution</summary>
 
 Fetching, parsing and formatting 100,000 rows run on the main thread in one task, and every row creates new Intl formatters. The fix moves the work to a Web Worker with shared formatters; it reports progress and can be cancelled.
@@ -340,11 +290,6 @@ Network panel: filter Socket (WS in older Chrome), open the feed request whose T
 <details><summary>What to notice</summary>
 
 What arrives during sleep, heartbeats included, and what the badge says meanwhile. The seq numbers after Wake up. The timing of reconnect attempts after Restart server.
-
-</details>
-<details><summary>Where in the code</summary>
-
-src/workspaces/live-feed/feedClient.baseline.ts, src/workspaces/live-feed/FeedQuote.baseline.tsx
 
 </details>
 <details><summary>Solution</summary>

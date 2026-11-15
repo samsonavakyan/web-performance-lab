@@ -48,7 +48,6 @@ const SLIDES: Slide[] = [
           <li>Reproduce</li>
           <li>Where to look</li>
           <li>What to notice</li>
-          <li>Where in the code</li>
           <li>Solution</li>
         </ol>
       </>

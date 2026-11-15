@@ -32,7 +32,7 @@ How a case works:
 
 1. Read the complaint. It describes the symptoms users or the team report, not the cause.
 2. Switch the case to Baseline and try to reproduce and find the problem on your own.
-3. When stuck, open the next hint: Reproduce, Where to look, What to notice, Where in the code, Solution.
+3. When stuck, open the next hint: Reproduce, Where to look, What to notice, Solution.
 4. Record the same steps in Baseline and Optimized in DevTools and compare.
 5. Diff `X.baseline.tsx` with `X.tsx` to see the fix.
 
