@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Instrument } from '../../types';
+import { api } from '../../api/client';
 import { LabSlot } from '../../lab/LabSlot';
 import { PriceChart } from '../../lab/variants';
 
@@ -13,9 +14,13 @@ export function InstrumentMonitor() {
   const [note, setNote] = useState('');
 
   useEffect(() => {
-    fetch('/api/instruments?limit=150')
-      .then((response) => response.json())
-      .then(setInstruments);
+    const controller = new AbortController();
+    api
+      .instruments(150, controller.signal)
+      .then(setInstruments)
+      .catch(() => {});
+
+    return () => controller.abort();
   }, []);
 
   const instrument = instruments[index];

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Instrument } from '../../types';
+import { api } from '../../api/client';
 import { LabSlot } from '../../lab/LabSlot';
 import { Desk } from '../../lab/variants';
 import type { DeskProps } from './DeskParts';
@@ -14,9 +14,10 @@ export function OrderDesk() {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/instruments?limit=${BOARD_SIZE}`)
-      .then((response) => response.json())
-      .then((instruments: Instrument[]) => {
+    const controller = new AbortController();
+    api
+      .instruments(BOARD_SIZE, controller.signal)
+      .then((instruments) => {
         quoteStore.reset(instruments.map(({ symbol, price, change }) => ({ symbol, price, change })));
         setDesk({
           symbols: instruments.map((item) => item.symbol),
@@ -26,7 +27,10 @@ export function OrderDesk() {
             cost: +(item.price * (1 + ((i % 7) - 3) / 100)).toFixed(2),
           })),
         });
-      });
+      })
+      .catch(() => {});
+
+    return () => controller.abort();
   }, []);
 
   // The simulated market continues from the prices on screen.

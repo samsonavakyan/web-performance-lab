@@ -73,7 +73,9 @@ export class FeedClient {
   }
 
   private async resync() {
-    const response = await fetch('/api/feed/snapshot');
+    const response = await fetch('/api/feed/snapshot').catch(() => null);
+    if (!response?.ok) return;
+
     const snapshot = (await response.json()) as { seq: number; price: number };
     if (snapshot.seq >= this.lastSeq) {
       this.lastSeq = snapshot.seq;

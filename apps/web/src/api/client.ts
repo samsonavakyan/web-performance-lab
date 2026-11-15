@@ -43,7 +43,8 @@ async function loadOverview(path: string, signal: AbortSignal, response: Overvie
 }
 
 export const api = {
-  instruments: () => request<Instrument[]>('/api/instruments'),
+  instruments: (limit?: number, signal?: AbortSignal) =>
+    request<Instrument[]>(limit ? `/api/instruments?limit=${limit}` : '/api/instruments', { signal }),
   news: () => request<NewsItem[]>('/api/news'),
   history: (symbol: string) => request<Candle[]>(`/api/history/${symbol}`),
   orderBook: (symbol: string) => request<BookLevel[]>(`/api/orderbook/${symbol}`),

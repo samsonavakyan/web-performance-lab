@@ -18,7 +18,7 @@ type Props = {
 };
 
 export function ChartPanel({ symbol, instrument, instruments, onSelect, candles, price, change }: Props) {
-  const [interval, setInterval] = useState('1W');
+  const [range, setRange] = useState('1W');
   const [favorite, setFavorite] = useState(false);
 
   return (
@@ -49,7 +49,7 @@ export function ChartPanel({ symbol, instrument, instruments, onSelect, candles,
           </span>
           <div className="intervals">
             {INTERVALS.map((value) => (
-              <button key={value} onClick={() => setInterval(value)} className={interval === value ? 'active' : ''}>
+              <button key={value} onClick={() => setRange(value)} className={range === value ? 'active' : ''}>
                 {value}
               </button>
             ))}
@@ -57,7 +57,7 @@ export function ChartPanel({ symbol, instrument, instruments, onSelect, candles,
         </div>
       </div>
 
-      <CandlestickChart candles={candles} symbol={symbol} interval={interval} change={change} />
+      <CandlestickChart candles={candles} symbol={symbol} interval={range} change={change} />
 
       <div className="chart-bottom">
         <div>

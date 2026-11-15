@@ -35,20 +35,23 @@ export function InstrumentPicker({ symbol, name, instruments, onSelect }: Props)
 
   return (
     <div className="instrument-picker" ref={root}>
-      <button
-        className="picker-button"
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((v) => !v)}
-      >
-        <h2>{name}</h2>
-        <ChevronDown size={15} />
-      </button>
+      <h2>
+        <button
+          className="picker-button"
+          aria-expanded={isOpen}
+          aria-controls="instrument-picker-menu"
+          onClick={() => setIsOpen((v) => !v)}
+        >
+          {name}
+          <ChevronDown size={15} />
+        </button>
+      </h2>
       {isOpen && (
-        <ul className="picker-menu" role="listbox" aria-label="Instruments">
+        <ul className="picker-menu" id="instrument-picker-menu" aria-label="Instruments">
           {instruments.slice(0, PICKER_SIZE).map((item) => (
-            <li key={item.symbol} role="option" aria-selected={item.symbol === symbol}>
+            <li key={item.symbol}>
               <button
+                aria-current={item.symbol === symbol ? 'true' : undefined}
                 onClick={() => {
                   onSelect(item.symbol);
                   setIsOpen(false);

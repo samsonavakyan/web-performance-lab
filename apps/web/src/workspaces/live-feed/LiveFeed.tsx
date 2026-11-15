@@ -6,8 +6,9 @@ import { FeedQuote } from '../../lab/variants';
 const DESKS = 40;
 type Stats = { connected: number; seq: number; restarting: boolean; buckets: number[] };
 
+// Lab controls are best effort: if the API is down, the button does nothing.
 async function post(path: string) {
-  await fetch(path, { method: 'POST' });
+  await fetch(path, { method: 'POST' }).catch(() => {});
 }
 
 // The live feed screen. Everything in LabSlot is the lab: server controls, simulated users and monitoring.
@@ -26,8 +27,8 @@ export function LiveFeed() {
 
   useEffect(() => {
     const timer = window.setInterval(async () => {
-      const response = await fetch('/api/lab/feed/stats');
-      if (response.ok) setStats(await response.json());
+      const response = await fetch('/api/lab/feed/stats').catch(() => null);
+      if (response?.ok) setStats(await response.json());
     }, 500);
 
     return () => clearInterval(timer);
