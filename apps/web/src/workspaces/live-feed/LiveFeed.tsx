@@ -10,6 +10,8 @@ async function post(path: string) {
   await fetch(path, { method: 'POST' });
 }
 
+// The live feed screen. Everything in LabSlot is the lab: server controls, simulated users and monitoring.
+// The product part is FeedQuote.
 export function LiveFeed() {
   const mode = useModes()['live-feed'];
 

@@ -12,6 +12,7 @@ export type Trade = {
 
 export const CSV_HEADER = 'Trade ID,Time,Symbol,Instrument,Side,Quantity,Price,Notional,Fee,Account\n';
 
+// Values with a quote, comma or line break are wrapped in quotes, and inner quotes are doubled (RFC 4180).
 export function escapeCsv(value: string) {
   return /[",\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
 }

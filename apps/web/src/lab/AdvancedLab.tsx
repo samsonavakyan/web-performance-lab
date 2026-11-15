@@ -23,6 +23,7 @@ export function AdvancedLab({
         </div>
         <button onClick={onBack}>Back to market</button>
       </div>
+      {/* key: a new case or mode remounts the screen, so every run starts clean */}
       <div className="workspace-content" key={`${scenario}-${mode}`}>
         {scenario === 'instrument-monitor' && <InstrumentMonitor />}
         {scenario === 'order-ticket' && <OrderDesk />}

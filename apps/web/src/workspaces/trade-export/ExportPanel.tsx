@@ -13,6 +13,7 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
   const [error, setError] = useState('');
   const worker = useRef<Worker | null>(null);
 
+  // Leaving the screen stops an export that is still running.
   useEffect(() => () => worker.current?.terminate(), []);
 
   function setRunning(next: boolean) {

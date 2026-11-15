@@ -15,6 +15,7 @@ export function InstrumentPicker({ symbol, name, instruments, onSelect }: Props)
   const [isOpen, setIsOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
 
+  // While the menu is open, a click outside or Escape closes it.
   useEffect(() => {
     if (!isOpen) return;
 

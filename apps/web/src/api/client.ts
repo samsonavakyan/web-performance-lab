@@ -9,6 +9,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
+// The overview comes from another service, so its shape is checked at runtime before the UI uses it.
 function isOverview(value: unknown): value is Overview {
   if (typeof value !== 'object' || value === null) return false;
 

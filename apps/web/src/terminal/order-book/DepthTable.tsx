@@ -5,6 +5,7 @@ import type { BookLevel } from '../../types';
 const VISIBLE_LEVELS = 160;
 const MAX_SIZE = 740;
 
+// seq changes with every quote batch; this table only depends on levels.
 type Props = { levels: BookLevel[]; seq: number };
 
 export function DepthTable({ levels }: Props) {

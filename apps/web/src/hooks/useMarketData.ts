@@ -27,6 +27,7 @@ export function useMarketData(symbol: string) {
     };
   }, []);
 
+  // Switching the symbol drops responses for the previous one.
   useEffect(() => {
     let active = true;
     Promise.all([api.history(symbol), api.orderBook(symbol)])

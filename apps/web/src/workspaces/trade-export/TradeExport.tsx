@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { LabSlot } from '../../lab/LabSlot';
 import { ExportPanel } from '../../lab/variants';
 
+// The export screen. Save file is a lab option; the export itself is in ExportPanel.
 export function TradeExport() {
   const [count, setCount] = useState(100_000);
   const [save, setSave] = useState(true);

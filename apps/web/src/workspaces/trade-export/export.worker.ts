@@ -1,6 +1,8 @@
 import { CSV_HEADER, formatTradeRow } from './csv';
 import type { Trade } from './csv';
 
+// Runs off the main thread: the page posts the URL, the worker fetches the trades, builds the CSV
+// and posts progress after every chunk, then the finished file.
 export type ExportRequest = { url: string };
 export type ExportMessage =
   | { kind: 'progress'; done: number; total: number }

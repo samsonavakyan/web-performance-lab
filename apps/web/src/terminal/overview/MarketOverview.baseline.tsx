@@ -17,6 +17,7 @@ export function MarketOverview({ reload, response }: Props) {
   const [details, setDetails] = useState('');
 
   useEffect(() => {
+    // A newer reload or response type cancels this request; `active` also drops a result that arrives after that.
     let active = true;
     const controller = new AbortController();
     setPending(true);

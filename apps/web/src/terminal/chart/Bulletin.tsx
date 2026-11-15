@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
 
+// The notice arrives a moment after the page loads, as a server push would.
 const SHOW_DELAY_MS = 2300;
 
 export function Bulletin({ replay }: { replay: number }) {

@@ -54,6 +54,7 @@ export function Watchlist({ instruments, quotes, selected, onSelect }: Props) {
         <span>CHG</span>
       </div>
 
+      {/* query lets the list scroll back to the top for a new search */}
       <InstrumentList items={sorted} quotes={quotes} selected={selected} onSelect={onSelect} query={query} />
 
       <div className="watchlist-footer">

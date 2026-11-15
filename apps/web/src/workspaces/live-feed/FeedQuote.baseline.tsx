@@ -11,6 +11,7 @@ function StatusBadge({ client }: { client: FeedClient }) {
 export function FeedQuote() {
   const client = useRef<FeedClient | null>(null);
 
+  // FeedClient is a plain object React does not watch, so the quote re-renders every 200 ms to show its state.
   useNow(200);
 
   useEffect(() => {
