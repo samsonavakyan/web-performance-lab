@@ -49,7 +49,7 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
       setResult({ rows: message.rows, bytes: message.blob.size });
       if (save) download(message.blob, message.rows);
     };
-    next.postMessage({ url: new URL(`/api/lab/trades?count=${count}`, location.href).href });
+    next.postMessage({ url: new URL(`/api/trades?count=${count}`, location.href).href });
   }
 
   function cancel() {

@@ -46,7 +46,11 @@ The Live feed case controls a shared server feed. Simulate sleep and Restart ser
 ## Layout
 
 ```text
-apps/api/          Fastify server, data generators, tests
+apps/api/          Fastify server
+  routes/          product API: market screen and workspace screens
+  feed.mjs         live price feed service
+  lab.mjs          lab-only controls under /api/lab: simulated sleep, restart, other users
+  data.mjs         data generators and their tests
 apps/web/          React app
   src/terminal/    main trading screen: watchlist, order book, chart, overview
   src/workspaces/  separate screens: instrument monitor, order desk, instrument switch, trade export, live feed

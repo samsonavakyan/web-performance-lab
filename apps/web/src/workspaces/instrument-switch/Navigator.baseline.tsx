@@ -13,7 +13,7 @@ function InstrumentPage({ symbol, onReady }: { symbol: string; onReady: Ready })
   const [info, setInfo] = useState<InstrumentInfo | null>(null);
   useEffect(() => {
     const controller = new AbortController();
-    fetchJson<InstrumentInfo>(`/api/lab/instrument/${symbol}`, controller.signal)
+    fetchJson<InstrumentInfo>(`/api/instruments/${symbol}`, controller.signal)
       .then(setInfo)
       .catch(() => {});
     return () => controller.abort();

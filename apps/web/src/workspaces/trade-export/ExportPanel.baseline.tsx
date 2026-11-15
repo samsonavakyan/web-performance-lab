@@ -24,7 +24,7 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
     setError('');
     const endTiming = startTiming('trade-export', 'trade export');
     try {
-      const response = await fetch(`/api/lab/trades?count=${count}`);
+      const response = await fetch(`/api/trades?count=${count}`);
       if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
       const trades = (await response.json()) as Trade[];
       let csv = CSV_HEADER;

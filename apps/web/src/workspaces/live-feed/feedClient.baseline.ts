@@ -25,7 +25,7 @@ export class FeedClient {
 
   private connect() {
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-    const socket = new WebSocket(`${protocol}://${location.host}/ws/lab/feed`);
+    const socket = new WebSocket(`${protocol}://${location.host}/ws/feed`);
     this.socket = socket;
     socket.onopen = () => {
       this.status = 'live';
@@ -51,7 +51,7 @@ export class FeedClient {
   }
 
   private async resync() {
-    const response = await fetch('/api/lab/feed/snapshot');
+    const response = await fetch('/api/feed/snapshot');
     const snapshot = (await response.json()) as { seq: number; price: number };
     if (snapshot.seq >= this.lastSeq) {
       this.lastSeq = snapshot.seq;

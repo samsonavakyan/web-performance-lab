@@ -8,7 +8,7 @@ export function ChartSection({ symbol, onReady }: { symbol: string; onReady: (se
   const [candles, setCandles] = useState<Candle[] | null>(null);
   useEffect(() => {
     const controller = new AbortController();
-    fetchJson<Candle[]>(`/api/lab/instrument/${symbol}/history`, controller.signal)
+    fetchJson<Candle[]>(`/api/instruments/${symbol}/candles`, controller.signal)
       .then(setCandles)
       .catch(() => {});
     return () => controller.abort();

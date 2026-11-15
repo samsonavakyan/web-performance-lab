@@ -19,10 +19,10 @@ const resources = new Map<string, Resources>();
 export function preloadInstrument(symbol: string): Resources {
   let entry = resources.get(symbol);
   if (!entry) {
-    const base = `/api/lab/instrument/${symbol}`;
+    const base = `/api/instruments/${symbol}`;
     entry = {
       info: fetchJson(base),
-      history: fetchJson(`${base}/history`),
+      history: fetchJson(`${base}/candles`),
       book: fetchJson(`${base}/book`),
       news: fetchJson(`${base}/news`),
     };

@@ -35,7 +35,7 @@ export class FeedClient {
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
     // Resumes from the last seq, and the server replays what was missed.
     const resume = this.lastSeq ? `?from=${this.lastSeq}` : '';
-    const socket = new WebSocket(`${protocol}://${location.host}/ws/lab/feed${resume}`);
+    const socket = new WebSocket(`${protocol}://${location.host}/ws/feed${resume}`);
     this.socket = socket;
     this.status = this.attempt ? 'reconnecting' : 'connecting';
     socket.onopen = () => {
@@ -67,7 +67,7 @@ export class FeedClient {
   }
 
   private async resync() {
-    const response = await fetch('/api/lab/feed/snapshot');
+    const response = await fetch('/api/feed/snapshot');
     const snapshot = (await response.json()) as { seq: number; price: number };
     if (snapshot.seq >= this.lastSeq) {
       this.lastSeq = snapshot.seq;

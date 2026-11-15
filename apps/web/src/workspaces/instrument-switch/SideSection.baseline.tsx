@@ -11,7 +11,7 @@ export function SideSection({ symbol, onReady }: { symbol: string; onReady: (sec
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchJson<BookLevel[]>(`/api/lab/instrument/${symbol}/book`, controller.signal)
+    fetchJson<BookLevel[]>(`/api/instruments/${symbol}/book`, controller.signal)
       .then(setLevels)
       .catch(() => {});
     return () => controller.abort();

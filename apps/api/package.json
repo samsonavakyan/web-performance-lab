@@ -2,6 +2,6 @@
   "name": "@marketlab/api",
   "private": true,
   "type": "module",
-  "scripts": {"dev": "node --watch src.mjs", "start": "node src.mjs"},
+  "scripts": {"dev": "node --watch server.mjs", "start": "node server.mjs"},
   "dependencies": {"fastify": "^5.4.0", "@fastify/websocket": "^11.0.0"}
 }

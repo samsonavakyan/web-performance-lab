@@ -8,7 +8,7 @@ export function NewsSection({ symbol, onReady }: { symbol: string; onReady: (sec
   const [items, setItems] = useState<NewsItem[] | null>(null);
   useEffect(() => {
     const controller = new AbortController();
-    fetchJson<NewsItem[]>(`/api/lab/instrument/${symbol}/news`, controller.signal)
+    fetchJson<NewsItem[]>(`/api/instruments/${symbol}/news`, controller.signal)
       .then(setItems)
       .catch(() => {});
     return () => controller.abort();
