@@ -41,7 +41,7 @@ export function LiveFeed() {
         <div className="lab-actions">
           <button
             onClick={() => post('/api/lab/feed/sleep')}
-            title="Imitates closing a laptop lid: open connections stop receiving data"
+            title="Imitates closing a laptop lid. Connections stay open but receive nothing"
           >
             Simulate sleep
           </button>

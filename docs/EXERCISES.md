@@ -25,22 +25,22 @@ In dev React StrictMode runs `useMemo` twice, so the search measure appears twic
 
 <details><summary>Reproduce</summary>
 
-Set CPU throttling to 4x. Type nvda, clear the field, then type NVDA with spaces before and after it.
+Set CPU throttling to 4x. Type nvda in the watchlist search, clear it and type it again.
 
 </details>
 <details><summary>Where to look</summary>
 
-Performance panel. Record while typing, then look at the Interactions and Main tracks.
+The Performance panel. Record while you type.
 
 </details>
 <details><summary>What to notice</summary>
 
-How long each keystroke takes until the next frame, and which functions fill the long tasks in Bottom-Up.
+How long each key press takes before the letter shows up. Which functions take the most time in Bottom-Up?
 
 </details>
 <details><summary>Solution</summary>
 
-The typo-tolerant match compares the query with every substring of every instrument on each keystroke (O(n²·m)), in the same render as the input. The fix finds the best match in one pass (O(n·m)) and filters a useDeferredValue copy of the query, so typing stays responsive and stale queries are skipped.
+On every key press the search compares the query with every part of every instrument name. That is slow, and the input waits for it. The fix uses a faster match that reads each name once and runs the search with useDeferredValue, so the letter shows up first.
 
 </details>
 
@@ -55,17 +55,17 @@ Keep the quote stream running and the Order Book tab open. Set CPU throttling to
 </details>
 <details><summary>Where to look</summary>
 
-Performance panel, Main track, with the quote stream running.
+The Performance panel, Main track.
 
 </details>
 <details><summary>What to notice</summary>
 
-Purple Layout blocks inside script tasks and the Forced reflow warnings. Which line causes them?
+Purple Layout blocks inside the script and Forced reflow warnings. Which line causes them?
 
 </details>
 <details><summary>Solution</summary>
 
-On every update the effect writes a bar width, reads the cell width and writes again, row after row. Each read after a write forces a synchronous layout (layout thrashing). The fix sizes the bars with transform: scaleX, so nothing has to be measured.
+For each of 160 rows the code changes a bar width and then reads the cell width. Every read after a change makes the browser recalculate the layout on the spot. The fix sets the bar size with transform: scaleX, so the code never measures anything.
 
 </details>
 
@@ -80,17 +80,17 @@ Clear the search and keep the quote stream running. Scroll to the bottom and bac
 </details>
 <details><summary>Where to look</summary>
 
-Elements panel for the list, then Performance while scrolling with the stream on.
+The Elements panel, then the Performance panel while you scroll.
 
 </details>
 <details><summary>What to notice</summary>
 
-How many rows are in the DOM compared to the rows you can see, and how long each quote update takes to render.
+How many rows are on the page compared to how many you can see. How long does one quote update take?
 
 </details>
 <details><summary>Solution</summary>
 
-All 2,200 rows are rendered and updated on every quote message. The fix renders only the rows in view plus a small buffer (virtualization).
+The list renders all 2,200 rows and updates them on every quote message. The fix renders only the rows you can see plus a few extra (virtualization).
 
 </details>
 
@@ -105,7 +105,7 @@ Press Replay bulletin and record at least three seconds without clicking.
 </details>
 <details><summary>Where to look</summary>
 
-Performance panel, Layout shifts track. In the Rendering drawer, turn on Layout Shift Regions.
+The Performance panel, Layout shifts track. In the Rendering tab, turn on Layout Shift Regions.
 
 </details>
 <details><summary>What to notice</summary>
@@ -115,7 +115,7 @@ What moves when the notice appears, and the CLS value.
 </details>
 <details><summary>Solution</summary>
 
-The notice is inserted above the content without reserved space, so everything below it shifts. The fix keeps a placeholder of the same height until the notice appears.
+The notice appears above the content with no space kept for it, so everything below jumps down. The fix keeps an empty box of the same height until the notice arrives.
 
 </details>
 
@@ -125,22 +125,22 @@ The notice is inserted above the content without reserved space, so everything b
 
 <details><summary>Reproduce</summary>
 
-Set Response to Normal and press Reload overview. Repeat with the same network settings. Then try Unavailable and Invalid data.
+Set Response to Normal and press Reload overview. Then try Unavailable and Invalid data.
 
 </details>
 <details><summary>Where to look</summary>
 
-Network panel. Compare the overview request in both modes.
+The Network panel. Compare the overview request in both modes.
 
 </details>
 <details><summary>What to notice</summary>
 
-Response size, and in Timing the time spent waiting for the server. How much of the response does the strip show?
+The size of the response and how long the server takes to answer (the Timing tab). How much of the response does the strip show?
 
 </details>
 <details><summary>Solution</summary>
 
-The strip loads /api/overview, which is slow and carries a 12,000-row sector table the strip never shows (overfetching). The fix loads /api/overview/summary with only the fields on screen.
+The strip needs four numbers, but it loads the full overview with a 12,000-row table it never shows, and the server is slow to build it. The fix loads /api/overview/summary, which has only what the strip shows.
 
 </details>
 
@@ -155,17 +155,17 @@ Set CPU throttling to 4x and record the moving marker for five seconds.
 </details>
 <details><summary>Where to look</summary>
 
-Performance panel with CPU throttling. In the Rendering drawer, turn on Paint flashing.
+The Performance panel with CPU throttling. In the Rendering tab, turn on Paint flashing.
 
 </details>
 <details><summary>What to notice</summary>
 
-What the browser does on every frame while the marker moves: layout and paint, or only compositing.
+Does the browser recalculate the layout and repaint on every frame while the marker moves?
 
 </details>
 <details><summary>Solution</summary>
 
-The marker animates left, which needs layout and paint on the main thread every frame. The fix animates transform, which the compositor handles without the main thread.
+The animation changes left, so the browser recalculates the layout and repaints on every frame. The fix animates transform instead, which the browser moves on the GPU without that work.
 
 </details>
 
@@ -179,22 +179,22 @@ Advanced cases open a separate screen. Their lab controls appear in the panel un
 
 <details><summary>Reproduce</summary>
 
-Reload the browser tab, type a trade note, then press Simulate trading day. It switches 80 instruments one by one. Type a note again.
+Reload the browser tab and type a trade note. Press Simulate trading day: it opens 80 instruments one by one. Type a note again.
 
 </details>
 <details><summary>Where to look</summary>
 
-Memory panel: a heap snapshot before and after the trading day. Elements panel, Event Listeners of window.
+The Memory panel. Take a heap snapshot before and after the trading day. In the Elements panel, check the event listeners on window.
 
 </details>
 <details><summary>What to notice</summary>
 
-In the snapshot comparison, which objects keep growing although the screen shows one chart? How many resize listeners are there?
+Which objects keep growing, even though the screen shows one chart? How many resize listeners are there?
 
 </details>
 <details><summary>Solution</summary>
 
-The chart effect has no cleanup, so every old chart stays subscribed to the quote feed and to window resize, keeps its canvas and recalculates on every tick. The history cache also grows without limit. The fix unsubscribes and destroys the chart on unmount and keeps an LRU cache of 20 histories.
+When the chart is replaced, the old one is never cleaned up. It stays subscribed to prices and window resize and keeps redrawing in the background. The price history cache also grows forever. The fix unsubscribes and destroys the chart when it is removed and keeps only the last 20 histories.
 
 </details>
 
@@ -209,17 +209,17 @@ Set CPU throttling to 4x. Press Start stream and type a limit price in the order
 </details>
 <details><summary>Where to look</summary>
 
-Performance panel while typing during the stream. In a dev build, the Components track.
+The Performance panel while you type during the stream.
 
 </details>
 <details><summary>What to notice</summary>
 
-How long keystrokes wait, and how many components render for one quote message.
+How long each key press waits, and how many components render for one price message.
 
 </details>
 <details><summary>Solution</summary>
 
-Each of 120 messages per second creates a new store state, and the desk reads the whole store, so 1,600 cells and 300 rows render per message. Every price also builds a new Intl.NumberFormat. Updates from useSyncExternalStore are synchronous, so transitions do not help. The fix batches messages per frame, subscribes each cell to its own quote and shares one formatter.
+Prices arrive 120 times a second, and each message renders the whole board again, about 1,900 components. Every price also creates a new number formatter. The fix groups the messages of one frame into one update, lets each cell follow only its own price and reuses one formatter.
 
 </details>
 
@@ -229,22 +229,22 @@ Each of 120 messages per second creates a new store state, and the desk reads th
 
 <details><summary>Reproduce</summary>
 
-Open Network, Fast 4G is fine. Switch NVDA, AAPL, MSFT. Press Clear data cache before each run.
+Open the Network panel and set Fast 4G. Switch NVDA, AAPL and MSFT. Press Clear data cache before each run.
 
 </details>
 <details><summary>Where to look</summary>
 
-Network panel, Waterfall column, with Fast 4G.
+The Network panel, Waterfall column.
 
 </details>
 <details><summary>What to notice</summary>
 
-When each request and JS chunk starts relative to the click. Do they start together or one after another?
+When does each request and JS file start, compared to the click? All together, or one after another?
 
 </details>
 <details><summary>Solution</summary>
 
-Each section fetches its data only after it renders, and it renders only after the previous request finishes: info, then the chart and book chunks and requests, then the news chunk and request (a waterfall). The page is also replaced by a skeleton on every switch. The fix starts every request and chunk at once on click, hover or focus (prefetchInstrument), reads them with use() and keeps the old page on screen during the switch with useTransition.
+Each part of the page starts loading only after the part above it has loaded: details first, then the chart and order book, then the news. This is a waterfall. The page also turns into a skeleton on every switch. The fix starts all requests and files at once, even on hover, and keeps the old page on screen until the new one is ready.
 
 </details>
 
@@ -259,23 +259,23 @@ Keep CPU and network throttling off. Choose 100,000 trades, press Export CSV and
 </details>
 <details><summary>Where to look</summary>
 
-Performance panel while the export runs and you type.
+The Performance panel while the export runs and you type.
 
 </details>
 <details><summary>What to notice</summary>
 
-The longest task on the Main track, what fills it in Bottom-Up, and whether a Worker track appears.
+The longest task on the Main track and what fills it. Is there a Worker track?
 
 </details>
 <details><summary>Solution</summary>
 
-Fetching, parsing and formatting 100,000 rows run on the main thread in one task, and every row creates new Intl formatters. The fix moves the work to a Web Worker with shared formatters; it reports progress and can be cancelled.
+Downloading, parsing and formatting 100,000 rows all happen on the main thread in one go, so the page cannot react to anything. Every row also creates new date and number formatters. The fix moves the work to a Web Worker and reuses the formatters. The worker reports progress, and the export can be cancelled.
 
 </details>
 
 ### 11. Live feed
 
-> Users and ops: "Users: after a break the status says online, but the prices are old. Ops: after every release the app shows no data for several seconds, and the feed service sees a spike of connections."
+> Users and ops: "After a break the status says online, but the prices are old. After every release the app shows no data for a few seconds, and ops see a spike of connections."
 
 <details><summary>Reproduce</summary>
 
@@ -284,16 +284,16 @@ Wait for the price to update. Press Simulate sleep, wait about 5 seconds, then p
 </details>
 <details><summary>Where to look</summary>
 
-Network panel: filter Socket (WS in older Chrome), open the feed request whose Time is Pending, then the Messages tab. Server monitoring in this panel.
+The Network panel. Filter Socket (WS in older Chrome), open the feed request whose Time is Pending, then the Messages tab. Also watch Server monitoring in this panel.
 
 </details>
 <details><summary>What to notice</summary>
 
-What arrives during sleep, heartbeats included, and what the badge says meanwhile. The seq numbers after Wake up. The timing of reconnect attempts after Restart server.
+What arrives during sleep and what the badge says meanwhile. The seq numbers after Wake up. How often the app tries to reconnect after Restart server.
 
 </details>
 <details><summary>Solution</summary>
 
-The client trusts an open socket: it ignores silence, heartbeats included, does not notice gaps in seq, and reconnects every second, so all clients come back in waves. The fix treats 3 s of silence as a dead connection, resumes from the last seq and takes a snapshot on a gap, reconnects with exponential backoff and jitter, and shows how fresh the price is.
+The app believes the connection works as long as it is open. It does not notice that messages stopped or that some were missed, and it retries every second, so after a restart all users reconnect at the same moment. The fix treats 3 seconds without messages as a lost connection, asks for the missed messages when it reconnects and waits a bit longer, plus a random delay, before each retry.
 
 </details>

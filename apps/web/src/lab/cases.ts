@@ -30,11 +30,12 @@ export const CASES: Case[] = [
       from: 'Support ticket',
       text: 'Typing in the watchlist search feels sticky. Letters show up late, and on the office laptops search is almost unusable.',
     },
-    steps: 'Set CPU throttling to 4x. Type nvda, clear the field, then type NVDA with spaces before and after it.',
-    look: 'Performance panel. Record while typing, then look at the Interactions and Main tracks.',
-    notice: 'How long each keystroke takes until the next frame, and which functions fill the long tasks in Bottom-Up.',
+    steps: 'Set CPU throttling to 4x. Type nvda in the watchlist search, clear it and type it again.',
+    look: 'The Performance panel. Record while you type.',
+    notice:
+      'How long each key press takes before the letter shows up. Which functions take the most time in Bottom-Up?',
     solution:
-      'The typo-tolerant match compares the query with every substring of every instrument on each keystroke (O(n²·m)), in the same render as the input. The fix finds the best match in one pass (O(n·m)) and filters a useDeferredValue copy of the query, so typing stays responsive and stale queries are skipped.',
+      'On every key press the search compares the query with every part of every instrument name. That is slow, and the input waits for it. The fix uses a faster match that reads each name once and runs the search with useDeferredValue, so the letter shows up first.',
     group: 'Basic',
     target: '.watchlist-panel',
     hasTimings: true,
@@ -49,10 +50,10 @@ export const CASES: Case[] = [
     },
     steps:
       'Keep the quote stream running and the Order Book tab open. Set CPU throttling to 4x and record five seconds.',
-    look: 'Performance panel, Main track, with the quote stream running.',
-    notice: 'Purple Layout blocks inside script tasks and the Forced reflow warnings. Which line causes them?',
+    look: 'The Performance panel, Main track.',
+    notice: 'Purple Layout blocks inside the script and Forced reflow warnings. Which line causes them?',
     solution:
-      'On every update the effect writes a bar width, reads the cell width and writes again, row after row. Each read after a write forces a synchronous layout (layout thrashing). The fix sizes the bars with transform: scaleX, so nothing has to be measured.',
+      'For each of 160 rows the code changes a bar width and then reads the cell width. Every read after a change makes the browser recalculate the layout on the spot. The fix sets the bar size with transform: scaleX, so the code never measures anything.',
     group: 'Basic',
     target: '.depth-panel',
   },
@@ -66,11 +67,10 @@ export const CASES: Case[] = [
     },
     steps:
       'Clear the search and keep the quote stream running. Scroll to the bottom and back, and record five seconds.',
-    look: 'Elements panel for the list, then Performance while scrolling with the stream on.',
-    notice:
-      'How many rows are in the DOM compared to the rows you can see, and how long each quote update takes to render.',
+    look: 'The Elements panel, then the Performance panel while you scroll.',
+    notice: 'How many rows are on the page compared to how many you can see. How long does one quote update take?',
     solution:
-      'All 2,200 rows are rendered and updated on every quote message. The fix renders only the rows in view plus a small buffer (virtualization).',
+      'The list renders all 2,200 rows and updates them on every quote message. The fix renders only the rows you can see plus a few extra (virtualization).',
     group: 'Basic',
     target: '.watchlist-panel',
   },
@@ -83,10 +83,10 @@ export const CASES: Case[] = [
       text: 'Users say the page jumps right when they click, and they open the wrong instrument. Our CLS in field data turned red after we added notices.',
     },
     steps: 'Press Replay bulletin and record at least three seconds without clicking.',
-    look: 'Performance panel, Layout shifts track. In the Rendering drawer, turn on Layout Shift Regions.',
+    look: 'The Performance panel, Layout shifts track. In the Rendering tab, turn on Layout Shift Regions.',
     notice: 'What moves when the notice appears, and the CLS value.',
     solution:
-      'The notice is inserted above the content without reserved space, so everything below it shifts. The fix keeps a placeholder of the same height until the notice appears.',
+      'The notice appears above the content with no space kept for it, so everything below jumps down. The fix keeps an empty box of the same height until the notice arrives.',
     group: 'Basic',
     target: '.bulletin-slot',
   },
@@ -98,13 +98,12 @@ export const CASES: Case[] = [
       from: 'Team lead',
       text: 'The overview strip shows a skeleton for more than a second, though it is only four numbers. On mobile networks it is worse.',
     },
-    steps:
-      'Set Response to Normal and press Reload overview. Repeat with the same network settings. Then try Unavailable and Invalid data.',
-    look: 'Network panel. Compare the overview request in both modes.',
+    steps: 'Set Response to Normal and press Reload overview. Then try Unavailable and Invalid data.',
+    look: 'The Network panel. Compare the overview request in both modes.',
     notice:
-      'Response size, and in Timing the time spent waiting for the server. How much of the response does the strip show?',
+      'The size of the response and how long the server takes to answer (the Timing tab). How much of the response does the strip show?',
     solution:
-      'The strip loads /api/overview, which is slow and carries a 12,000-row sector table the strip never shows (overfetching). The fix loads /api/overview/summary with only the fields on screen.',
+      'The strip needs four numbers, but it loads the full overview with a 12,000-row table it never shows, and the server is slow to build it. The fix loads /api/overview/summary, which has only what the strip shows.',
     group: 'Basic',
     target: '.overview-section',
     hasTimings: true,
@@ -118,10 +117,10 @@ export const CASES: Case[] = [
       text: 'The scan marker under the chart stutters whenever the app is busy. On a slower laptop the animation is never smooth.',
     },
     steps: 'Set CPU throttling to 4x and record the moving marker for five seconds.',
-    look: 'Performance panel with CPU throttling. In the Rendering drawer, turn on Paint flashing.',
-    notice: 'What the browser does on every frame while the marker moves: layout and paint, or only compositing.',
+    look: 'The Performance panel with CPU throttling. In the Rendering tab, turn on Paint flashing.',
+    notice: 'Does the browser recalculate the layout and repaint on every frame while the marker moves?',
     solution:
-      'The marker animates left, which needs layout and paint on the main thread every frame. The fix animates transform, which the compositor handles without the main thread.',
+      'The animation changes left, so the browser recalculates the layout and repaints on every frame. The fix animates transform instead, which the browser moves on the GPU without that work.',
     group: 'Basic',
     target: '.chart-panel',
   },
@@ -134,12 +133,11 @@ export const CASES: Case[] = [
       text: 'In the morning everything is fast. By the end of the day the screen lags and typing a trade note is slow. Reloading the tab helps.',
     },
     steps:
-      'Reload the browser tab, type a trade note, then press Simulate trading day. It switches 80 instruments one by one. Type a note again.',
-    look: 'Memory panel: a heap snapshot before and after the trading day. Elements panel, Event Listeners of window.',
-    notice:
-      'In the snapshot comparison, which objects keep growing although the screen shows one chart? How many resize listeners are there?',
+      'Reload the browser tab and type a trade note. Press Simulate trading day: it opens 80 instruments one by one. Type a note again.',
+    look: 'The Memory panel. Take a heap snapshot before and after the trading day. In the Elements panel, check the event listeners on window.',
+    notice: 'Which objects keep growing, even though the screen shows one chart? How many resize listeners are there?',
     solution:
-      'The chart effect has no cleanup, so every old chart stays subscribed to the quote feed and to window resize, keeps its canvas and recalculates on every tick. The history cache also grows without limit. The fix unsubscribes and destroys the chart on unmount and keeps an LRU cache of 20 histories.',
+      'When the chart is replaced, the old one is never cleaned up. It stays subscribed to prices and window resize and keeps redrawing in the background. The price history cache also grows forever. The fix unsubscribes and destroys the chart when it is removed and keeps only the last 20 histories.',
     group: 'Advanced',
     hasTimings: true,
   },
@@ -152,10 +150,10 @@ export const CASES: Case[] = [
       text: 'When the market is busy, the limit price field lags and sometimes characters disappear. On a quiet market it is fine.',
     },
     steps: 'Set CPU throttling to 4x. Press Start stream and type a limit price in the order ticket.',
-    look: 'Performance panel while typing during the stream. In a dev build, the Components track.',
-    notice: 'How long keystrokes wait, and how many components render for one quote message.',
+    look: 'The Performance panel while you type during the stream.',
+    notice: 'How long each key press waits, and how many components render for one price message.',
     solution:
-      'Each of 120 messages per second creates a new store state, and the desk reads the whole store, so 1,600 cells and 300 rows render per message. Every price also builds a new Intl.NumberFormat. Updates from useSyncExternalStore are synchronous, so transitions do not help. The fix batches messages per frame, subscribes each cell to its own quote and shares one formatter.',
+      'Prices arrive 120 times a second, and each message renders the whole board again, about 1,900 components. Every price also creates a new number formatter. The fix groups the messages of one frame into one update, lets each cell follow only its own price and reuses one formatter.',
     group: 'Advanced',
   },
   {
@@ -166,11 +164,12 @@ export const CASES: Case[] = [
       from: 'Users',
       text: 'When I switch instruments, everything disappears and comes back in pieces. Flipping through several in a row, I only see gray placeholders.',
     },
-    steps: 'Open Network, Fast 4G is fine. Switch NVDA, AAPL, MSFT. Press Clear data cache before each run.',
-    look: 'Network panel, Waterfall column, with Fast 4G.',
-    notice: 'When each request and JS chunk starts relative to the click. Do they start together or one after another?',
+    steps:
+      'Open the Network panel and set Fast 4G. Switch NVDA, AAPL and MSFT. Press Clear data cache before each run.',
+    look: 'The Network panel, Waterfall column.',
+    notice: 'When does each request and JS file start, compared to the click? All together, or one after another?',
     solution:
-      'Each section fetches its data only after it renders, and it renders only after the previous request finishes: info, then the chart and book chunks and requests, then the news chunk and request (a waterfall). The page is also replaced by a skeleton on every switch. The fix starts every request and chunk at once on click, hover or focus (prefetchInstrument), reads them with use() and keeps the old page on screen during the switch with useTransition.',
+      'Each part of the page starts loading only after the part above it has loaded: details first, then the chart and order book, then the news. This is a waterfall. The page also turns into a skeleton on every switch. The fix starts all requests and files at once, even on hover, and keeps the old page on screen until the new one is ready.',
     group: 'Advanced',
     hasTimings: true,
   },
@@ -184,10 +183,10 @@ export const CASES: Case[] = [
     },
     steps:
       'Keep CPU and network throttling off. Choose 100,000 trades, press Export CSV and start typing a comment right away. Clear Save file in the panel if you do not want downloads.',
-    look: 'Performance panel while the export runs and you type.',
-    notice: 'The longest task on the Main track, what fills it in Bottom-Up, and whether a Worker track appears.',
+    look: 'The Performance panel while the export runs and you type.',
+    notice: 'The longest task on the Main track and what fills it. Is there a Worker track?',
     solution:
-      'Fetching, parsing and formatting 100,000 rows run on the main thread in one task, and every row creates new Intl formatters. The fix moves the work to a Web Worker with shared formatters; it reports progress and can be cancelled.',
+      'Downloading, parsing and formatting 100,000 rows all happen on the main thread in one go, so the page cannot react to anything. Every row also creates new date and number formatters. The fix moves the work to a Web Worker and reuses the formatters. The worker reports progress, and the export can be cancelled.',
     group: 'Advanced',
     hasTimings: true,
   },
@@ -197,15 +196,15 @@ export const CASES: Case[] = [
     subtitle: 'Connection health',
     complaint: {
       from: 'Users and ops',
-      text: 'Users: after a break the status says online, but the prices are old. Ops: after every release the app shows no data for several seconds, and the feed service sees a spike of connections.',
+      text: 'After a break the status says online, but the prices are old. After every release the app shows no data for a few seconds, and ops see a spike of connections.',
     },
     steps:
       'Wait for the price to update. Press Simulate sleep, wait about 5 seconds, then press Wake up. Then press Restart server.',
-    look: 'Network panel: filter Socket (WS in older Chrome), open the feed request whose Time is Pending, then the Messages tab. Server monitoring in this panel.',
+    look: 'The Network panel. Filter Socket (WS in older Chrome), open the feed request whose Time is Pending, then the Messages tab. Also watch Server monitoring in this panel.',
     notice:
-      'What arrives during sleep, heartbeats included, and what the badge says meanwhile. The seq numbers after Wake up. The timing of reconnect attempts after Restart server.',
+      'What arrives during sleep and what the badge says meanwhile. The seq numbers after Wake up. How often the app tries to reconnect after Restart server.',
     solution:
-      'The client trusts an open socket: it ignores silence, heartbeats included, does not notice gaps in seq, and reconnects every second, so all clients come back in waves. The fix treats 3 s of silence as a dead connection, resumes from the last seq and takes a snapshot on a gap, reconnects with exponential backoff and jitter, and shows how fresh the price is.',
+      'The app believes the connection works as long as it is open. It does not notice that messages stopped or that some were missed, and it retries every second, so after a restart all users reconnect at the same moment. The fix treats 3 seconds without messages as a lost connection, asks for the missed messages when it reconnects and waits a bit longer, plus a random delay, before each retry.',
     group: 'Advanced',
     hasTimings: true,
   },

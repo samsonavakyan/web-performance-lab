@@ -2,7 +2,7 @@
 
 For the mentor. Show a case after the learner has found and proved the problem in DevTools.
 
-Each case has two implementations side by side: `X.baseline.tsx` has the problem, `X.tsx` has the fix. The app does not know which one runs; `apps/web/src/lab/variants.ts` picks it by the case mode. The diff of a pair is the walkthrough:
+Each case has two implementations side by side: `X.baseline.tsx` has the problem, `X.tsx` has the fix. The app does not know which one runs. `apps/web/src/lab/variants.ts` picks it by the case mode. Diff a pair to walk through the fix.
 
 ```bash
 git diff --no-index apps/web/src/lib/search.baseline.ts apps/web/src/lib/search.ts
@@ -48,7 +48,7 @@ The marker animates `left`, which needs layout and paint every frame on the main
 
 `workspaces/instrument-monitor/PriceChart.baseline.tsx`
 
-The chart effect has no cleanup: every chart stays subscribed to the quote feed and keeps its canvas and `resize` listener. The history cache also grows without limit. Old charts keep recalculating on every tick, so the page slows down during the day. The fix unsubscribes and destroys the chart on unmount and keeps an LRU cache of 20 histories.
+The chart effect has no cleanup. Every chart stays subscribed to the quote feed and keeps its canvas and `resize` listener. The history cache also grows without limit. Old charts keep recalculating on every tick, so the page slows down during the day. The fix unsubscribes and destroys the chart on unmount and keeps an LRU cache of 20 histories.
 
 ## 08. Order ticket
 
@@ -60,19 +60,19 @@ Each of 120 messages per second updates the store, and the whole desk subscribes
 
 `workspaces/instrument-switch/Navigator.baseline.tsx`, `ChartSection.baseline.tsx`, `SidePanel.baseline.tsx`, `NewsFeed.baseline.tsx`
 
-Requests and code chunks load one after another: page info, then the chart and order book chunks and requests, then the news chunk and request (a waterfall). The page is replaced by a skeleton on every switch. The fix starts all requests and chunks at once, also on hover and focus, and keeps the old page until the new one is ready (`useTransition`).
+Requests and code chunks load one after another. Page info comes first, then the chart and order book code and data, then the news code and data. This is a waterfall. The page is replaced by a skeleton on every switch. The fix starts all requests and chunks at once, also on hover and focus, and keeps the old page until the new one is ready (`useTransition`).
 
 ## 10. Trade export
 
 `workspaces/trade-export/ExportPanel.baseline.tsx`, `csv.baseline.ts`
 
-Fetching, parsing and formatting the CSV run on the main thread, and every row builds new `Intl` formatters. The fix moves the work to a Worker with shared formatters; it reports progress and can be cancelled.
+Fetching, parsing and formatting the CSV run on the main thread, and every row builds new `Intl` formatters. The fix moves the work to a Worker with shared formatters. The worker reports progress, and the export can be cancelled.
 
 ## 11. Live feed
 
 `workspaces/live-feed/feedClient.baseline.ts`, `FeedQuote.baseline.tsx`
 
-- A silent connection (sleep) is never detected: the socket stays open and the badge says Connected while the price is frozen. The fix treats no message, heartbeats included, for 3 s as a dead connection.
-- After a reconnect messages are lost. The fix resumes from the last `seq` and takes a snapshot when it sees a gap.
+- A silent connection after sleep goes unnoticed. The socket stays open, and the badge says Connected while the price is frozen. The fix treats 3 s without any message, heartbeats included, as a dead connection.
+- Messages sent during the outage are lost. The fix resumes from the last `seq` and takes a snapshot when it sees a gap.
 - All clients reconnect after a fixed 1 s, so a restart produces waves of connections. The fix uses exponential backoff with jitter.
 - The fix shows how fresh the price is, not only whether the socket is open.

@@ -12,8 +12,8 @@ const SLIDES: Slide[] = [
     title: 'A trading terminal with real problems',
     body: (
       <p>
-        MarketLab looks and works like a product. Some of its screens are slow or broken in ways real apps are. You
-        investigate them the way a team does: from a complaint to a fix.
+        MarketLab looks and works like a product. Some of its screens are slow or broken the way real apps are. You
+        investigate them like a team would, starting from a complaint and ending with a fix.
       </p>
     ),
   },
@@ -43,7 +43,7 @@ const SLIDES: Slide[] = [
     title: 'Open hints only when stuck',
     body: (
       <>
-        <p>Each case has hints in order. Open the next one only after you tried without it.</p>
+        <p>Each case has hints in order. Open the next one only after you have tried without it.</p>
         <ol className="onboarding-steps">
           <li>Reproduce</li>
           <li>Where to look</li>
