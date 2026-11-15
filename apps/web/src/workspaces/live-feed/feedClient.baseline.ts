@@ -69,7 +69,10 @@ export class FeedClient {
     this.disposed = true;
     this.status = 'closed';
     clearTimeout(this.retryTimer);
-    this.socket?.close();
+    // Closing a socket that is still connecting aborts the handshake and leaves a failed request in DevTools.
+    const socket = this.socket;
+    if (socket?.readyState === WebSocket.CONNECTING) socket.onopen = () => socket.close();
+    else socket?.close();
     this.socket = null;
   }
 }
