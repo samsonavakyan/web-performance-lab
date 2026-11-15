@@ -107,7 +107,18 @@ export function LabPanel({
                       <span className="switch-track" aria-hidden="true" />
                     </button>
                   )}
-                  {active && <p className="scenario-hint">{scenario.hint}</p>}
+                  {active && (
+                    <div className="case-brief">
+                      <figure className="case-complaint">
+                        <figcaption>{scenario.complaint.from}</figcaption>
+                        <blockquote>{scenario.complaint.text}</blockquote>
+                      </figure>
+                      <div className="case-steps">
+                        <strong>Reproduce</strong>
+                        <p>{scenario.steps}</p>
+                      </div>
+                    </div>
+                  )}
                   {active && scenario.group === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
                   {scenario.id === 'overview' && (
                     <div className="experiment-controls">

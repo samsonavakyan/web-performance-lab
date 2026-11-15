@@ -8,6 +8,7 @@ const NewsSection = lazy(() => import('./NewsSection').then((module) => ({ defau
 
 export function SideSection({ symbol, onReady }: { symbol: string; onReady: (section: Section) => void }) {
   const [levels, setLevels] = useState<BookLevel[] | null>(null);
+
   useEffect(() => {
     const controller = new AbortController();
     fetchJson<BookLevel[]>(`/api/lab/instrument/${symbol}/book`, controller.signal)
@@ -15,10 +16,13 @@ export function SideSection({ symbol, onReady }: { symbol: string; onReady: (sec
       .catch(() => {});
     return () => controller.abort();
   }, [symbol]);
+
+
   useEffect(() => {
     if (levels) onReady('book');
   }, [levels, onReady]);
   if (!levels) return <Skeleton label="order book" height={300} />;
+
   return (
     <>
       <BookView levels={levels} />
