@@ -26,9 +26,17 @@ npm run dev:web
 
 ## Exercises
 
-The Performance Lab panel lists six Basic and five Advanced cases. Each case has a Baseline and an Optimized mode. Pick a case, record the same interaction in both modes in DevTools and compare.
+The Performance Lab panel lists six Basic and five Advanced cases. Each case has a Baseline mode with the problem and an Optimized mode with the fix. A short guide opens on the first visit; the ? button in the panel opens it again.
 
-Steps for each case are in [docs/EXERCISES.md](docs/EXERCISES.md). Test one case at a time and keep the others on Optimized, otherwise the traces get noisy.
+How a case works:
+
+1. Read the complaint. It describes the symptoms users or the team report, not the cause.
+2. Switch the case to Baseline and try to reproduce and find the problem on your own.
+3. When stuck, open the next hint: Reproduce, Where to look, What to notice, Where in the code, Solution.
+4. Record the same steps in Baseline and Optimized in DevTools and compare.
+5. Diff `X.baseline.tsx` with `X.tsx` to see the fix.
+
+The same cases and hints are in [docs/EXERCISES.md](docs/EXERCISES.md). Test one case at a time and keep the others on Optimized, otherwise the traces get noisy.
 
 On a fast laptop some differences are small. Turn on CPU throttling (4x or 6x) in the Performance panel. Record each case a few times before drawing conclusions.
 

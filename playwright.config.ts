@@ -12,6 +12,8 @@ export default defineConfig({
   use: {
     channel: process.env.PLAYWRIGHT_CHANNEL || 'chrome',
     baseURL: 'http://localhost:5173',
+    // Tests start with the onboarding already seen.
+    storageState: 'tests/storage-state.json',
     viewport: { width: 1600, height: 1100 },
   },
 });

@@ -1,4 +1,4 @@
-import { ChevronRight, FlaskConical, Pause, Play, RefreshCcw, RotateCcw, Timer, X } from 'lucide-react';
+import { ChevronRight, CircleHelp, FlaskConical, Pause, Play, RefreshCcw, RotateCcw, Timer, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ADVANCED_CASES, CASES, isAdvanced } from './cases';
 import type { Mode, Scenario } from './cases';
@@ -7,6 +7,15 @@ import type { OverviewResponse } from '../api/client';
 import { ModeSwitch } from './ModeSwitch';
 import { setLabSlot } from './LabSlot';
 import { setTimings, useTimings } from './timings';
+
+// Opened one at a time: the learner tries on their own before each next hint.
+const HINTS = [
+  { key: 'steps', label: 'Reproduce' },
+  { key: 'look', label: 'Where to look' },
+  { key: 'notice', label: 'What to notice' },
+  { key: 'code', label: 'Where in the code' },
+  { key: 'solution', label: 'Solution' },
+] as const;
 
 type Props = {
   modes: Modes;
@@ -17,6 +26,7 @@ type Props = {
   onReplayBulletin: () => void;
   onReloadOverview: () => void;
   onClose: () => void;
+  onOpenGuide: () => void;
   onOpenCase: (id: Scenario) => void;
   streamPaused: boolean;
   onToggleStream: () => void;
@@ -31,6 +41,7 @@ export function LabPanel({
   onReplayBulletin,
   onReloadOverview,
   onClose,
+  onOpenGuide,
   onOpenCase,
   streamPaused,
   onToggleStream,
@@ -58,9 +69,14 @@ export function LabPanel({
             <span>{CASES.length} cases</span>
           </div>
         </div>
-        <button className="icon-button" onClick={onClose} title="Close lab controls">
-          <X size={20} />
-        </button>
+        <div className="lab-header-actions">
+          <button className="icon-button" onClick={onOpenGuide} title="How the lab works">
+            <CircleHelp size={20} />
+          </button>
+          <button className="icon-button" onClick={onClose} title="Close lab controls">
+            <X size={20} />
+          </button>
+        </div>
       </div>
       <p className="lab-intro">Open a case, read the complaint and reproduce it. Record the same steps in Baseline and Optimized.</p>
       <nav className="lab-sections" role="tablist" aria-label="Case groups">
@@ -119,10 +135,12 @@ export function LabPanel({
                       </summary>
                       <blockquote>{scenario.complaint.text}</blockquote>
                     </details>
-                    <details className="case-toggle">
-                      <summary>Reproduce</summary>
-                      <p>{scenario.steps}</p>
-                    </details>
+                    {HINTS.map(({ key, label }) => (
+                      <details className={`case-toggle ${key === 'solution' ? 'solution' : ''}`} key={key}>
+                        <summary>{label}</summary>
+                        <p>{scenario[key]}</p>
+                      </details>
+                    ))}
                     <div className="case-field">
                       <span className="case-label">Mode</span>
                       <ModeSwitch mode={mode} onChange={(next) => onModeChange(scenario.id, next)} />

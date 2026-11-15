@@ -15,6 +15,7 @@ import { useQuoteStream } from './hooks/useQuoteStream';
 import { ADVANCED_CASES, caseById, isAdvanced } from './lab/cases';
 import type { AdvancedScenario, Scenario } from './lab/cases';
 import { LabPanel } from './lab/LabPanel';
+import { isOnboardingDone, Onboarding } from './lab/Onboarding';
 import { ModesContext, useLabModes } from './lab/modes';
 import { Bulletin, MarketOverview } from './lab/variants';
 
@@ -55,6 +56,7 @@ export default function App() {
   const [selected, setSelected] = useState('NVDA');
   const [paused, setPaused] = useState(false);
   const [labOpen, setLabOpen] = useState(true);
+  const [isGuideOpen, setGuideOpen] = useState(() => !isOnboardingDone());
   const [bulletinReplay, setBulletinReplay] = useState(0);
   const [overviewReload, setOverviewReload] = useState(0);
   const [overviewResponse, setOverviewResponse] = useState<OverviewResponse>('normal');
@@ -143,10 +145,12 @@ export default function App() {
             onReplayBulletin={() => setBulletinReplay((v) => v + 1)}
             onReloadOverview={() => setOverviewReload((v) => v + 1)}
             onClose={() => setLabOpen(false)}
+            onOpenGuide={() => setGuideOpen(true)}
             streamPaused={paused}
             onToggleStream={() => setPaused((v) => !v)}
           />
         )}
+        <Onboarding isOpen={isGuideOpen} onClose={() => setGuideOpen(false)} />
       </div>
     </ModesContext.Provider>
   );
