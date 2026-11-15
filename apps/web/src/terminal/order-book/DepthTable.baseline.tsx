@@ -18,6 +18,7 @@ export function DepthTable({ levels, seq }: Props) {
       const cell = row.querySelector<HTMLElement>('.depth-bid');
       const bar = row.querySelector<HTMLElement>('[data-depth-bar]');
       if (cell && bar && levels[i]) {
+        // Measure the cell without the previous bar, then fit the bar to it.
         bar.style.width = '0px';
         const width = cell.getBoundingClientRect().width;
         bar.style.width = `${(width * levels[i].bidSize) / MAX_SIZE}px`;
