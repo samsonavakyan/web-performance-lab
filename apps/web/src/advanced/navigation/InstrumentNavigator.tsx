@@ -74,6 +74,7 @@ function OptimizedPage({ symbol, onReady }: { symbol: string; onReady: Ready }) 
 }
 
 export function InstrumentNavigator({ mode }: { mode: Mode }) {
+  const isOptimized = mode === 'optimized';
   const [symbol, setSymbol] = useState(SYMBOLS[0]);
   const [isPending, startTransition] = useTransition();
   const target = useRef(SYMBOLS[0]);
@@ -96,7 +97,8 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
     target.current = next;
     started.current = performance.now();
     ready.current = new Set();
-    if (mode === 'optimized') {
+    // Optimized starts all requests and chunks at once (also on hover and focus) and keeps the old page until the new one is ready.
+    if (isOptimized) {
       preloadInstrument(next);
       startTransition(() => setSymbol(next));
       return;
@@ -120,15 +122,15 @@ export function InstrumentNavigator({ mode }: { mode: Mode }) {
               key={item}
               aria-current={item === symbol ? 'page' : undefined}
               onClick={() => navigate(item)}
-              onMouseEnter={mode === 'optimized' ? () => preloadInstrument(item) : undefined}
-              onFocus={mode === 'optimized' ? () => preloadInstrument(item) : undefined}
+              onMouseEnter={isOptimized ? () => preloadInstrument(item) : undefined}
+              onFocus={isOptimized ? () => preloadInstrument(item) : undefined}
             >
               {item}
             </button>
           ))}
         </nav>
         <div className={isPending ? 'nav-content pending' : 'nav-content'}>
-          {mode === 'optimized' ? (
+          {isOptimized ? (
             <Suspense fallback={<PageSkeleton />}>
               <OptimizedPage symbol={symbol} onReady={onReady} />
             </Suspense>

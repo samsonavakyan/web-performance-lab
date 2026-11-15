@@ -14,11 +14,14 @@ type Props = {
 };
 
 export function OrderBook({ levels, seq, mode, symbol }: Props) {
+  const isOptimized = mode === 'optimized';
   const root = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<'book' | 'trades'>('book');
 
   useEffect(() => {
-    if (mode !== 'baseline' || tab !== 'book' || !root.current) return;
+    // Optimized sizes the bars with transform in DepthRows, nothing to measure.
+    if (isOptimized) return;
+    if (tab !== 'book' || !root.current) return;
     const rows = root.current.querySelectorAll<HTMLElement>('[data-depth-row]');
     rows.forEach((row, i) => {
       const cell = row.querySelector<HTMLElement>('.depth-bid');
@@ -29,7 +32,7 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
         bar.style.width = `${(width * levels[i].bidSize) / MAX_SIZE}px`;
       }
     });
-  }, [seq, mode, tab, levels]);
+  }, [seq, isOptimized, tab, levels]);
 
   return (
     <section className="panel depth-panel">
@@ -58,7 +61,7 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
             <span>ASK SIZE</span>
           </div>
           <div className="depth-scroll" ref={root}>
-            <DepthRows key={mode} levels={levels} mode={mode} />
+            <DepthRows key={mode} levels={levels} isOptimized={isOptimized} />
           </div>
           <div className="spread">
             <span>Spread</span>
@@ -83,7 +86,7 @@ export function OrderBook({ levels, seq, mode, symbol }: Props) {
   );
 }
 
-const DepthRows = memo(function DepthRows({ levels, mode }: { levels: BookLevel[]; mode: Mode }) {
+const DepthRows = memo(function DepthRows({ levels, isOptimized }: { levels: BookLevel[]; isOptimized: boolean }) {
   return (
     <>
       {levels.slice(0, VISIBLE_LEVELS).map((level) => (
@@ -92,7 +95,7 @@ const DepthRows = memo(function DepthRows({ levels, mode }: { levels: BookLevel[
             <span
               className="depth-bar green"
               data-depth-bar
-              style={mode === 'optimized' ? { transform: `scaleX(${level.bidSize / MAX_SIZE})` } : undefined}
+              style={isOptimized ? { transform: `scaleX(${level.bidSize / MAX_SIZE})` } : undefined}
             />
             <span>{level.bidSize.toLocaleString()}</span>
           </div>

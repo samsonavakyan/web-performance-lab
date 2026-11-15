@@ -17,6 +17,7 @@ function download(blob: Blob, rows: number) {
 type Result = { rows: number; bytes: number };
 
 export function TradeExport({ mode }: { mode: Mode }) {
+  const isOptimized = mode === 'optimized';
   const [count, setCount] = useState(100_000);
   const [save, setSave] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -75,7 +76,8 @@ export function TradeExport({ mode }: { mode: Mode }) {
     setError('');
     const url = `/api/lab/trades?count=${count}`;
     const started = performance.now();
-    if (mode === 'optimized') exportInWorker(url, started);
+    // Optimized fetches, parses and formats in a Worker, so the main thread stays free for input; it reports progress and can be cancelled.
+    if (isOptimized) exportInWorker(url, started);
     else void exportOnMainThread(url, started);
   }
 
@@ -105,14 +107,14 @@ export function TradeExport({ mode }: { mode: Mode }) {
         <button disabled={busy} onClick={start}>
           Export CSV
         </button>
-        <button disabled={!busy || mode !== 'optimized'} onClick={cancel}>
+        <button disabled={!busy || !isOptimized} onClick={cancel}>
           Cancel
         </button>
         <span role="status">
-          {busy ? (mode === 'optimized' ? `Exporting ${(progress * 100).toFixed(0)}%` : 'Exporting') : error || 'Ready'}
+          {busy ? (isOptimized ? `Exporting ${(progress * 100).toFixed(0)}%` : 'Exporting') : error || 'Ready'}
         </span>
       </div>
-      {mode === 'optimized' && busy && <progress className="export-progress" value={progress} max={1} />}
+      {isOptimized && busy && <progress className="export-progress" value={progress} max={1} />}
       {result && (
         <p className="export-result">
           Saved {result.rows.toLocaleString('en-US')} trades, {(result.bytes / 1048576).toFixed(1)} MB

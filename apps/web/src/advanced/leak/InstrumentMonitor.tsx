@@ -8,10 +8,11 @@ const HISTORY_LIMIT = 20;
 const TRADING_DAY = 80;
 const historyCache = new Map<string, Candle[]>();
 
-async function loadHistory(symbol: string, mode: Mode): Promise<Candle[]> {
+async function loadHistory(symbol: string, isOptimized: boolean): Promise<Candle[]> {
   const cached = historyCache.get(symbol);
   if (cached) {
-    if (mode === 'optimized') {
+    // Optimized keeps the cache in LRU order: a hit moves the entry to the end.
+    if (isOptimized) {
       historyCache.delete(symbol);
       historyCache.set(symbol, cached);
     }
@@ -21,7 +22,8 @@ async function loadHistory(symbol: string, mode: Mode): Promise<Candle[]> {
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
   const candles = (await response.json()) as Candle[];
   historyCache.set(symbol, candles);
-  if (mode === 'optimized' && historyCache.size > HISTORY_LIMIT) {
+  // Optimized caps the cache and evicts the least recently used entry.
+  if (isOptimized && historyCache.size > HISTORY_LIMIT) {
     historyCache.delete(historyCache.keys().next().value!);
   }
   return candles;
@@ -29,11 +31,11 @@ async function loadHistory(symbol: string, mode: Mode): Promise<Candle[]> {
 
 function PriceChart({
   instrument,
-  mode,
+  isOptimized,
   onReady,
 }: {
   instrument: Instrument;
-  mode: Mode;
+  isOptimized: boolean;
   onReady: (symbol: string) => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -42,11 +44,11 @@ function PriceChart({
 
   useEffect(() => {
     let active = true;
-    loadHistory(instrument.symbol, mode).then((data) => active && setCandles(data));
+    loadHistory(instrument.symbol, isOptimized).then((data) => active && setCandles(data));
     return () => {
       active = false;
     };
-  }, [instrument.symbol, mode]);
+  }, [instrument.symbol, isOptimized]);
 
   useEffect(() => {
     if (!candles || !canvas.current) return;
@@ -56,13 +58,14 @@ function PriceChart({
       setLast(price);
     });
     onReady(instrument.symbol);
-    if (mode === 'optimized') {
+    // Optimized unsubscribes and destroys the chart on unmount, so nothing keeps the old chart and its canvas alive.
+    if (isOptimized) {
       return () => {
         unsubscribe();
         chart.destroy();
       };
     }
-  }, [candles, instrument, mode, onReady]);
+  }, [candles, instrument, isOptimized, onReady]);
 
   return (
     <div className="monitor-chart">
@@ -77,6 +80,7 @@ function PriceChart({
 }
 
 export function InstrumentMonitor({ mode }: { mode: Mode }) {
+  const isOptimized = mode === 'optimized';
   const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [index, setIndex] = useState(0);
   const [remaining, setRemaining] = useState(0);
@@ -133,7 +137,7 @@ export function InstrumentMonitor({ mode }: { mode: Mode }) {
         </label>
       </div>
       {instrument && (
-        <PriceChart key={instrument.symbol} instrument={instrument} mode={mode} onReady={setReadySymbol} />
+        <PriceChart key={instrument.symbol} instrument={instrument} isOptimized={isOptimized} onReady={setReadySymbol} />
       )}
       <label className="analysis-note">
         Trade note <input aria-label="Trade note" value={note} onChange={(event) => setNote(event.target.value)} />

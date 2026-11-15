@@ -35,8 +35,9 @@ app.get('/api/news', async () => NEWS);
 app.get('/api/overview', async (request, reply) => {
   const mode = request.query?.mode === 'baseline' ? 'baseline' : 'optimized';
   reply.header('Cache-Control', 'no-store');
-  if (mode === 'baseline') await sleep(1100);
-  else await sleep(60);
+  // Optimized models a lean endpoint: fast and only the fields the widget shows. Baseline is slow and adds 12 000 unused rows.
+  if (mode === 'optimized') await sleep(60);
+  else await sleep(1100);
   if (request.query?.response === 'unavailable') {
     return reply.code(500).send({error: 'Overview unavailable'});
   }

@@ -10,6 +10,7 @@ type Props = {
 };
 
 export function Bulletin({ mode, replay }: Props) {
+  const isOptimized = mode === 'optimized';
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -18,6 +19,7 @@ export function Bulletin({ mode, replay }: Props) {
     return () => window.clearTimeout(timer);
   }, [mode, replay]);
 
+  // Optimized keeps the slot at its final height (.bulletin-slot.optimized), so the bulletin appears without a layout shift.
   return (
     <div className={`bulletin-slot ${mode}`}>
       {visible && (
@@ -32,7 +34,7 @@ export function Bulletin({ mode, replay }: Props) {
           <span>JUST NOW</span>
         </div>
       )}
-      {!visible && mode === 'optimized' && <div className="bulletin-placeholder" aria-hidden="true" />}
+      {!visible && isOptimized && <div className="bulletin-placeholder" aria-hidden="true" />}
     </div>
   );
 }

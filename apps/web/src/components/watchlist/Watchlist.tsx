@@ -17,6 +17,7 @@ type Props = {
 };
 
 export function Watchlist({ instruments, quotes, selected, onSelect, mode }: Props) {
+  const isOptimized = mode === 'optimized';
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'name' | 'change'>('name');
   const [scrollTop, setScrollTop] = useState(0);
@@ -26,23 +27,25 @@ export function Watchlist({ instruments, quotes, selected, onSelect, mode }: Pro
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [query, mode]);
   const deferredQuery = useDeferredValue(query);
-  const searchMode = useModes().search;
+  const isSearchOptimized = useModes().search === 'optimized';
 
   const onSearch = (next: string) => {
     setQuery(next);
   };
 
   const filtered = useMemo(() => {
-    const base = searchMode === 'baseline' ? fuzzyFilter(instruments, query) : simpleFilter(instruments, deferredQuery);
+    // Optimized filters with a cheap substring match on a deferred query, so typing is not blocked by filtering.
+    const base = isSearchOptimized ? simpleFilter(instruments, deferredQuery) : fuzzyFilter(instruments, query);
     if (sort === 'change') {
       return [...base].sort((a, b) => (quotes[b.symbol]?.change ?? b.change) - (quotes[a.symbol]?.change ?? a.change));
     }
     return base;
-  }, [deferredQuery, instruments, quotes, searchMode, query, sort]);
+  }, [deferredQuery, instruments, quotes, isSearchOptimized, query, sort]);
 
   const first = Math.max(0, Math.min(Math.floor(scrollTop / ROW_HEIGHT), Math.max(0, filtered.length - 1)) - 4);
   const count = Math.ceil(LIST_HEIGHT / ROW_HEIGHT) + 8;
-  const visible = mode === 'optimized' ? filtered.slice(first, first + count) : filtered;
+  // Optimized renders only the rows in view plus a small buffer (virtualization).
+  const visible = isOptimized ? filtered.slice(first, first + count) : filtered;
 
   const rows = visible.map((item) => (
     <InstrumentRow
@@ -88,7 +91,7 @@ export function Watchlist({ instruments, quotes, selected, onSelect, mode }: Pro
       </div>
 
       <div className="watchlist-scroll" ref={scrollRef} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}>
-        {mode === 'optimized' ? (
+        {isOptimized ? (
           <div style={{ height: filtered.length * ROW_HEIGHT, position: 'relative' }}>
             <div
               style={{ position: 'absolute', top: 0, width: '100%', transform: `translateY(${first * ROW_HEIGHT}px)` }}

@@ -12,10 +12,11 @@ const UPDATES_PER_MESSAGE = 20;
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
+// Optimized formats with one shared formatter; formatPrice above builds a new Intl.NumberFormat on every call.
 const priceFormat = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatQuotePrice = (value: number) => priceFormat.format(value);
 
-function useStream(running: boolean, mode: Mode, symbols: string[]) {
+function useStream(running: boolean, isOptimized: boolean, symbols: string[]) {
   useEffect(() => {
     if (!running || !symbols.length) return;
     let pending: Quote[] = [];
@@ -27,7 +28,8 @@ function useStream(running: boolean, mode: Mode, symbols: string[]) {
         const price = +(previous.price * (1 + (Math.random() - 0.5) * 0.002)).toFixed(2);
         return { symbol, price, change: +(previous.change + (Math.random() - 0.5) * 0.05).toFixed(2) };
       });
-      if (mode === 'optimized') {
+      // Optimized batches the messages of one frame into a single store update.
+      if (isOptimized) {
         pending.push(...updates);
         frame ||= requestAnimationFrame(() => {
           quoteStore.apply(pending);
@@ -42,7 +44,7 @@ function useStream(running: boolean, mode: Mode, symbols: string[]) {
       clearInterval(timer);
       cancelAnimationFrame(frame);
     };
-  }, [running, mode, symbols]);
+  }, [running, isOptimized, symbols]);
 }
 
 function QuoteCell({ quote, format }: { quote?: Quote; format: (value: number) => string }) {
@@ -137,6 +139,7 @@ function BaselineDesk({ symbols, positions }: DeskProps) {
   );
 }
 
+// Each cell, row and the ticket subscribe to their own quote, so a message rerenders only what it changed.
 function OptimizedDesk({ symbols, positions }: DeskProps) {
   return (
     <div className="order-desk">
@@ -175,6 +178,7 @@ function PositionsTable({ children }: { children: ReactNode }) {
 }
 
 export function OrderDesk({ mode }: { mode: Mode }) {
+  const isOptimized = mode === 'optimized';
   const [desk, setDesk] = useState<DeskProps | null>(null);
   const [running, setRunning] = useState(false);
 
@@ -193,7 +197,7 @@ export function OrderDesk({ mode }: { mode: Mode }) {
         });
       });
   }, []);
-  useStream(running, mode, desk?.symbols ?? EMPTY);
+  useStream(running, isOptimized, desk?.symbols ?? EMPTY);
 
   return (
     <>
@@ -209,7 +213,7 @@ export function OrderDesk({ mode }: { mode: Mode }) {
         </div>
         <span role="status">{running ? 'Streaming' : 'Ready'}</span>
       </LabSlot>
-      {desk && (mode === 'optimized' ? <OptimizedDesk {...desk} /> : <BaselineDesk {...desk} />)}
+      {desk && (isOptimized ? <OptimizedDesk {...desk} /> : <BaselineDesk {...desk} />)}
     </>
   );
 }

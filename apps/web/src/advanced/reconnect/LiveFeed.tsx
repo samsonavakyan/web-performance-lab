@@ -15,8 +15,9 @@ function useNow(interval: number) {
   return now;
 }
 
-function StatusBadge({ client, mode, now }: { client: FeedClient; mode: Mode; now: number }) {
-  if (mode === 'optimized') {
+function StatusBadge({ client, isOptimized, now }: { client: FeedClient; isOptimized: boolean; now: number }) {
+  // Optimized shows whether the data is fresh, not only whether the socket is open.
+  if (isOptimized) {
     if (client.status === 'live') return <span className="feed-badge good">Live</span>;
     if (client.status === 'stale') return <span className="feed-badge bad">Stale · reconnecting</span>;
     const wait = Math.max(0, (client.retryAt - now) / 1000);
@@ -31,6 +32,7 @@ async function post(path: string) {
 }
 
 export function LiveFeed({ mode }: { mode: Mode }) {
+  const isOptimized = mode === 'optimized';
   const client = useRef<FeedClient | null>(null);
   const [withDesks, setWithDesks] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -95,8 +97,8 @@ export function LiveFeed({ mode }: { mode: Mode }) {
         <div className="feed-quote">
           <span>NVDA</span>
           <strong>{feed.price ? feed.price.toFixed(2) : '-'}</strong>
-          <StatusBadge client={feed} mode={mode} now={now} />
-          {mode === 'optimized' && feed.lastMessageAt > 0 && <small>Updated {age.toFixed(1)} s ago</small>}
+          <StatusBadge client={feed} isOptimized={isOptimized} now={now} />
+          {isOptimized && feed.lastMessageAt > 0 && <small>Updated {age.toFixed(1)} s ago</small>}
         </div>
       )}
     </>
