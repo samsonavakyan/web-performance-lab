@@ -1,4 +1,4 @@
-import { FlaskConical, RefreshCcw, RotateCcw, X } from 'lucide-react';
+import { FlaskConical, Pause, Play, RefreshCcw, RotateCcw, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ADVANCED_SCENARIOS, SCENARIOS } from '../types';
 import type { Mode, Scenario } from '../types';
@@ -17,6 +17,8 @@ type Props = {
   onReloadOverview: () => void;
   onClose: () => void;
   onOpenCase: (id: Scenario) => void;
+  streamPaused: boolean;
+  onToggleStream: () => void;
 };
 
 export function LabPanel({
@@ -29,6 +31,8 @@ export function LabPanel({
   onReloadOverview,
   onClose,
   onOpenCase,
+  streamPaused,
+  onToggleStream,
 }: Props) {
   const [group, setGroup] = useState('Basic');
   useEffect(() => {
@@ -68,6 +72,14 @@ export function LabPanel({
           </button>
         ))}
       </nav>
+      {group === 'Basic' && (
+        <div className="lab-stream">
+          <span>Quote stream {streamPaused ? 'paused' : 'running'}</span>
+          <button onClick={onToggleStream}>
+            {streamPaused ? <Play size={14} /> : <Pause size={14} />} {streamPaused ? 'Resume' : 'Pause'}
+          </button>
+        </div>
+      )}
       <div className="scenario-list">
         {[group].map((group) => (
           <section className="case-group" key={group} aria-label={`${group} cases`}>

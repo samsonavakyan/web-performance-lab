@@ -1,8 +1,6 @@
-import { BarChart3, FlaskConical, LayoutGrid, Layers, Pause, Play } from 'lucide-react';
+import { BarChart3, FlaskConical, LayoutGrid, Layers } from 'lucide-react';
 
 type Props = {
-  paused: boolean;
-  onTogglePause: () => void;
   labOpen: boolean;
   advancedOpen: boolean;
   onTerminal: () => void;
@@ -10,7 +8,7 @@ type Props = {
   onToggleLab: () => void;
 };
 
-export function TopBar({ paused, onTogglePause, labOpen, onToggleLab, advancedOpen, onTerminal, onAdvanced }: Props) {
+export function TopBar({ labOpen, onToggleLab, advancedOpen, onTerminal, onAdvanced }: Props) {
   return (
     <header className="topbar">
       <div className="brand">
@@ -35,9 +33,6 @@ export function TopBar({ paused, onTogglePause, labOpen, onToggleLab, advancedOp
         <span className="market-open">
           <span className="status-dot" /> MARKET OPEN
         </span>
-        <button className="button minor" onClick={onTogglePause}>
-          {paused ? <Play size={14} /> : <Pause size={14} />} {paused ? 'Resume' : 'Pause'} stream
-        </button>
         <button className={`button lab-toggle ${labOpen ? 'active' : ''}`} onClick={onToggleLab}>
           <FlaskConical size={15} /> Performance Lab
         </button>

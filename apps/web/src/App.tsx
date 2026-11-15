@@ -84,8 +84,6 @@ export default function App() {
           advancedOpen={advanced !== null}
           onTerminal={backToTerminal}
           onAdvanced={() => openCase(ADVANCED_SCENARIOS[0])}
-          paused={paused}
-          onTogglePause={() => setPaused((v) => !v)}
           labOpen={labOpen}
           onToggleLab={() => setLabOpen((v) => !v)}
         />
@@ -152,6 +150,8 @@ export default function App() {
             onReplayBulletin={() => setBulletinReplay((v) => v + 1)}
             onReloadOverview={() => setOverviewReload((v) => v + 1)}
             onClose={() => setLabOpen(false)}
+            streamPaused={paused}
+            onToggleStream={() => setPaused((v) => !v)}
           />
         )}
       </div>
