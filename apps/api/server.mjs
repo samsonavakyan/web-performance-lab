@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
-import { makeInstruments } from './data.mjs';
+import { makeInstruments } from './data/instruments.mjs';
 import { registerFeed } from './feed.mjs';
 import { registerLab } from './lab.mjs';
 import { registerMarket } from './routes/market.mjs';

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeInstruments, makeCandles, makeOrderBook, makeOverview } from './data.mjs';
+import { makeInstruments } from './instruments.mjs';
+import { makeCandles, makeOrderBook, makeOverview } from './market.mjs';
 
 test('fixtures are reproducible', () => {
   assert.deepEqual(makeInstruments(100), makeInstruments(100));
@@ -29,7 +30,7 @@ test('overview summary shows the same data as the full overview', () => {
 });
 
 test('trades are reproducible and well-formed', async () => {
-  const { makeTrades } = await import('./data.mjs');
+  const { makeTrades } = await import('./trades.mjs');
   const trades = makeTrades(500);
   assert.deepEqual(trades, makeTrades(500));
   assert.equal(new Set(trades.map((t) => t.id)).size, 500);

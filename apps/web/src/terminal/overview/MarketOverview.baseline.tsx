@@ -1,74 +1,12 @@
-import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { OverviewResponse } from '../../api/client';
-import { money, signed } from '../../lib/format';
-import { startTiming } from '../../lab/timings';
-import type { Overview } from '../../types';
+import { OverviewStrip } from './OverviewStrip';
+import { useOverview } from './useOverview';
 
-type Props = {
-  reload: number;
-  response: OverviewResponse;
-};
+type Props = { reload: number; response: OverviewResponse };
 
 export function MarketOverview({ reload, response }: Props) {
-  const [data, setData] = useState<Overview | null>(null);
-  const [pending, setPending] = useState(true);
-  const [error, setError] = useState('');
-  const [details, setDetails] = useState('');
+  const overview = useOverview(api.overview, reload, response);
 
-  useEffect(() => {
-    // A newer reload or response type cancels this request; `active` also drops a result that arrives after that.
-    let active = true;
-    const controller = new AbortController();
-    setPending(true);
-    setData(null);
-    setError('');
-    setDetails('');
-    const endTiming = startTiming('overview', 'overview');
-    api
-      .overview(controller.signal, response)
-      .then((result) => {
-        if (!active) return;
-
-        endTiming();
-        setData(result);
-        setPending(false);
-      })
-      .catch((e: Error) => {
-        if (!active || e.name === 'AbortError') return;
-
-        endTiming();
-        setError('Overview unavailable');
-        setDetails(e instanceof SyntaxError ? 'Unexpected response' : e.message);
-        setPending(false);
-      });
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [reload, response]);
-
-  return (
-    <section className="overview-section" aria-label="Market overview">
-      <div className="overview-strip">
-        <div className="overview-title">
-          <span className="eyebrow">MARKET SNAPSHOT</span>
-          <strong role="status">{pending ? 'Loading market pulse…' : error || data?.title}</strong>
-          <small>{pending ? 'Fetching overview' : details || 'Updated just now'}</small>
-        </div>
-        <div className="overview-items" aria-busy={pending}>
-          {pending
-            ? Array.from({ length: 4 }, (_, i) => <span key={i} className="overview-skeleton" />)
-            : data?.highlights.map((item) => (
-                <div className="overview-item" key={item.symbol}>
-                  <span>{item.symbol}</span>
-                  <strong>{money(item.price)}</strong>
-                  <small className={item.change >= 0 ? 'txt-up' : 'txt-down'}>{signed(item.change)}</small>
-                </div>
-              ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <OverviewStrip {...overview} />;
 }

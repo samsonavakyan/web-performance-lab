@@ -1,21 +1,8 @@
-import { makeCandles, makeOrderBook, makeTrades, NEWS } from '../data.mjs';
+import { makeCandles, makeOrderBook } from '../data/market.mjs';
+import { instrumentHeadlines, NEWS } from '../data/news.mjs';
+import { makeTrades } from '../data/trades.mjs';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const instrumentHeadlines = ({ symbol, name, sector }) =>
-  sector === 'Crypto'
-    ? [
-        `${name} holds steady as crypto volumes climb`,
-        `Funding rates for ${symbol} turn positive`,
-        `Exchange outflows of ${symbol} rise for a third day`,
-        `${name} trades in a narrow range overnight`,
-      ]
-    : [
-        `${name} trades in line with the ${sector.toLowerCase()} sector`,
-        `Analysts update price targets for ${symbol}`,
-        `${symbol} options volume rises ahead of the next report`,
-        `${name} shares open steady after a quiet session`,
-      ];
 
 // Routes of the workspace screens. Latencies are fixed, so request timing is the same on every run.
 export function registerWorkspaces(app, instruments) {

@@ -1,4 +1,4 @@
-import { rngFrom } from './data.mjs';
+import { rngFrom } from './data/random.mjs';
 
 const QUOTE_INTERVAL = 200;
 const HEARTBEAT_INTERVAL = 1000;

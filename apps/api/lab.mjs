@@ -1,4 +1,4 @@
-import { rngFrom } from './data.mjs';
+import { rngFrom } from './data/random.mjs';
 
 // Lab-only controls. Nothing in the product calls these routes; the Performance Lab panel does.
 export function registerLab(app, feed) {

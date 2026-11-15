@@ -12,7 +12,7 @@
     "dev:web": "npm run dev -w @marketlab/web",
     "build": "npm run build -w @marketlab/web",
     "typecheck": "npm run typecheck -w @marketlab/web",
-    "test": "node --test apps/api/data.test.mjs",
+    "test": "node --test apps/api/data/data.test.mjs",
     "preview": "node scripts/dev.mjs --preview",
     "preview:api": "npm run start -w @marketlab/api",
     "preview:web": "npm run preview -w @marketlab/web",

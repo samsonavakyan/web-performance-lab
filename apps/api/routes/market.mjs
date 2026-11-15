@@ -1,4 +1,6 @@
-import { makeCandles, makeOrderBook, makeOverview, NEWS, rngFrom } from '../data.mjs';
+import { makeCandles, makeOrderBook, makeOverview } from '../data/market.mjs';
+import { NEWS } from '../data/news.mjs';
+import { rngFrom } from '../data/random.mjs';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
