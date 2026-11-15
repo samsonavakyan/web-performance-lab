@@ -96,12 +96,14 @@ export function Onboarding({ isOpen, onClose }: Props) {
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
+
     if (isOpen && !element.open) {
       setIndex(0);
       element.showModal();
       // showModal focuses the first button (Skip); the main action is Next.
       next.current?.focus();
     }
+
     if (!isOpen && element.open) element.close();
   }, [isOpen]);
 

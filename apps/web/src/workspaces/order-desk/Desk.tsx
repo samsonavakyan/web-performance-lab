@@ -21,6 +21,7 @@ function useQuoteUpdates() {
         frame = 0;
       });
     });
+
     return () => {
       unsubscribe();
       cancelAnimationFrame(frame);
@@ -42,6 +43,7 @@ function LiveOrderTicket({ symbol }: { symbol: string }) {
 
 export function Desk({ symbols, positions }: DeskProps) {
   useQuoteUpdates();
+
   return (
     <div className="order-desk">
       <LiveOrderTicket symbol={symbols[0]} />

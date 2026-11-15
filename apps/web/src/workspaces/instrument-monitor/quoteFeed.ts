@@ -22,13 +22,16 @@ function tick() {
 export const quoteFeed = {
   subscribe(symbol: string, startPrice: number, listener: Listener) {
     if (!prices.has(symbol)) prices.set(symbol, startPrice);
+
     const set = listeners.get(symbol) ?? new Set();
     set.add(listener);
     listeners.set(symbol, set);
     timer ??= window.setInterval(tick, 200);
+
     return () => {
       set.delete(listener);
       if (!set.size) listeners.delete(symbol);
+
       if (!listeners.size) {
         clearInterval(timer);
         timer = undefined;

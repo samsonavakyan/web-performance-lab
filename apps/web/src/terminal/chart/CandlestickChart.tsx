@@ -23,13 +23,16 @@ type Props = {
 export function CandlestickChart({ candles, symbol, interval, change }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [width, setWidth] = useState(970);
+
   useLayoutEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
+
     const updateWidth = () => setWidth(Math.max(240, svg.getBoundingClientRect().width));
     updateWidth();
     const observer = new ResizeObserver(updateWidth);
     observer.observe(svg);
+
     return () => observer.disconnect();
   }, []);
   const view = interval === '1D' ? candles.slice(-55) : interval === '1W' ? candles.slice(-100) : candles;
@@ -100,6 +103,7 @@ export function CandlestickChart({ candles, symbol, interval, change }: Props) {
         ))}
         {Array.from({ length: timeTickCount }, (_, i) => {
           const x = LEFT + i * (plotWidth / (timeTickCount - 1));
+
           return (
             <g key={i}>
               <line x1={x} y1={TOP} x2={x} y2="320" className="grid-line" />
@@ -116,6 +120,7 @@ export function CandlestickChart({ candles, symbol, interval, change }: Props) {
           const color = c.close >= c.open ? '#089981' : '#f23645';
           const bodyWidth = Math.max(0.75, step * 0.58);
           const volumeHeight = (c.volume / maxVolume) * 56;
+
           return (
             <g key={`${interval}-${i}`}>
               <line x1={x} x2={x} y1={valueY(c.high)} y2={valueY(c.low)} stroke={color} strokeWidth="1.25" />

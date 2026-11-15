@@ -6,6 +6,8 @@ import { NewsView, Skeleton } from './views';
 
 export function NewsFeed({ symbol }: { symbol: string }) {
   const items = useFetch<NewsItem[]>(instrumentApi.news(symbol));
+
   useReportReady('news', items !== null);
+
   return items ? <NewsView items={items} /> : <Skeleton label="news" />;
 }

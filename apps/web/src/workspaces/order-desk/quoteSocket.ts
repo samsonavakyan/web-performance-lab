@@ -10,6 +10,7 @@ const listeners = new Set<Listener>();
 export const quoteSocket = {
   subscribe(listener: Listener) {
     listeners.add(listener);
+
     return () => {
       listeners.delete(listener);
     };
@@ -26,10 +27,12 @@ export const quoteSocket = {
           change: +(previous.change + (Math.random() - 0.5) * 0.05).toFixed(2),
         };
         quotes.set(next.symbol, next);
+
         return next;
       });
       listeners.forEach((listener) => listener(updates));
     }, 1000 / MESSAGES_PER_SECOND);
+
     return () => clearInterval(timer);
   },
 };

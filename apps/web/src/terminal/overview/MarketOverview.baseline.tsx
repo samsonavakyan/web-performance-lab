@@ -28,17 +28,20 @@ export function MarketOverview({ reload, response }: Props) {
       .overview(controller.signal, response)
       .then((result) => {
         if (!active) return;
+
         endTiming();
         setData(result);
         setPending(false);
       })
       .catch((e: Error) => {
         if (!active || e.name === 'AbortError') return;
+
         endTiming();
         setError('Overview unavailable');
         setDetails(e instanceof SyntaxError ? 'Unexpected response' : e.message);
         setPending(false);
       });
+
     return () => {
       active = false;
       controller.abort();

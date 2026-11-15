@@ -15,6 +15,7 @@ function loadModes(): Modes {
     for (const key of Object.keys(defaultModes) as Scenario[]) {
       if (saved[key] === 'baseline' || saved[key] === 'optimized') result[key] = saved[key];
     }
+
     return result;
   } catch {
     return { ...defaultModes };
@@ -35,6 +36,7 @@ export function useLabModes() {
   const setMode = useCallback((id: Scenario, mode: Mode) => {
     setModes((previous) => ({ ...previous, [id]: mode }));
   }, []);
+
   return [modes, setMode] as const;
 }
 

@@ -9,6 +9,7 @@ export function Bulletin({ replay }: { replay: number }) {
   useEffect(() => {
     setVisible(false);
     const timer = window.setTimeout(() => setVisible(true), SHOW_DELAY_MS);
+
     return () => window.clearTimeout(timer);
   }, [replay]);
 

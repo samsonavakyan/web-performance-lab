@@ -12,11 +12,13 @@ async function post(path: string) {
 
 export function LiveFeed() {
   const mode = useModes()['live-feed'];
+
   const [withDesks, setWithDesks] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
     void post(`/api/lab/feed/users?count=${withDesks ? DESKS : 0}&policy=${mode}`);
+
     return () => void post('/api/lab/feed/users?count=0');
   }, [mode, withDesks]);
 
@@ -25,10 +27,12 @@ export function LiveFeed() {
       const response = await fetch('/api/lab/feed/stats');
       if (response.ok) setStats(await response.json());
     }, 500);
+
     return () => clearInterval(timer);
   }, []);
 
   const peak = Math.max(1, ...(stats?.buckets ?? [1]));
+
   return (
     <>
       <LabSlot>

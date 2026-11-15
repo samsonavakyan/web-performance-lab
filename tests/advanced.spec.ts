@@ -74,7 +74,9 @@ test('Trade export produces the same file and blocks the main thread only in Bas
     await page.getByRole('combobox', { name: 'Trades' }).selectOption('50000');
     await page.evaluate(() => {
       const frames: number[] = [];
-      const observer = new PerformanceObserver((list) => list.getEntries().forEach((entry) => frames.push(entry.duration)));
+      const observer = new PerformanceObserver((list) =>
+        list.getEntries().forEach((entry) => frames.push(entry.duration)),
+      );
       observer.observe({ type: 'longtask' });
       // Long tasks, not long animation frames: a test window may not render frames, but tasks are always reported.
       Object.assign(window, { longTasks: frames, longTaskObserver: observer });

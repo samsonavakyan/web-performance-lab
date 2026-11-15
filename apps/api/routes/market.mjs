@@ -8,7 +8,9 @@ export function registerMarket(app, instruments) {
 
   app.get('/api/instruments', async (request, reply) => {
     reply.header('Cache-Control', 'no-store');
-    const q = String(request.query?.q ?? '').toLowerCase().trim();
+    const q = String(request.query?.q ?? '')
+      .toLowerCase()
+      .trim();
     const limit = Math.min(Math.max(Number(request.query?.limit || 2200), 1), 2200);
     const found = q
       ? instruments.filter((x) => x.symbol.toLowerCase().includes(q) || x.name.toLowerCase().includes(q))

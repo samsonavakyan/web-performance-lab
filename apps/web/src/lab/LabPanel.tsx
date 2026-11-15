@@ -47,18 +47,24 @@ export function LabPanel({
   onToggleStream,
 }: Props) {
   const [group, setGroup] = useState('Basic');
+
   const timings = useTimings();
+
   useEffect(() => {
     setGroup(activeScenario && isAdvanced(activeScenario) ? 'Advanced' : 'Basic');
   }, [activeScenario]);
+
   useEffect(() => {
     if (!activeScenario) return;
+
     const timer = window.setTimeout(
       () => document.querySelector(`[data-scenario="${activeScenario}"]`)?.scrollIntoView({ block: 'nearest' }),
       200,
     );
+
     return () => clearTimeout(timer);
   }, [activeScenario, group]);
+
   return (
     <aside className="lab-panel" aria-label="Case list">
       <div className="lab-header">
@@ -78,7 +84,9 @@ export function LabPanel({
           </button>
         </div>
       </div>
-      <p className="lab-intro">Open a case, read the complaint and reproduce it. Record the same steps in Baseline and Optimized.</p>
+      <p className="lab-intro">
+        Open a case, read the complaint and reproduce it. Record the same steps in Baseline and Optimized.
+      </p>
       <nav className="lab-sections" role="tablist" aria-label="Case groups">
         {['Basic', 'Advanced'].map((name) => (
           <button key={name} role="tab" aria-selected={group === name} onClick={() => setGroup(name)}>
@@ -99,6 +107,7 @@ export function LabPanel({
           <section className="case-group" key={group} aria-label={`${group} cases`}>
             {CASES.map((scenario, index) => {
               if (scenario.group !== group) return null;
+
               const active = activeScenario === scenario.id;
               const number = String(index + 1).padStart(2, '0');
               const mode = modes[scenario.id];
@@ -114,7 +123,11 @@ export function LabPanel({
               if (!active) {
                 return (
                   <div className="scenario" data-scenario={scenario.id} key={scenario.id}>
-                    <button className="scenario-heading case-row" onClick={() => onOpenCase(scenario.id)} aria-label="Open case">
+                    <button
+                      className="scenario-heading case-row"
+                      onClick={() => onOpenCase(scenario.id)}
+                      aria-label="Open case"
+                    >
                       {title}
                       <span className={`mode-badge ${mode}`}>{mode === 'baseline' ? 'Baseline' : 'Optimized'}</span>
                       <ChevronRight size={16} className="case-row-chevron" />
@@ -122,6 +135,7 @@ export function LabPanel({
                   </div>
                 );
               }
+
               return (
                 <div className="scenario active" data-scenario={scenario.id} key={scenario.id}>
                   <div className="scenario-heading">

@@ -45,6 +45,7 @@ export class FeedClient {
     socket.onmessage = (event) => this.handle(JSON.parse(String(event.data)) as Message);
     socket.onclose = () => {
       if (this.socket !== socket || this.disposed) return;
+
       this.socket = null;
       this.scheduleReconnect();
     };
@@ -53,13 +54,18 @@ export class FeedClient {
   private handle(message: Message) {
     this.lastMessageAt = Date.now();
     if (this.status === 'stale') this.status = 'live';
+
     if (message.kind === 'reset') {
       void this.resync();
+
       return;
     }
+
     if (message.kind !== 'quote' || message.seq <= this.lastSeq) return;
+
     // A gap in seq means lost messages, so the client takes a fresh snapshot.
     if (this.lastSeq && message.seq > this.lastSeq + 1) void this.resync();
+
     this.trackQuoteGap();
     this.lastSeq = message.seq;
     this.price = message.price;
@@ -77,6 +83,7 @@ export class FeedClient {
 
   private checkStale() {
     if (this.status !== 'live' || Date.now() - this.lastMessageAt < STALE_AFTER) return;
+
     this.status = 'stale';
     const socket = this.socket;
     this.socket = null;
@@ -91,12 +98,14 @@ export class FeedClient {
     this.attempt += 1;
     this.retryAt = Date.now() + delay;
     if (this.status !== 'stale') this.status = 'reconnecting';
+
     this.retryTimer = window.setTimeout(() => this.connect(), delay);
   }
 
   private trackQuoteGap() {
     const now = performance.now();
-    if (this.lastQuoteAt && now - this.lastQuoteAt > QUOTE_GAP) measureSince('live-feed', 'no quotes', this.lastQuoteAt);
+    if (this.lastQuoteAt && now - this.lastQuoteAt > QUOTE_GAP)
+      measureSince('live-feed', 'no quotes', this.lastQuoteAt);
     this.lastQuoteAt = now;
   }
 

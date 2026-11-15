@@ -14,7 +14,9 @@ function useQuoteUpdates() {
 
 export function Desk({ symbols, positions }: DeskProps) {
   useQuoteUpdates();
+
   const { quotes } = useQuoteState();
+
   return (
     <div className="order-desk">
       <OrderTicket symbol={symbols[0]} quote={quotes[symbols[0]]} format={formatPrice} />

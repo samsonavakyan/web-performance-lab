@@ -13,10 +13,12 @@ type Props = {
 export function Watchlist({ instruments, quotes, selected, onSelect }: Props) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'name' | 'change'>('name');
+
   const found = useInstrumentSearch(instruments, query);
 
   const sorted = useMemo(() => {
     if (sort === 'name') return found;
+
     return [...found].sort((a, b) => (quotes[b.symbol]?.change ?? b.change) - (quotes[a.symbol]?.change ?? a.change));
   }, [found, quotes, sort]);
 

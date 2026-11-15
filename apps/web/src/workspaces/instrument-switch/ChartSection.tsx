@@ -7,5 +7,6 @@ import { ChartView } from './views';
 export function ChartSection({ candles }: { candles: Promise<Candle[]> }) {
   const data = use(candles);
   useReportReady('chart', true);
+
   return <ChartView candles={data} />;
 }

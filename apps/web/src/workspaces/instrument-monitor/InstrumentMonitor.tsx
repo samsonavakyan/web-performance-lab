@@ -24,12 +24,15 @@ export function InstrumentMonitor() {
   // Switches to the next instrument once the current chart is on screen.
   useEffect(() => {
     if (!running || readySymbol !== instrument?.symbol) return;
+
     const timer = window.setTimeout(() => {
       setIndex((current) => (current + 1) % instruments.length);
       setRemaining((count) => count - 1);
     }, 150);
+
     return () => clearTimeout(timer);
   }, [running, readySymbol, instrument, instruments.length]);
+
   return (
     <>
       <LabSlot>
@@ -47,11 +50,7 @@ export function InstrumentMonitor() {
       <div className="workspace-controls">
         <label>
           Instrument
-          <select
-            aria-label="Instrument"
-            value={index}
-            onChange={(event) => setIndex(Number(event.target.value))}
-          >
+          <select aria-label="Instrument" value={index} onChange={(event) => setIndex(Number(event.target.value))}>
             {instruments.map((item, i) => (
               <option key={item.symbol} value={i}>
                 {item.symbol}
@@ -60,9 +59,7 @@ export function InstrumentMonitor() {
           </select>
         </label>
       </div>
-      {instrument && (
-        <PriceChart key={instrument.symbol} instrument={instrument} onReady={setReadySymbol} />
-      )}
+      {instrument && <PriceChart key={instrument.symbol} instrument={instrument} onReady={setReadySymbol} />}
       <label className="analysis-note">
         Trade note <input aria-label="Trade note" value={note} onChange={(event) => setNote(event.target.value)} />
       </label>

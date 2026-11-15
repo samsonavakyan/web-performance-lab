@@ -9,8 +9,10 @@ export function variant<P extends object>(id: Scenario, implementations: Impleme
   function Variant(props: P) {
     const mode = useModes()[id];
     const Implementation = implementations[mode];
+
     return <Implementation key={mode} {...props} />;
   }
   Variant.displayName = `Variant(${id})`;
+
   return Variant;
 }

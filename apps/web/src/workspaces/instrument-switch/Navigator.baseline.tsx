@@ -11,8 +11,10 @@ const SidePanel = lazy(() => import('./SidePanel.baseline').then((module) => ({ 
 
 function InstrumentPage({ symbol }: { symbol: string }) {
   const info = useFetch<InstrumentInfo>(instrumentApi.info(symbol));
+
   useReportReady('info', info !== null);
   if (!info) return <PageSkeleton />;
+
   return (
     <div className="nav-page">
       <InfoView info={info} />
@@ -32,10 +34,12 @@ function InstrumentPage({ symbol }: { symbol: string }) {
 
 export function Navigator() {
   const [symbol, setSymbol] = useState(SYMBOLS[0]);
+
   const timing = useSwitchTiming(symbol);
 
   function navigate(next: string) {
     if (next === symbol) return;
+
     timing.begin(next);
     setSymbol(next);
   }

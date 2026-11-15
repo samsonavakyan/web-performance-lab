@@ -49,6 +49,7 @@ export class MiniChart {
   draw() {
     const context = this.canvas.getContext('2d');
     if (!context) return;
+
     const width = (this.canvas.width = this.canvas.clientWidth || 640);
     const height = (this.canvas.height = this.canvas.clientHeight || 220);
     const visible = this.points.slice(-120);

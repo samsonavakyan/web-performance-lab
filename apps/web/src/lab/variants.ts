@@ -51,7 +51,10 @@ export const ScannerTrack = variant('scanner', {
   optimized: ScannerTrackOptimized,
 });
 
-export const PriceChart = variant('instrument-monitor', { baseline: PriceChartBaseline, optimized: PriceChartOptimized });
+export const PriceChart = variant('instrument-monitor', {
+  baseline: PriceChartBaseline,
+  optimized: PriceChartOptimized,
+});
 export const Desk = variant('order-ticket', { baseline: DeskBaseline, optimized: DeskOptimized });
 export const Navigator = variant('instrument-switch', { baseline: NavigatorBaseline, optimized: NavigatorOptimized });
 export const ExportPanel = variant('trade-export', { baseline: ExportPanelBaseline, optimized: ExportPanelOptimized });

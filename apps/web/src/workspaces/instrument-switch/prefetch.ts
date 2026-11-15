@@ -23,8 +23,10 @@ export function prefetchInstrument(symbol: string): Pending {
     };
     prefetched.set(symbol, pending);
   }
+
   void loadChartSection();
   void loadSidePanel();
+
   return pending;
 }
 

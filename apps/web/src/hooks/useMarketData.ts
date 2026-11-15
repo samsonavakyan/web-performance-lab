@@ -14,12 +14,14 @@ export function useMarketData(symbol: string) {
     Promise.all([api.instruments(), api.news()])
       .then(([nextInstruments, nextNews]) => {
         if (!active) return;
+
         setInstruments(nextInstruments);
         setNews(nextNews);
       })
       .catch((e: Error) => {
         if (active) setError(e.message);
       });
+
     return () => {
       active = false;
     };
@@ -30,12 +32,14 @@ export function useMarketData(symbol: string) {
     Promise.all([api.history(symbol), api.orderBook(symbol)])
       .then(([nextCandles, nextLevels]) => {
         if (!active) return;
+
         setCandles(nextCandles);
         setLevels(nextLevels);
       })
       .catch((e: Error) => {
         if (active) setError(e.message);
       });
+
     return () => {
       active = false;
     };

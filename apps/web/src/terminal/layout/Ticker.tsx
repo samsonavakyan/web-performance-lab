@@ -18,6 +18,7 @@ export function Ticker() {
       </div>
       {INDICES.map(({ name, change }) => {
         const isDown = change < 0;
+
         return (
           <div className="ticker-item" key={name}>
             <span>{name}</span>

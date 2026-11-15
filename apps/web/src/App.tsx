@@ -24,6 +24,7 @@ const StableAdvancedLab = memo(AdvancedLab);
 // An open Advanced case is kept in the URL hash, so a browser reload reopens it.
 function caseFromHash(): AdvancedScenario | null {
   const id = location.hash.slice(1);
+
   return isAdvanced(id) ? id : null;
 }
 
@@ -31,13 +32,16 @@ export default function App() {
   const [advanced, setAdvanced] = useState<AdvancedScenario | null>(caseFromHash);
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(caseFromHash);
   const [locate, setLocate] = useState<Scenario | null>(null);
+
   useEffect(() => {
     history.replaceState(null, '', advanced ? `#${advanced}` : location.pathname);
   }, [advanced]);
+
   const backToTerminal = useCallback(() => {
     setAdvanced(null);
     setActiveScenario(null);
   }, []);
+
   const openCase = useCallback((id: Scenario) => {
     setActiveScenario(id);
     if (isAdvanced(id)) {
@@ -47,12 +51,16 @@ export default function App() {
       setLocate(id);
     }
   }, []);
+
   useEffect(() => {
     if (!locate || advanced) return;
+
     const selector = caseById(locate).target;
     if (selector) document.querySelector(selector)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
     setLocate(null);
   }, [locate, advanced]);
+
   const [selected, setSelected] = useState('NVDA');
   const [paused, setPaused] = useState(false);
   const [labOpen, setLabOpen] = useState(true);
@@ -60,9 +68,11 @@ export default function App() {
   const [bulletinReplay, setBulletinReplay] = useState(0);
   const [overviewReload, setOverviewReload] = useState(0);
   const [overviewResponse, setOverviewResponse] = useState<OverviewResponse>('normal');
+
   const [modes, setMode] = useLabModes();
 
   const { instruments, news, candles, levels, error } = useMarketData(selected);
+
   // The terminal stream is paused while an Advanced case is open, so it does not add renders to its profiles.
   const { quotes, seq, connected } = useQuoteStream(paused || advanced !== null);
 
@@ -85,11 +95,7 @@ export default function App() {
         <main className="terminal">
           <div className="terminal-content">
             {advanced ? (
-              <StableAdvancedLab
-                scenario={advanced}
-                mode={modes[advanced]}
-                onBack={backToTerminal}
-              />
+              <StableAdvancedLab scenario={advanced} mode={modes[advanced]} onBack={backToTerminal} />
             ) : (
               <>
                 <MarketOverview reload={overviewReload} response={overviewResponse} />

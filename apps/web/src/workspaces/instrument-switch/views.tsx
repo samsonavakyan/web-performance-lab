@@ -22,6 +22,7 @@ export function ChartView({ candles }: { candles: Candle[] }) {
   const min = Math.min(...closes);
   const range = Math.max(...closes) - min || 1;
   const points = closes.map((close, i) => `${(i / (closes.length - 1)) * 600},${200 - ((close - min) / range) * 180}`);
+
   return (
     <svg className="nav-chart" viewBox="0 0 600 210" preserveAspectRatio="none" aria-label="Price history">
       <polyline points={points.join(' ')} fill="none" stroke="currentColor" strokeWidth="2" />

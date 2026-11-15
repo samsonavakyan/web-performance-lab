@@ -11,6 +11,7 @@ export const ReadyProvider = ReadyContext.Provider;
 
 export function useReportReady(section: Section, isReady: boolean) {
   const report = useContext(ReadyContext);
+
   useEffect(() => {
     if (isReady) report(section);
   }, [isReady, report, section]);
@@ -31,6 +32,7 @@ export function useSwitchTiming(symbol: string) {
   const report = useCallback(
     (section: Section) => {
       if (symbol !== target.current || ready.current.has(section)) return;
+
       ready.current.add(section);
       if (ready.current.size === SECTIONS) end.current?.();
     },

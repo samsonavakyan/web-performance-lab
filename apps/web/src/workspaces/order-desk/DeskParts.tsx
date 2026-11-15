@@ -8,6 +8,7 @@ type Format = (value: number) => string;
 
 export function QuoteCell({ quote, format }: { quote?: Quote; format: Format }) {
   if (!quote) return <div className="quote-cell" />;
+
   return (
     <div className={`quote-cell ${quote.change >= 0 ? 'up' : 'down'}`}>
       <span>{quote.symbol}</span>
@@ -18,6 +19,7 @@ export function QuoteCell({ quote, format }: { quote?: Quote; format: Format }) 
 
 export function PositionRow({ position, quote, format }: { position: Position; quote?: Quote; format: Format }) {
   const pnl = quote ? (quote.price - position.cost) * position.quantity : 0;
+
   return (
     <tr>
       <td>{position.symbol}</td>
@@ -34,6 +36,7 @@ export function OrderTicket({ symbol, quote, format }: { symbol: string; quote?:
   const [quantity, setQuantity] = useState('100');
   const [side, setSide] = useState<'BUY' | 'SELL'>('BUY');
   const notional = price.trim() ? Number(price) * Number(quantity) : NaN;
+
   return (
     <form className="order-ticket" onSubmit={(event) => event.preventDefault()}>
       <h2>Order ticket · {symbol}</h2>
@@ -51,7 +54,12 @@ export function OrderTicket({ symbol, quote, format }: { symbol: string; quote?:
       </label>
       <label>
         Quantity
-        <input aria-label="Quantity" inputMode="numeric" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+        <input
+          aria-label="Quantity"
+          inputMode="numeric"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+        />
       </label>
       <p>Notional: {Number.isFinite(notional) ? format(notional) : '-'}</p>
     </form>

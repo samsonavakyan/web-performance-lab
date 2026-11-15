@@ -13,6 +13,7 @@ export function setLabSlot(element: HTMLElement | null) {
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
+
   return () => {
     listeners.delete(listener);
   };
@@ -20,5 +21,6 @@ function subscribe(listener: () => void) {
 
 export function LabSlot({ children }: { children: ReactNode }) {
   const target = useSyncExternalStore(subscribe, () => slot);
+
   return target ? createPortal(children, target) : null;
 }

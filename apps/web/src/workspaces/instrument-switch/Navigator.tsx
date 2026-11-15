@@ -12,6 +12,7 @@ function InstrumentPage({ symbol }: { symbol: string }) {
   const data = prefetchInstrument(symbol);
   const info = use(data.info);
   useReportReady('info', true);
+
   return (
     <div className="nav-page">
       <InfoView info={info} />
@@ -31,12 +32,15 @@ function InstrumentPage({ symbol }: { symbol: string }) {
 
 export function Navigator() {
   const [symbol, setSymbol] = useState(SYMBOLS[0]);
+
   // While the next page is loading, the current one stays on screen and isPending is true.
   const [isPending, startTransition] = useTransition();
+
   const timing = useSwitchTiming(symbol);
 
   function navigate(next: string) {
     if (next === symbol) return;
+
     timing.begin(next);
     prefetchInstrument(next);
     startTransition(() => setSymbol(next));

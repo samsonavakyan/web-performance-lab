@@ -17,6 +17,7 @@ type Props = {
 export function InstrumentList({ items, quotes, selected, onSelect, query }: Props) {
   const [scrollTop, setScrollTop] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setScrollTop(0);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;

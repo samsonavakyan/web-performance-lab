@@ -12,15 +12,19 @@ async function loadHistory(symbol: string): Promise<Candle[]> {
   if (cached) {
     historyCache.delete(symbol);
     historyCache.set(symbol, cached);
+
     return cached;
   }
+
   const response = await fetch(`/api/history/${symbol}`);
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+
   const candles = (await response.json()) as Candle[];
   historyCache.set(symbol, candles);
   if (historyCache.size > HISTORY_LIMIT) {
     historyCache.delete(historyCache.keys().next().value!);
   }
+
   return candles;
 }
 
@@ -34,6 +38,7 @@ export function PriceChart({ instrument, onReady }: Props) {
   useEffect(() => {
     let active = true;
     loadHistory(instrument.symbol).then((data) => active && setCandles(data));
+
     return () => {
       active = false;
     };
@@ -41,12 +46,14 @@ export function PriceChart({ instrument, onReady }: Props) {
 
   useEffect(() => {
     if (!candles || !canvas.current) return;
+
     const chart = new MiniChart(canvas.current, candles);
     const unsubscribe = quoteFeed.subscribe(instrument.symbol, candles[candles.length - 1].close, (price) => {
       chart.update(price);
       setLast(price);
     });
     onReady(instrument.symbol);
+
     return () => {
       unsubscribe();
       chart.destroy();

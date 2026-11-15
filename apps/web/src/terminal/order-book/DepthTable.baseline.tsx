@@ -13,6 +13,7 @@ export function DepthTable({ levels, seq }: Props) {
   // Sizes the bid bars to the cell width on every book update.
   useEffect(() => {
     if (!root.current) return;
+
     const rows = root.current.querySelectorAll<HTMLElement>('[data-depth-row]');
     rows.forEach((row, i) => {
       const cell = row.querySelector<HTMLElement>('.depth-bid');

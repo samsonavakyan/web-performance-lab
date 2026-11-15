@@ -13,6 +13,7 @@ self.onmessage = async (event: MessageEvent<ExportRequest>) => {
   try {
     const response = await fetch(event.data.url);
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+
     const trades = (await response.json()) as Trade[];
     const parts: string[] = [CSV_HEADER];
     const chunk: string[] = [];

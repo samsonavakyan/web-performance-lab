@@ -11,6 +11,7 @@ function editDistance(a: string, b: string): number {
       previous = saved;
     }
   }
+
   return row[b.length];
 }
 
@@ -22,6 +23,7 @@ function matchDistance(text: string, query: string): number {
       best = Math.min(best, editDistance(text.slice(start, end), query));
     }
   }
+
   return best;
 }
 
@@ -29,7 +31,9 @@ function matchDistance(text: string, query: string): number {
 export function searchInstruments(items: Instrument[], query: string): Instrument[] {
   const needle = query.toLowerCase().trim();
   if (!needle) return items;
+
   const maxDistance = needle.length >= 5 ? 1 : 0;
+
   return items
     .map((item) => ({ item, distance: matchDistance(`${item.symbol} ${item.name}`.toLowerCase(), needle) }))
     .filter((match) => match.distance <= maxDistance)

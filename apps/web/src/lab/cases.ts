@@ -1,4 +1,5 @@
-export type AdvancedScenario = 'instrument-monitor' | 'order-ticket' | 'instrument-switch' | 'trade-export' | 'live-feed';
+export type AdvancedScenario =
+  'instrument-monitor' | 'order-ticket' | 'instrument-switch' | 'trade-export' | 'live-feed';
 export type Scenario = AdvancedScenario | 'search' | 'watchlist' | 'order-book' | 'scanner' | 'bulletin' | 'overview';
 export type Mode = 'baseline' | 'optimized';
 
@@ -48,7 +49,8 @@ export const CASES: Case[] = [
       from: 'QA',
       text: 'On a slower laptop the whole terminal stutters while the order book is open. On the Recent Trades tab it is fine.',
     },
-    steps: 'Keep the quote stream running and the Order Book tab open. Set CPU throttling to 4x and record five seconds.',
+    steps:
+      'Keep the quote stream running and the Order Book tab open. Set CPU throttling to 4x and record five seconds.',
     look: 'Performance panel, Main track, with the quote stream running.',
     notice: 'Purple Layout blocks inside script tasks and the Forced reflow warnings. Which line causes them?',
     code: 'src/terminal/order-book/DepthTable.baseline.tsx',
@@ -65,9 +67,11 @@ export const CASES: Case[] = [
       from: 'Users',
       text: 'Scrolling the watchlist is jerky, and the terminal feels sluggish while the full list is on screen.',
     },
-    steps: 'Clear the search and keep the quote stream running. Scroll to the bottom and back, and record five seconds.',
+    steps:
+      'Clear the search and keep the quote stream running. Scroll to the bottom and back, and record five seconds.',
     look: 'Elements panel for the list, then Performance while scrolling with the stream on.',
-    notice: 'How many rows are in the DOM compared to the rows you can see, and how long each quote update takes to render.',
+    notice:
+      'How many rows are in the DOM compared to the rows you can see, and how long each quote update takes to render.',
     code: 'src/terminal/watchlist/InstrumentList.baseline.tsx',
     solution:
       'All 2,200 rows are rendered and updated on every quote message. The fix renders only the rows in view plus a small buffer (virtualization).',
@@ -99,9 +103,11 @@ export const CASES: Case[] = [
       from: 'Team lead',
       text: 'The overview strip shows a skeleton for more than a second, though it is only four numbers. On mobile networks it is worse.',
     },
-    steps: 'Set Response to Normal and press Reload overview. Repeat with the same network settings. Then try Unavailable and Invalid data.',
+    steps:
+      'Set Response to Normal and press Reload overview. Repeat with the same network settings. Then try Unavailable and Invalid data.',
     look: 'Network panel. Compare the overview request in both modes.',
-    notice: 'Response size, and in Timing the time spent waiting for the server. How much of the response does the strip show?',
+    notice:
+      'Response size, and in Timing the time spent waiting for the server. How much of the response does the strip show?',
     code: 'src/terminal/overview/MarketOverview.baseline.tsx',
     solution:
       'The strip loads /api/overview, which is slow and carries a 12,000-row sector table the strip never shows (overfetching). The fix loads /api/overview/summary with only the fields on screen.',
@@ -134,9 +140,11 @@ export const CASES: Case[] = [
       from: 'Traders',
       text: 'In the morning everything is fast. By the end of the day the screen lags and typing a trade note is slow. Reloading the tab helps.',
     },
-    steps: 'Reload the browser tab, type a trade note, then press Simulate trading day. It switches 80 instruments one by one. Type a note again.',
+    steps:
+      'Reload the browser tab, type a trade note, then press Simulate trading day. It switches 80 instruments one by one. Type a note again.',
     look: 'Memory panel: a heap snapshot before and after the trading day. Elements panel, Event Listeners of window.',
-    notice: 'In the snapshot comparison, which objects keep growing although the screen shows one chart? How many resize listeners are there?',
+    notice:
+      'In the snapshot comparison, which objects keep growing although the screen shows one chart? How many resize listeners are there?',
     code: 'src/workspaces/instrument-monitor/PriceChart.baseline.tsx',
     solution:
       'The chart effect has no cleanup, so every old chart stays subscribed to the quote feed and to window resize, keeps its canvas and recalculates on every tick. The history cache also grows without limit. The fix unsubscribes and destroys the chart on unmount and keeps an LRU cache of 20 histories.',
@@ -184,7 +192,8 @@ export const CASES: Case[] = [
       from: 'Back office',
       text: 'I pressed export for the whole year, the tab froze completely and Chrome offered to close the page.',
     },
-    steps: 'Keep CPU and network throttling off. Choose 100,000 trades, press Export CSV and start typing a comment right away. Clear Save file in the panel if you do not want downloads.',
+    steps:
+      'Keep CPU and network throttling off. Choose 100,000 trades, press Export CSV and start typing a comment right away. Clear Save file in the panel if you do not want downloads.',
     look: 'Performance panel while the export runs and you type.',
     notice: 'The longest task on the Main track, what fills it in Bottom-Up, and whether a Worker track appears.',
     code: 'src/workspaces/trade-export/ExportPanel.baseline.tsx, src/workspaces/trade-export/csv.baseline.ts',
@@ -201,9 +210,11 @@ export const CASES: Case[] = [
       from: 'Users and ops',
       text: 'Users: after a break the status says online, but the prices are old. Ops: after every release the app shows no data for several seconds, and the feed service sees a spike of connections.',
     },
-    steps: 'Wait for the price to update. Press Simulate sleep, wait about 5 seconds, then press Wake up. Then press Restart server.',
+    steps:
+      'Wait for the price to update. Press Simulate sleep, wait about 5 seconds, then press Wake up. Then press Restart server.',
     look: 'Network panel: filter Socket (WS in older Chrome), open the feed request whose Time is Pending, then the Messages tab. Server monitoring in this panel.',
-    notice: 'What arrives during sleep, heartbeats included, and what the badge says meanwhile. The seq numbers after Wake up. The timing of reconnect attempts after Restart server.',
+    notice:
+      'What arrives during sleep, heartbeats included, and what the badge says meanwhile. The seq numbers after Wake up. The timing of reconnect attempts after Restart server.',
     code: 'src/workspaces/live-feed/feedClient.baseline.ts, src/workspaces/live-feed/FeedQuote.baseline.tsx',
     solution:
       'The client trusts an open socket: it ignores silence, heartbeats included, does not notice gaps in seq, and reconnects every second, so all clients come back in waves. The fix treats 3 s of silence as a dead connection, resumes from the last seq and takes a snapshot on a gap, reconnects with exponential backoff and jitter, and shows how fresh the price is.',
@@ -212,7 +223,9 @@ export const CASES: Case[] = [
   },
 ];
 
-export const ADVANCED_CASES = CASES.filter((item) => item.group === 'Advanced').map((item) => item.id as AdvancedScenario);
+export const ADVANCED_CASES = CASES.filter((item) => item.group === 'Advanced').map(
+  (item) => item.id as AdvancedScenario,
+);
 
 export function isAdvanced(id: string): id is AdvancedScenario {
   return (ADVANCED_CASES as string[]).includes(id);

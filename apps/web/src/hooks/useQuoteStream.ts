@@ -22,13 +22,16 @@ export function useQuoteStream(paused: boolean) {
     socket.onmessage = (event) => {
       const msg = JSON.parse(String(event.data)) as StreamMessage;
       if (msg.kind !== 'quotes' || pausedRef.current || !msg.updates) return;
+
       setSeq(msg.seq ?? 0);
       setQuotes((previous) => {
         const next = { ...previous };
         for (const item of msg.updates ?? []) next[item.symbol] = item;
+
         return next;
       });
     };
+
     return () => {
       // Closing a socket that is still connecting aborts it, and the Vite proxy logs ECONNRESET.
       if (socket.readyState === WebSocket.CONNECTING) socket.onopen = () => socket.close();

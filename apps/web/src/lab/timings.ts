@@ -29,6 +29,7 @@ export function setTimings(id: Scenario, isOn: boolean) {
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
+
   return () => {
     listeners.delete(listener);
   };
@@ -41,7 +42,9 @@ export function useTimings() {
 // Adds a measure to the Timings track when the case has timings on. Call the returned function when the work ends.
 export function startTiming(id: Scenario, name: string) {
   if (!enabled.has(id)) return () => {};
+
   const start = performance.now();
+
   return () => {
     performance.measure(name, { start, end: performance.now() });
   };

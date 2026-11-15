@@ -37,14 +37,18 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
       const message = event.data;
       if (message.kind === 'progress') {
         setProgress(message.done / message.total);
+
         return;
       }
+
       stopWorker();
       setRunning(false);
       if (message.kind === 'error') {
         setError(message.message);
+
         return;
       }
+
       endTiming();
       setResult({ rows: message.rows, bytes: message.blob.size });
       if (save) download(message.blob, message.rows);

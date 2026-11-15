@@ -11,8 +11,10 @@ const NewsFeed = lazy(() => import('./NewsFeed.baseline').then((module) => ({ de
 // Order book first, news below it.
 export function SidePanel({ symbol }: { symbol: string }) {
   const levels = useFetch<BookLevel[]>(instrumentApi.book(symbol));
+
   useReportReady('book', levels !== null);
   if (!levels) return <Skeleton label="order book" height={300} />;
+
   return (
     <>
       <BookView levels={levels} />

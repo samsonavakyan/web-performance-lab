@@ -11,6 +11,7 @@ export const quoteStore = {
   getState: () => state,
   subscribe(listener: () => void) {
     listeners.add(listener);
+
     return () => {
       listeners.delete(listener);
     };

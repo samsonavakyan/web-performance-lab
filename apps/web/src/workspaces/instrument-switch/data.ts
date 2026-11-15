@@ -1,6 +1,13 @@
 import type { BookLevel, Candle, NewsItem } from '../../types';
 
-export type InstrumentInfo = { symbol: string; name: string; sector: string; price: number; change: number; volume: number };
+export type InstrumentInfo = {
+  symbol: string;
+  name: string;
+  sector: string;
+  price: number;
+  change: number;
+  volume: number;
+};
 
 export const SYMBOLS = ['NVDA', 'AAPL', 'MSFT', 'TSLA', 'AMZN', 'META', 'GOOGL', 'BTCUSD'];
 
@@ -22,5 +29,6 @@ export type InstrumentData = {
 export async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(url, { signal });
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+
   return (await response.json()) as T;
 }

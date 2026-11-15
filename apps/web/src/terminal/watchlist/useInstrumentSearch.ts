@@ -5,6 +5,7 @@ import type { Instrument } from '../../types';
 
 export function useInstrumentSearch(items: Instrument[], query: string) {
   const deferredQuery = useDeferredValue(query);
+
   return useMemo(
     () =>
       deferredQuery.trim()

@@ -6,7 +6,15 @@ import { InstrumentNavigator } from '../workspaces/instrument-switch/InstrumentN
 import { TradeExport } from '../workspaces/trade-export/TradeExport';
 import { LiveFeed } from '../workspaces/live-feed/LiveFeed';
 
-export function AdvancedLab({ scenario, mode, onBack }: { scenario: AdvancedScenario; mode: Mode; onBack: () => void }) {
+export function AdvancedLab({
+  scenario,
+  mode,
+  onBack,
+}: {
+  scenario: AdvancedScenario;
+  mode: Mode;
+  onBack: () => void;
+}) {
   return (
     <section className="panel workspace-page" aria-label="Advanced Lab">
       <div className="workspace-heading">

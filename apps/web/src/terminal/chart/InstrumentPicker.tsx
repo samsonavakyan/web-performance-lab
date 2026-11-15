@@ -17,6 +17,7 @@ export function InstrumentPicker({ symbol, name, instruments, onSelect }: Props)
 
   useEffect(() => {
     if (!isOpen) return;
+
     const close = (event: Event) => {
       if (event instanceof KeyboardEvent ? event.key === 'Escape' : !root.current?.contains(event.target as Node)) {
         setIsOpen(false);
@@ -24,6 +25,7 @@ export function InstrumentPicker({ symbol, name, instruments, onSelect }: Props)
     };
     document.addEventListener('pointerdown', close);
     document.addEventListener('keydown', close);
+
     return () => {
       document.removeEventListener('pointerdown', close);
       document.removeEventListener('keydown', close);
@@ -32,7 +34,12 @@ export function InstrumentPicker({ symbol, name, instruments, onSelect }: Props)
 
   return (
     <div className="instrument-picker" ref={root}>
-      <button className="picker-button" aria-haspopup="listbox" aria-expanded={isOpen} onClick={() => setIsOpen((v) => !v)}>
+      <button
+        className="picker-button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((v) => !v)}
+      >
         <h2>{name}</h2>
         <ChevronDown size={15} />
       </button>

@@ -33,6 +33,7 @@ export class FeedClient {
     socket.onmessage = (event) => this.handle(JSON.parse(String(event.data)) as Message);
     socket.onclose = () => {
       if (this.socket !== socket || this.disposed) return;
+
       this.socket = null;
       this.status = 'reconnecting';
       this.retryTimer = window.setTimeout(() => this.connect(), RECONNECT_DELAY);
@@ -42,9 +43,12 @@ export class FeedClient {
   private handle(message: Message) {
     if (message.kind === 'reset') {
       void this.resync();
+
       return;
     }
+
     if (message.kind !== 'quote' || message.seq <= this.lastSeq) return;
+
     this.trackQuoteGap();
     this.lastSeq = message.seq;
     this.price = message.price;
@@ -61,7 +65,8 @@ export class FeedClient {
 
   private trackQuoteGap() {
     const now = performance.now();
-    if (this.lastQuoteAt && now - this.lastQuoteAt > QUOTE_GAP) measureSince('live-feed', 'no quotes', this.lastQuoteAt);
+    if (this.lastQuoteAt && now - this.lastQuoteAt > QUOTE_GAP)
+      measureSince('live-feed', 'no quotes', this.lastQuoteAt);
     this.lastQuoteAt = now;
   }
 

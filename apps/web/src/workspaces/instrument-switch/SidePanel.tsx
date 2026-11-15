@@ -6,12 +6,14 @@ import { BookView, NewsView, Skeleton } from './views';
 function BookSection({ book }: { book: Promise<BookLevel[]> }) {
   const levels = use(book);
   useReportReady('book', true);
+
   return <BookView levels={levels} />;
 }
 
 function NewsSection({ news }: { news: Promise<NewsItem[]> }) {
   const items = use(news);
   useReportReady('news', true);
+
   return <NewsView items={items} />;
 }
 
