@@ -11,7 +11,7 @@ async function post(path: string) {
 }
 
 export function LiveFeed() {
-  const mode = useModes().reconnect;
+  const mode = useModes()['live-feed'];
   const [withDesks, setWithDesks] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
 

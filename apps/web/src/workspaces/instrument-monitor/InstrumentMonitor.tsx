@@ -44,7 +44,7 @@ export function InstrumentMonitor() {
         </div>
         <span role="status">{running ? `Switching ${TRADING_DAY - remaining}/${TRADING_DAY}` : 'Ready'}</span>
       </LabSlot>
-      <div className="advanced-controls">
+      <div className="workspace-controls">
         <label>
           Instrument
           <select

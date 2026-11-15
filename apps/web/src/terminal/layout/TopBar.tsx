@@ -2,13 +2,13 @@ import { BarChart3, FlaskConical, LayoutGrid, Layers } from 'lucide-react';
 
 type Props = {
   labOpen: boolean;
-  advancedOpen: boolean;
+  isWorkspaceOpen: boolean;
   onTerminal: () => void;
-  onAdvanced: () => void;
+  onWorkspaces: () => void;
   onToggleLab: () => void;
 };
 
-export function TopBar({ labOpen, onToggleLab, advancedOpen, onTerminal, onAdvanced }: Props) {
+export function TopBar({ labOpen, onToggleLab, isWorkspaceOpen, onTerminal, onWorkspaces }: Props) {
   return (
     <header className="topbar">
       <div className="brand">
@@ -22,10 +22,10 @@ export function TopBar({ labOpen, onToggleLab, advancedOpen, onTerminal, onAdvan
         <span className="app-label">Trading Terminal</span>
       </div>
       <nav className="main-nav" aria-label="Workspace">
-        <button className={!advancedOpen ? 'nav-active' : ''} onClick={onTerminal}>
+        <button className={!isWorkspaceOpen ? 'nav-active' : ''} onClick={onTerminal}>
           <LayoutGrid size={16} /> Market
         </button>
-        <button className={advancedOpen ? 'nav-active' : ''} onClick={onAdvanced}>
+        <button className={isWorkspaceOpen ? 'nav-active' : ''} onClick={onWorkspaces}>
           <Layers size={16} /> Workspaces
         </button>
       </nav>

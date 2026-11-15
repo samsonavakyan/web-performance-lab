@@ -1,23 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { CASES } from './cases';
 import type { Mode, Scenario } from './cases';
 
 export type Modes = Record<Scenario, Mode>;
 
 const STORAGE_KEY = 'marketlab-modes';
 
-const defaultModes: Modes = {
-  search: 'optimized',
-  watchlist: 'optimized',
-  layout: 'optimized',
-  animation: 'optimized',
-  shift: 'optimized',
-  loading: 'optimized',
-  leak: 'optimized',
-  stream: 'optimized',
-  navigation: 'optimized',
-  export: 'optimized',
-  reconnect: 'optimized',
-};
+const defaultModes = Object.fromEntries(CASES.map((item) => [item.id, 'optimized'])) as Modes;
 
 function loadModes(): Modes {
   try {

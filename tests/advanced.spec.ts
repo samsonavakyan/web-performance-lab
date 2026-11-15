@@ -39,7 +39,7 @@ test('Instrument monitor keeps listeners and canvases after switching instrument
   const cdp = await page.context().newCDPSession(page);
   for (const mode of ['Baseline', 'Optimized'] as const) {
     await page.goto('/');
-    await open(page, 'leak', mode);
+    await open(page, 'instrument-monitor', mode);
     const select = page.getByRole('combobox', { name: 'Instrument' });
     await expect(select.locator('option')).toHaveCount(150);
     for (const value of ['1', '2', '3', '4', '5']) {
@@ -63,7 +63,7 @@ test('Instrument monitor keeps listeners and canvases after switching instrument
 test('Trade export produces the same file and blocks the main thread only in Baseline', async ({ page }) => {
   const results: Record<string, { hash: string; block: number }> = {};
   for (const mode of ['Baseline', 'Optimized'] as const) {
-    await open(page, 'export', mode);
+    await open(page, 'trade-export', mode);
     await page.getByRole('combobox', { name: 'Trades' }).selectOption('50000');
     await page.evaluate(() => {
       const frames: number[] = [];
@@ -90,7 +90,7 @@ test('Trade export produces the same file and blocks the main thread only in Bas
 test('Live feed status through sleep, wake and restart', async ({ page }) => {
   test.setTimeout(60000);
   for (const mode of ['Baseline', 'Optimized'] as const) {
-    await open(page, 'reconnect', mode);
+    await open(page, 'live-feed', mode);
     const panel = page.locator('.lab-slot');
     await panel.getByRole('checkbox').uncheck();
     const badge = page.locator('.feed-badge');

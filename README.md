@@ -46,11 +46,13 @@ The Live feed case controls a shared server feed. Simulate sleep and Restart ser
 ## Layout
 
 ```text
-apps/api/      Fastify server, data generators, tests
-apps/web/      React app
-  src/lab/     Performance Lab panel, case list, mode switching, timings
-scripts/       dev runner
-docs/          exercises and solutions
+apps/api/          Fastify server, data generators, tests
+apps/web/          React app
+  src/terminal/    main trading screen: watchlist, order book, chart, overview
+  src/workspaces/  separate screens: instrument monitor, order desk, instrument switch, trade export, live feed
+  src/lab/         Performance Lab panel, case list, mode switching, timings
+scripts/           dev runner
+docs/              exercises and solutions
 ```
 
 The app code does not know about modes. A case keeps two implementations side by side: `X.baseline.tsx` has the problem and `X.tsx` has the fix. `apps/web/src/lab/variants.ts` picks one by the case mode. Solutions for the mentor are in [docs/SOLUTIONS.md](docs/SOLUTIONS.md).

@@ -1,5 +1,5 @@
-export type AdvancedScenario = 'leak' | 'stream' | 'navigation' | 'export' | 'reconnect';
-export type Scenario = AdvancedScenario | 'search' | 'watchlist' | 'layout' | 'animation' | 'shift' | 'loading';
+export type AdvancedScenario = 'instrument-monitor' | 'order-ticket' | 'instrument-switch' | 'trade-export' | 'live-feed';
+export type Scenario = AdvancedScenario | 'search' | 'watchlist' | 'order-book' | 'scanner' | 'bulletin' | 'overview';
 export type Mode = 'baseline' | 'optimized';
 
 export type Case = {
@@ -25,7 +25,7 @@ export const CASES: Case[] = [
     hasTimings: true,
   },
   {
-    id: 'layout',
+    id: 'order-book',
     title: 'Order book',
     subtitle: 'Market depth',
     hint: 'Record the updates to bid and ask levels.',
@@ -41,7 +41,7 @@ export const CASES: Case[] = [
     target: '.watchlist-panel',
   },
   {
-    id: 'shift',
+    id: 'bulletin',
     title: 'Market bulletin',
     subtitle: 'Event notification',
     hint: 'Press Replay bulletin and capture the moment it appears.',
@@ -49,7 +49,7 @@ export const CASES: Case[] = [
     target: '.bulletin-slot',
   },
   {
-    id: 'loading',
+    id: 'overview',
     title: 'Market overview',
     subtitle: 'Data refresh',
     hint: 'Press Reload overview and inspect the result.',
@@ -58,7 +58,7 @@ export const CASES: Case[] = [
     hasTimings: true,
   },
   {
-    id: 'animation',
+    id: 'scanner',
     title: 'Chart scanner',
     subtitle: 'Visual activity',
     hint: 'Record the moving marker on the price chart.',
@@ -66,7 +66,7 @@ export const CASES: Case[] = [
     target: '.chart-panel',
   },
   {
-    id: 'leak',
+    id: 'instrument-monitor',
     title: 'Instrument monitor',
     subtitle: 'Long session',
     hint: 'A trader keeps this screen open all day and switches instruments. Run a trading day, then type a trade note. Reload the browser tab to start over.',
@@ -74,14 +74,14 @@ export const CASES: Case[] = [
     hasTimings: true,
   },
   {
-    id: 'stream',
+    id: 'order-ticket',
     title: 'Order ticket',
     subtitle: 'Live quotes',
     hint: 'Start the stream and type a limit price in the order ticket.',
     group: 'Advanced',
   },
   {
-    id: 'navigation',
+    id: 'instrument-switch',
     title: 'Instrument switch',
     subtitle: 'Navigation',
     hint: 'Each instrument page shows details, price history, order book and news. Switch between instruments.',
@@ -89,7 +89,7 @@ export const CASES: Case[] = [
     hasTimings: true,
   },
   {
-    id: 'export',
+    id: 'trade-export',
     title: 'Trade export',
     subtitle: 'CSV download',
     hint: 'Back office exports every trade for the year as a CSV file. Type a comment while the export runs.',
@@ -97,7 +97,7 @@ export const CASES: Case[] = [
     hasTimings: true,
   },
   {
-    id: 'reconnect',
+    id: 'live-feed',
     title: 'Live feed',
     subtitle: 'Connection health',
     hint: 'NVDA price from the live feed. Use Simulate sleep, Wake up and Restart server.',

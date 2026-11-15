@@ -96,7 +96,7 @@ export class FeedClient {
 
   private trackQuoteGap() {
     const now = performance.now();
-    if (this.lastQuoteAt && now - this.lastQuoteAt > QUOTE_GAP) measureSince('reconnect', 'no quotes', this.lastQuoteAt);
+    if (this.lastQuoteAt && now - this.lastQuoteAt > QUOTE_GAP) measureSince('live-feed', 'no quotes', this.lastQuoteAt);
     this.lastQuoteAt = now;
   }
 

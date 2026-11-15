@@ -1,15 +1,15 @@
 import { memo, useCallback, useEffect, useState } from 'react';
-import { AdvancedLab } from './advanced/AdvancedLab';
+import { AdvancedLab } from './lab/AdvancedLab';
 import type { OverviewResponse } from './api/client';
 import { WifiOff } from 'lucide-react';
-import { ActivityPanel } from './components/activity/ActivityPanel';
-import { ChartPanel } from './components/chart/ChartPanel';
-import { Footer } from './components/layout/Footer';
-import { Ticker } from './components/layout/Ticker';
-import { TopBar } from './components/layout/TopBar';
-import { MarketNews } from './components/news/MarketNews';
-import { OrderBook } from './components/order-book/OrderBook';
-import { Watchlist } from './components/watchlist/Watchlist';
+import { ActivityPanel } from './terminal/activity/ActivityPanel';
+import { ChartPanel } from './terminal/chart/ChartPanel';
+import { Footer } from './terminal/layout/Footer';
+import { Ticker } from './terminal/layout/Ticker';
+import { TopBar } from './terminal/layout/TopBar';
+import { MarketNews } from './terminal/news/MarketNews';
+import { OrderBook } from './terminal/order-book/OrderBook';
+import { Watchlist } from './terminal/watchlist/Watchlist';
 import { useMarketData } from './hooks/useMarketData';
 import { useQuoteStream } from './hooks/useQuoteStream';
 import { ADVANCED_CASES, caseById, isAdvanced } from './lab/cases';
@@ -72,9 +72,9 @@ export default function App() {
     <ModesContext.Provider value={modes}>
       <div className={`app-shell ${labOpen ? 'with-lab' : ''}`}>
         <TopBar
-          advancedOpen={advanced !== null}
+          isWorkspaceOpen={advanced !== null}
           onTerminal={backToTerminal}
-          onAdvanced={() => openCase(ADVANCED_CASES[0])}
+          onWorkspaces={() => openCase(ADVANCED_CASES[0])}
           labOpen={labOpen}
           onToggleLab={() => setLabOpen((v) => !v)}
         />

@@ -30,7 +30,7 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
     setProgress(0);
     setResult(null);
     setError('');
-    const endTiming = startTiming('export', 'trade export');
+    const endTiming = startTiming('trade-export', 'trade export');
     const next = new Worker(new URL('./export.worker.ts', import.meta.url), { type: 'module' });
     worker.current = next;
     next.onmessage = (event: MessageEvent<ExportMessage>) => {
@@ -60,7 +60,7 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
 
   return (
     <>
-      <div className="advanced-controls">
+      <div className="workspace-controls">
         {children}
         <button disabled={busy} onClick={start}>
           Export CSV

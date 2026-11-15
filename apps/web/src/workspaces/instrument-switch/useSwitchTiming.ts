@@ -9,12 +9,12 @@ export function useSwitchTiming(symbol: string) {
   const target = useRef(symbol);
   const ready = useRef(new Set<Section>());
   const end = useRef<(() => void) | null>(null);
-  end.current ??= startTiming('navigation', `instrument ${symbol}`);
+  end.current ??= startTiming('instrument-switch', `instrument ${symbol}`);
 
   const begin = useCallback((next: string) => {
     target.current = next;
     ready.current = new Set();
-    end.current = startTiming('navigation', `instrument ${next}`);
+    end.current = startTiming('instrument-switch', `instrument ${next}`);
   }, []);
 
   const onReady = useMemo(

@@ -109,7 +109,7 @@ export function LabPanel({
                   )}
                   {active && <p className="scenario-hint">{scenario.hint}</p>}
                   {active && scenario.group === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
-                  {scenario.id === 'loading' && (
+                  {scenario.id === 'overview' && (
                     <div className="experiment-controls">
                       <label>
                         Response
@@ -131,12 +131,12 @@ export function LabPanel({
                         Open case
                       </button>
                     )}
-                    {scenario.id === 'shift' && (
+                    {scenario.id === 'bulletin' && (
                       <button className="replay" onClick={onReplayBulletin}>
                         <RotateCcw size={15} /> Replay bulletin
                       </button>
                     )}
-                    {scenario.id === 'loading' && (
+                    {scenario.id === 'overview' && (
                       <button className="replay" onClick={onReloadOverview}>
                         <RefreshCcw size={15} /> Reload overview
                       </button>

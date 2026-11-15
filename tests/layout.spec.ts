@@ -71,7 +71,7 @@ for (const largePrice of [false, true]) {
 test('Sidebar controls and actions stay separated and aligned', async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 800 });
   await page.goto('/');
-  const overview = page.locator('[data-scenario="loading"]');
+  const overview = page.locator('[data-scenario="overview"]');
   await overview.scrollIntoViewIfNeeded();
   const layout = await overview.evaluate((root) => {
     const bounds = root.getBoundingClientRect();

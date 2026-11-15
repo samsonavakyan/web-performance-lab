@@ -8,7 +8,7 @@ const prices = new Map<string, number>();
 let timer: number | undefined;
 
 function tick() {
-  timed('leak', 'quote tick', () => {
+  timed('instrument-monitor', 'quote tick', () => {
     for (const [symbol, set] of listeners) {
       const price = (prices.get(symbol) ?? 100) * (1 + (Math.random() - 0.5) * 0.004);
       prices.set(symbol, price);

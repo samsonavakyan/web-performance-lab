@@ -22,7 +22,7 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
     setRunning(true);
     setResult(null);
     setError('');
-    const endTiming = startTiming('export', 'trade export');
+    const endTiming = startTiming('trade-export', 'trade export');
     try {
       const response = await fetch(`/api/lab/trades?count=${count}`);
       if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
@@ -41,7 +41,7 @@ export function ExportPanel({ count, save, onBusyChange, children }: ExportProps
 
   return (
     <>
-      <div className="advanced-controls">
+      <div className="workspace-controls">
         {children}
         <button disabled={busy} onClick={start}>
           Export CSV

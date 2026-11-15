@@ -23,9 +23,9 @@ export function MarketOverview({ reload, response }: Props) {
     setData(null);
     setError('');
     setDetails('');
-    const endTiming = startTiming('loading', 'overview');
+    const endTiming = startTiming('overview', 'overview');
     api
-      .overviewSummary(controller.signal, response)
+      .overview(controller.signal, response)
       .then((result) => {
         if (!active) return;
         endTiming();
