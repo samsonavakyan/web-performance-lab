@@ -1318,34 +1318,56 @@ a {
 }
 .case-brief {
   display: grid;
-  gap: 12px;
+  gap: 6px;
   margin-top: 12px;
   font-size: 13px;
   line-height: 1.55;
 }
-.case-complaint {
-  margin: 0;
-  padding: 8px 12px;
-  border-left: 3px solid var(--text);
+.case-toggle {
+  border: 1px solid var(--border);
+  border-radius: 4px;
   background: var(--surface);
-  border-radius: 0 4px 4px 0;
 }
-.case-complaint figcaption,
-.case-steps strong {
-  display: block;
-  margin-bottom: 2px;
+.case-toggle summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--muted);
+  cursor: pointer;
+  list-style: none;
 }
-.case-complaint blockquote {
-  margin: 0;
+.case-toggle summary::-webkit-details-marker {
+  display: none;
+}
+.case-toggle summary::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+.case-toggle[open] summary::before {
+  transform: rotate(45deg);
+}
+.case-toggle summary:hover {
   color: var(--text);
 }
-.case-steps p {
+.case-toggle blockquote,
+.case-toggle p {
   margin: 0;
+  padding: 0 10px 9px 22px;
+}
+.case-toggle blockquote {
+  color: var(--text);
+}
+.case-toggle p {
   color: var(--muted);
 }
 .lab-stream {

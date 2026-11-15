@@ -109,14 +109,14 @@ export function LabPanel({
                   )}
                   {active && (
                     <div className="case-brief">
-                      <figure className="case-complaint">
-                        <figcaption>{scenario.complaint.from}</figcaption>
+                      <details className="case-toggle" open>
+                        <summary>Complaint · {scenario.complaint.from}</summary>
                         <blockquote>{scenario.complaint.text}</blockquote>
-                      </figure>
-                      <div className="case-steps">
-                        <strong>Reproduce</strong>
+                      </details>
+                      <details className="case-toggle">
+                        <summary>Reproduce</summary>
                         <p>{scenario.steps}</p>
-                      </div>
+                      </details>
                     </div>
                   )}
                   {active && scenario.group === 'Advanced' && <div className="lab-slot" ref={setLabSlot} />}
